@@ -1,25 +1,16 @@
-%Create map
+filePath = fullfile(fileparts(which('PathPlanningExample')),'data','exampleMaps.mat');
+load(filePath)
 map = robotics.BinaryOccupancyGrid(50,10,30);
-%Buoy coordinates
 xy = [3 2; 8 5; 13 7; 20 1; 25 8; 32 6; 38 3; 40 9; 42 4; 23 2; 28 5; 33 7];
-%Set as obstacles
 setOccupancy(map, xy, 1);
-%Robot radius
 robotRadius = 0.5;
-%Variable for inflating map
 mapInflated = copy(map);
-%Radius to inflate the map
 inflate(mapInflated,0.3);
-%Probabilistic roadmap
 prm = robotics.PRM
-%Map to apply the PRM
 prm.Map = mapInflated;
-%Position 1
 startLocation = [3 3];
-%Position 2
 endLocation = [47 7];
-%Number of points to start the prm
-prm.NumNodes = 2;
+prm.NumNodes = 25;
 
 % Search for a solution between start and end location.
 path = findpath(prm, startLocation, endLocation);
@@ -28,18 +19,14 @@ while isempty(path)
     update(prm);
     path = findpath(prm, startLocation, endLocation);
 end
-%Display map
-figure(9)
-show(mapInflated)
+
 % Display path
 path
 figure(1)
 show(prm)
 
-%Path array
 [r c] = size(path)
 
-%input of velocities, accelerations and times - initial and final
 d = input(' initial data = [v0, ac0, v1, ac1, t0, tf] = ')
 tf = 0;
 dt = 0;
@@ -53,7 +40,6 @@ for y = 0:(r-2)
    dt = dt + dr;
 end
 
-%
 for x = 0:(r-2)
 
 q0x = path(x+1,1); v0 = d(1); ac0 = d(2);
