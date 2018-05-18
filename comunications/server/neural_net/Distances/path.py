@@ -4,7 +4,5 @@ def receive(values):
 
 
 def get_distances(rois):
-	print '[%s]' % ', '.join(map(str, rois))
-	return True
-
-
+    print('[%s]' % ', '.join(map(str, rois)))
+    return True
