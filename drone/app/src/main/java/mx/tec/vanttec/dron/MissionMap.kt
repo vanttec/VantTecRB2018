@@ -37,7 +37,7 @@ class MissionMap(private val fragmentManager: FragmentManager) : GoogleMap.OnMap
                 // Do nothing
             }
         }
-    }.publish()
+    }.publish()!!
 
     init {
         waypointObservable.connect()
