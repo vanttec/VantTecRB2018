@@ -7,12 +7,21 @@ from Distances import get_distances
 TIME_DIVIDER = 10.0
 MAX_TIME = 30
 
+def generate_data():
+    result = []
+    for i in range(10):
+        x1 = randint(1, 50)
+        y1 = randint(50, 100)
+        x2 = randint(50, 100)
+        y2 = randint(1, 50)
+        result.append([x1, y1, x2, y2])
+    return result
+
 def call():
     '''Realiza llamadas a codigo de red neuronal en C y pasa datos a codigo path.py'''
     # https://pexpect.readthedocs.io/en/stable/overview.html
     # Spawn process to call neural net
     # child = popen_spawn.PopenSpawn('./a.out')
-    counter = 1
     start_time = time.time()
     while (time.time() - start_time) < MAX_TIME:
         # Expect outputs
@@ -24,11 +33,6 @@ def call():
         # NOTE x1 < x2, y1 > y2
         # random sleep time for testing
         time.sleep(randint(1, 10) / TIME_DIVIDER)
-        x1 = randint(1, 50)
-        y1 = randint(50, 100)
-        x2 = randint(50, 100)
-        y2 = randint(1, 50)
-        get_distances([counter, x1, y1, x2, y2])
-        counter += 1
+        get_distances(generate_data())
 
 call()
