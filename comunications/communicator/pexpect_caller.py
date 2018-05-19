@@ -17,19 +17,36 @@ def generate_data():
         result.append([x1, y1, x2, y2])
     return result
 
+def parse_data(data):
+    '''Parse data from string to get coordinates in float values'''
+    start_index = data.find("(")
+    # Cut last 2 characters of data ")}"
+    values = data[start_index:-2]
+    coordinates = values.split(",")
+    # Parse to float the coordinate values
+    float_values = list(map(lambda x: float(x), coordinates))
+    return float_values
+
+
 def call():
     '''Realiza llamadas a codigo de red neuronal en C y pasa datos a codigo path.py'''
     # https://pexpect.readthedocs.io/en/stable/overview.html
     # Spawn process to call neural net
-    # child = popen_spawn.PopenSpawn('./a.out')
-    start_time = time.time()
+    # child = pexpect.spawn('./darknet') or pexpect.spawn('python darknet.py')
+    # Skip first 31 lines of output
+    # counter = 0
+    # while counter < 31:
+    #     child.expect('.*')
+    #     counter += 1
+    # Expected output from darknet: {b, 0.583, (2.5, 30.58, 78.5, 4.78)}
+    start_time = time.time() # Use this for simulation of time
     while (time.time() - start_time) < MAX_TIME:
         # Expect outputs
         # child.expect('.*')
         # Print for debugging
         # print(child.after.decode("utf-8"), end='')
         # TODO Parse data of child.after
-        # data = child.after.decode("utf-8")
+        # data = parse_data(child.after.decode("utf-8"))
         # NOTE x1 < x2, y1 > y2
         # random sleep time for testing
         time.sleep(randint(1, 10) / TIME_DIVIDER)
