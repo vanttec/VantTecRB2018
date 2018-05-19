@@ -21,7 +21,7 @@ def parse_data(data):
     '''Parse data from string to get coordinates in float values'''
     start_index = data.find("(")
     # Cut last 2 characters of data ")}"
-    values = data[start_index:-2]
+    values = data[(start_index + 1):-2]
     coordinates = values.split(",")
     # Parse to float the coordinate values
     float_values = list(map(lambda x: float(x), coordinates))
