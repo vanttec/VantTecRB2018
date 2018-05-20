@@ -38,6 +38,7 @@ def call():
     # counter = 0
     # while counter < 31:
     #     child.expect('.*')
+    #     print(child.after.decode("utf-8"), end='')
     #     counter += 1
     # Expected output from darknet: "{b, 0.583, (2.5, 30.58, 78.5, 4.78)}"
     start_time = time.time() # Use this for simulation of time
