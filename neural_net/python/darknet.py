@@ -154,5 +154,3 @@ if __name__ == "__main__":
         #r = detect(net, meta, "sample_img/1.jpg")
         r = detect(net, meta, image)
         print r
-    
-
