@@ -11,10 +11,10 @@ def generate_data():
     '''Funcion para generar coordenadas aleatorias de objetos'''
     result = []
     for i in range(10):
-        x1 = round(randint(1, 50) * 1.0 + randint(0, 100) / 100.00, 2)
-        y1 = round(randint(50, 100) * 1.0 + randint(0, 100) / 100.00, 2)
-        x2 = round(randint(50, 100) * 1.0 + randint(0, 100) / 100.00, 2)
-        y2 = round(randint(1, 50) * 1.0 + randint(0, 100) / 100.00, 2)
+        x1 = randint(1, 50)
+        y1 = randint(50, 100)
+        x2 = randint(50, 100)
+        y2 = randint(1, 50)
         result.append([x1, y1, x2, y2])
     return result
 
@@ -25,7 +25,7 @@ def parse_data(data):
     values = data[(start_index + 1):-2]
     coordinates = values.split(",")
     # Parse to float the coordinate values
-    float_values = list(map(float, coordinates))
+    float_values = list(map(int, coordinates))
     return float_values
 
 
