@@ -8,10 +8,10 @@ show you the results of the algorithm.
 """
 
 
-import Image
+#import Image
 import random
 import os
-import pygame, sys
+import  sys
 import cv2
 import numpy as np
 from PIL import Image
@@ -150,7 +150,7 @@ class Kmeans(object):
 
             self.oldClusters = [cluster.centroid for cluster in self.clusters]
 
-            print iterations
+            print(iterations)
 
             for pixel in self.pixels:
                 self.assignClusters(pixel)
@@ -328,8 +328,8 @@ def getColor(fn,left,upper,right,lower):
 	upper = centroidy - shiftleft
 	lower = centroidy + shiftleft
 	print(left,upper,right,lower)
-	print centroidx
-	print centroidy
+	print(centroidx)
+	print(centroidy)
 
 	#Crop ROI 
 	image_obj = Image.open(fn)
@@ -339,7 +339,7 @@ def getColor(fn,left,upper,right,lower):
 	#Run Kmeans
 	k = Kmeans()
 	result = k.run(cropped_image)
-	print result
+	print(result)
 
 
 
