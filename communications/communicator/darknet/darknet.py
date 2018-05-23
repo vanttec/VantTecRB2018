@@ -43,7 +43,7 @@ class METADATA(Structure):
                 ("names", POINTER(c_char_p))]
 
 
-lib = CDLL("/home/vantec/Documents/VantTecRB2018/darknet/libdarknet.so", RTLD_GLOBAL)
+lib = CDLL("/home/vantec/Documents/VantTecRB2018/communications/communicator/darknet/libdarknet.so", RTLD_GLOBAL)
 lib.network_width.argtypes = [c_void_p]
 lib.network_width.restype = c_int
 lib.network_height.argtypes = [c_void_p]

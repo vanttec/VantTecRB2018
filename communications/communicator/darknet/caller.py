@@ -3,6 +3,8 @@ import pexpect
 from pexpect import popen_spawn
 from random import randint
 from distances import get_distances
+from subprocess import Popen, PIPE, STDOUT
+import sys
 
 TIME_DIVIDER = 10.0
 MAX_TIME = 30
@@ -56,4 +58,34 @@ def call():
         distances = get_distances(generate_data())
         print(distances)
 
-call()
+def caller():
+    print('holaaa')
+    child = pexpect.spawn('python darknet.py')
+    counter = 0
+    while counter < 35:
+        child.expect('.*')
+        print(child.after.decode("utf-8"), end='')
+        counter += 1
+    child.expect('.*')
+    print(child.after.decode("utf-8"), end='')
+
+
+def subcaller():
+    child = Popen(
+        [sys.executable, '-u', 'darknet.py'],
+        stdin=PIPE,
+        stdout=PIPE,
+        bufsize=1,
+        universal_newlines=True)
+
+    commandlist = ['alberca_4_augmente.jpg']
+    for command in commandlist:
+        print('From PIPE: Q:', child.stdout.readline().rstrip('\n'))
+        print(command, file=child.stdin)
+        #### child.stdin.flush()
+        if command != 'Exit':
+            print('From PIPE: A:', child.stdout.readline().rstrip('\n'))
+    child.stdin.close()  # no more input
+    assert not child.stdout.read()  # should be empty
+    child.stdout.close()
+    child.wait()
