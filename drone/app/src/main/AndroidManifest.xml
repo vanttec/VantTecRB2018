@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mx.tec.vanttec.dron">
 
+    <!-- Permissions and features -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -25,6 +26,7 @@
     <uses-feature
         android:name="android.hardware.usb.accessory"
         android:required="true" />
+    <!-- Permissions and features -->
 
     <application
         android:name=".DJIApplication"

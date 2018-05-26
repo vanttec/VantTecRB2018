@@ -14,16 +14,16 @@
         android:background="@android:color/background_dark"
         app:layout_constraintTop_toTopOf="parent">
 
-        <dji.ui.widget.BatteryWidget
+        <dji.ux.widget.BatteryWidget
             android:layout_width="wrap_content"
             android:layout_height="24dp"
             custom:excludeView="singleVoltage|doubleVoltage" />
 
-        <dji.ui.widget.RemoteControlSignalWidget
+        <dji.ux.widget.RemoteControlSignalWidget
             android:layout_width="46dp"
             android:layout_height="24dp" />
 
-        <dji.ui.widget.GPSSignalWidget
+        <dji.ux.widget.GPSSignalWidget
             android:layout_width="wrap_content"
             android:layout_height="24dp" />
 
