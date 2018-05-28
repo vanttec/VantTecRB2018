@@ -14,23 +14,31 @@ android {
         versionName "2.0"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        ndk {
+            abiFilters 'armeabi-v7a', 'x86', 'arm64-v8a'
         }
     }
 
-    packagingOptions {
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+
+    packagingOptions{
+        doNotStrip "*/*/libdjivideo.so"
+        doNotStrip "*/*/libSDKRelativeJNI.so"
+        doNotStrip "*/*/libFlyForbid.so"
+        doNotStrip "*/*/libduml_vision_bokeh.so"
+        doNotStrip "*/*/libyuv2.so"
+        doNotStrip "*/*/libGroudStation.so"
+        doNotStrip "*/*/libFRCorkscrew.so"
+        doNotStrip "*/*/libUpgradeVerify.so"
+        doNotStrip "*/*/libFR.so"
         exclude 'META-INF/rxjava.properties'
     }
 
-    //Mention in the doc
-    dexOptions {
-        preDexLibraries = false
-        javaMaxHeapSize "4g" // 2g should be also OK
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -40,21 +48,25 @@ dependencies {
     compileOnly 'com.dji:dji-sdk-provided:4.5.1'
 
     implementation 'com.android.support:support-v4:27.1.1'
-    implementation 'com.dji:dji-sdk:4.5.1'
-    implementation 'com.dji:dji-uxsdk:4.5.1'
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    api 'com.dji:dji-sdk:4.5.1'
+    implementation 'com.dji:dji-uxsdk:4.5.1'
     implementation 'com.google.android.gms:play-services-maps:15.0.1'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
     implementation 'io.reactivex.rxjava2:rxjava:2.1.13'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'org.tensorflow:tensorflow-android:1.5.0-rc1'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':opencv')
 }
 
 repositories {
+    flatDir {
+        dirs 'libs'
+    }
+
     mavenCentral()
 }

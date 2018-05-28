@@ -32,8 +32,6 @@ class SDKManagerCallback : SDKManagerCallback, ObservableOnSubscribe<BaseProduct
     override fun onProductChange(oldProduct: BaseProduct?, newProduct: BaseProduct?) {
         if(newProduct != null)
             observableEmitter?.onNext(newProduct)
-        else
-            observableEmitter?.onError(Exception("Product disconnected"))
     }
 
     override fun subscribe(emitter: ObservableEmitter<BaseProduct>) {
