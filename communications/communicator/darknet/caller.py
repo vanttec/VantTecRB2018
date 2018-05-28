@@ -5,6 +5,10 @@ from random import randint
 from distances import get_distances
 from subprocess import Popen, PIPE, STDOUT
 import sys
+from os.path import dirname, abspath
+
+local_dir = abspath(dirname(__file__))
+sys.path.append(local_dir)
 
 TIME_DIVIDER = 10.0
 MAX_TIME = 30
@@ -72,20 +76,23 @@ def caller():
 
 def subcaller():
     child = Popen(
-        [sys.executable, '-u', 'darknet.py'],
+        ['python darknet.py'],
         stdin=PIPE,
         stdout=PIPE,
         bufsize=1,
-        universal_newlines=True)
+        universal_newlines=True,
+        shell=True)
 
-    commandlist = ['alberca_4_augmente.jpg']
-    for command in commandlist:
-        print('From PIPE: Q:', child.stdout.readline().rstrip('\n'))
-        print(command, file=child.stdin)
-        #### child.stdin.flush()
-        if command != 'Exit':
-            print('From PIPE: A:', child.stdout.readline().rstrip('\n'))
+    # commandlist = ['alberca_4_augmente.jpg']
+    # for command in commandlist:
+    print('From PIPE:', child.stdout.readline().rstrip('\n'))
+    # print(command, file=child.stdin)
+    #### child.stdin.flush()
+    # if command != 'Exit':
+    #     print('From PIPE: A:', child.stdout.readline().rstrip('\n'))
     child.stdin.close()  # no more input
     assert not child.stdout.read()  # should be empty
     child.stdout.close()
     child.wait()
+
+subcaller()

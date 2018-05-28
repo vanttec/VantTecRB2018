@@ -150,7 +150,7 @@ if __name__ == "__main__":
     meta = load_meta("vantec_cfg/obj.data")
 
     while True:
-        image = raw_input("Enter image to test: ")
+        image = input("Enter image to test: ")
         #r = detect(net, meta, "sample_img/1.jpg")
         r = detect(net, meta, image)
-        print r
+        print(r)
