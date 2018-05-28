@@ -85,14 +85,5 @@ def subcaller():
 
     # commandlist = ['alberca_4_augmente.jpg']
     # for command in commandlist:
-    print('From PIPE:', child.stdout.readline().rstrip('\n'))
-    # print(command, file=child.stdin)
-    #### child.stdin.flush()
-    # if command != 'Exit':
-    #     print('From PIPE: A:', child.stdout.readline().rstrip('\n'))
-    child.stdin.close()  # no more input
-    assert not child.stdout.read()  # should be empty
-    child.stdout.close()
-    child.wait()
 
 subcaller()
