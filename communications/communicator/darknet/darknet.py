@@ -149,6 +149,5 @@ if __name__ == "__main__":
     net = load_net("vantec_cfg/yolo-vantec.cfg", "vantec_cfg/yolo-vantec.weights", 0)
     meta = load_meta("vantec_cfg/obj.data")
 
-    while True:
-        r = detect(net, meta, "alberca_4_augmented.jpg")
-        print(r)
+    r = detect(net, meta, "alberca_4_augmented.jpg")
+    print(r)
