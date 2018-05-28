@@ -150,4 +150,4 @@ if __name__ == "__main__":
     meta = load_meta("vantec_cfg/obj.data")
 
     r = detect(net, meta, "alberca_4_augmented.jpg")
-    print(r)
+    return r

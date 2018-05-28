@@ -62,17 +62,6 @@ def call():
         distances = get_distances(generate_data())
         print(distances)
 
-def caller():
-    print('holaaa')
-    child = pexpect.spawn('python darknet.py')
-    counter = 0
-    while counter < 35:
-        child.expect('.*')
-        print(child.after.decode("utf-8"), end='')
-        counter += 1
-    child.expect('.*')
-    print(child.after.decode("utf-8"), end='')
-
 
 def subcaller():
     child = Popen(
@@ -82,8 +71,10 @@ def subcaller():
         bufsize=1,
         universal_newlines=True,
         shell=True)
-
-    # commandlist = ['alberca_4_augmente.jpg']
-    # for command in commandlist:
+    try:
+        outs, errs = proc.communicate(timeout=15)
+    except TimeoutExpired:
+        proc.kill()
+        outs, errs = proc.communicate()
 
 subcaller()
