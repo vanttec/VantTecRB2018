@@ -139,15 +139,16 @@ def detect(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45):
     free_image(im)
     free_detections(dets, num)
     return res
+
+net = load_net("vantec_cfg/yolo-vantec.cfg", "vantec_cfg/yolo-vantec.weights", 0)
+meta = load_meta("vantec_cfg/obj.data")
     
-if __name__ == "__main__":
+def execute():
     #net = load_net("cfg/densenet201.cfg", "/home/pjreddie/trained/densenet201.weights", 0)
     #im = load_image("data/wolf.jpg", 0, 0)
     #meta = load_meta("cfg/imagenet1k.data")
     #r = classify(net, meta, im)
     #print r[:10]
-    net = load_net("vantec_cfg/yolo-vantec.cfg", "vantec_cfg/yolo-vantec.weights", 0)
-    meta = load_meta("vantec_cfg/obj.data")
 
     r = detect(net, meta, "alberca_4_augmented.jpg")
     return r
