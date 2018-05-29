@@ -32,19 +32,11 @@ def call():
     start_time = time.time() # Use this for simulation of time
     print('-------DATOS DARKNET------')
     while (time.time() - start_time) < MAX_TIME:
-        # Expect outputs
-        # child.expect('.*')
-        # Print for debugging
-        # print(child.after.decode("utf-8"), end='')
-        # Parse data string of child.after
-        # data = parse_data(child.after.decode("utf-8"))
-        # NOTE x1 < x2, y1 > y2
-        # random sleep time for testing
         data = execute_test()
         data = parse_data(data)
-        #print(data)
+        # print(data)
         distances = get_distances(data)
-        print(distances)
+        # print(distances)
         time.sleep(randint(1, 5) / TIME_DIVIDER)
 
 call()
