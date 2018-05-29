@@ -1,6 +1,6 @@
 import time
 from random import randint
-from distances import get_distances
+# from distances import get_distances
 from darknet import execute
 
 TIME_DIVIDER = 10.0
@@ -18,6 +18,15 @@ def generate_data():
         result.append([identifier, x1, y1, x2, y2])
     return result
 
+def parse_data(data):
+    results = []
+    for val in data:
+        if val[0] == 'b':
+            results.append([1, val[2][0], val[2][1], val[2][2], val[2][3]])
+        else:
+            results.append([0, val[2][0], val[2][1], val[2][2], val[2][3]])
+    return results
+
 def call():
     '''Realiza llamadas a codigo de red neuronal en C y pasa datos a codigo path.py'''
     start_time = time.time() # Use this for simulation of time
@@ -31,9 +40,9 @@ def call():
         # NOTE x1 < x2, y1 > y2
         # random sleep time for testing
         data = execute()
-        print(data)
-        time.sleep(randint(1, 10) / TIME_DIVIDER)
-        # distances = get_distances(generate_data())
+        data = parse_data(data)
+        # distances = get_distances(data)
         # print(distances)
+        time.sleep(randint(1, 10) / TIME_DIVIDER)
 
 call()
