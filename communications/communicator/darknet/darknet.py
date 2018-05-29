@@ -145,7 +145,7 @@ net = load_net("vantec_cfg/yolo-vantec.cfg", "vantec_cfg/yolo-vantec.weights", 0
 meta = load_meta("vantec_cfg/obj.data")
 
 def execute():
-    cap = VideoCapture(0)
+    cap = VideoCapture(1)
     ret, frame = cap.read()
     height, width, channels = frame.shape
     cap.release()
