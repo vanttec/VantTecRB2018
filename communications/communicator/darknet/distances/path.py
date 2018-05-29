@@ -14,7 +14,7 @@ import os
 import  sys
 import cv2
 import numpy as np
-import Image
+from PIL import Image
 from glob import glob
 from datetime  import datetime
 from skimage import io, color,exposure

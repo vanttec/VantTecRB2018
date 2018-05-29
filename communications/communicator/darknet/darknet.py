@@ -1,9 +1,7 @@
 from ctypes import *
 import math
 import random
-
 from cv2 import *
-import cv2
 
 def sample(probs):
     s = sum(probs)
@@ -146,9 +144,8 @@ def detect(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45):
 net = load_net("vantec_cfg/yolo-vantec.cfg", "vantec_cfg/yolo-vantec.weights", 0)
 meta = load_meta("vantec_cfg/obj.data")
 
-cap = cv2.VideoCapture(0)
-
 def execute():
+    cap = VideoCapture(0)
     ret, frame = cap.read()
     height, width, channels = frame.shape
     cap.release()

@@ -4,7 +4,7 @@ from random import randint
 from darknet import execute
 
 TIME_DIVIDER = 10.0
-MAX_TIME = 30
+MAX_TIME = 10
 
 def generate_data():
     '''Funcion para generar coordenadas aleatorias de objetos'''
@@ -30,6 +30,7 @@ def parse_data(data):
 def call():
     '''Realiza llamadas a codigo de red neuronal en C y pasa datos a codigo path.py'''
     start_time = time.time() # Use this for simulation of time
+    print('-------DATOS DARKNET------')
     while (time.time() - start_time) < MAX_TIME:
         # Expect outputs
         # child.expect('.*')
@@ -41,6 +42,7 @@ def call():
         # random sleep time for testing
         data = execute()
         data = parse_data(data)
+        print(data)
         # distances = get_distances(data)
         # print(distances)
         time.sleep(randint(1, 10) / TIME_DIVIDER)
