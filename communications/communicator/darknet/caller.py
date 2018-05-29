@@ -1,7 +1,7 @@
 import time
 from random import randint
-# from distances import get_distances
-from darknet import execute
+from distances import get_distances
+from darknet import execute, execute_test
 
 TIME_DIVIDER = 10.0
 MAX_TIME = 60
@@ -40,11 +40,11 @@ def call():
         # data = parse_data(child.after.decode("utf-8"))
         # NOTE x1 < x2, y1 > y2
         # random sleep time for testing
-        data = execute()
+        data = execute_test()
         data = parse_data(data)
-        print(data)
-        # distances = get_distances(data)
-        # print(distances)
-        time.sleep(randint(1, 10) / TIME_DIVIDER)
+        #print(data)
+        distances = get_distances(data)
+        print(distances)
+        time.sleep(randint(1, 5) / TIME_DIVIDER)
 
 call()

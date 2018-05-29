@@ -160,3 +160,7 @@ def execute():
 
     r = detect(net, meta, "filename.jpg")
     return r
+
+def execute_test():
+    r = detect(net, meta, "alberca_4_augmented.jpg")
+    return r
