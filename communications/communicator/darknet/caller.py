@@ -4,7 +4,7 @@ from random import randint
 from darknet import execute
 
 TIME_DIVIDER = 10.0
-MAX_TIME = 10
+MAX_TIME = 60
 
 def generate_data():
     '''Funcion para generar coordenadas aleatorias de objetos'''
