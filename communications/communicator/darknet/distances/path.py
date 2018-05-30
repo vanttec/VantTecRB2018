@@ -87,7 +87,7 @@ def get_rois_data(rois):
 		#convert angles to radians 
 		radians = angle * 0.0174533
 		#trigonometric functions to get objects in a different position than the center
-		realmeters = meters/cos(radians)  
+		realmeters = meters/math.cos(radians)  
 	  #compute color of the object if needed(posts)
         #-1 means no color, 0 means red , 1 means green
 		#colorofpost = -1  
