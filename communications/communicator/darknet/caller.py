@@ -33,9 +33,12 @@ def call():
     while True:
         data = execute()
         # print(data)
-        data = parse_data(data)
-        # print(data)
-        distances = get_rois_data(data)
-        # print(distances)
+        if len(data):
+            data = parse_data(data)
+            # print(data)
+            distances = get_rois_data(data)
+            # print(distances)
+        else:
+            print('---------Nothing detected------------')
 
 call()

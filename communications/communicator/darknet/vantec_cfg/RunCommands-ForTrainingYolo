@@ -97,6 +97,9 @@ sample_img/50.jpg
 # Run webcam demo for Julo N
 ./darknet detector demo vantec/cfg/obj.data vantec/cfg/yolo-vantec.cfg yolo-vantec.weights
 
+# Laptop
+./darknet detector demo vantec_cfg/obj.data vantec_cfg/yolo-vantec.cfg vantec_cfg/yolo-vantec.weights
+
 
 ###############################
 ######## Tiny-YOLO ############
