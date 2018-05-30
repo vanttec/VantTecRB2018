@@ -53,7 +53,7 @@ def call():
         # NOTE x1 < x2, y1 > y2
         # random sleep time for testing
         time.sleep(randint(1, 10) / TIME_DIVIDER)
-        distances = get_distances(generate_data())
+        distances = get_rois_data(generate_data())
         print(distances)
 
 call()
