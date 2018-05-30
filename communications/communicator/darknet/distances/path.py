@@ -80,7 +80,8 @@ def get_rois_data(rois):
 		#get inches to the object 
 		inches = distance2camera(KNOWN_WIDTH, focalLength, width)
 		#convert inches to meters
-		meters = inches * .0254  
+		meters = inches * .0254 
+		print("Meters before radians are:" + str(meters)) 
 	  #compute angles
 		#args x1,y1,x2,y2
 		angle = angle2camera(rois[i][1],rois[i][2],rois[i][3],rois[i][4])
