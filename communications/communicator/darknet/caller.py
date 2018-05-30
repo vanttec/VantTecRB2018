@@ -32,7 +32,7 @@ def call():
     start_time = time.time() # Use this for simulation of time
     print('-------DATOS DARKNET------')
     while (time.time() - start_time) < MAX_TIME:
-        data = execute_test()
+        data = execute()
         data = parse_data(data)
         # print(data)
         distances = get_distances(data)
