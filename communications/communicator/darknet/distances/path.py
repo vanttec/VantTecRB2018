@@ -1,14 +1,12 @@
-"""MODULES IMPORT."""
+"""	
+	OVER-ALL METHODS DESCRIPTIONS.
 
+	Color detection.- Kmeans clustering algorithm.
+	Distances to objects.- Triangle Similarity for Object/Marker to Camera Distance.
+	Angles to objects.-
 """
-Kmeans clustering algorithm for colour detection in images
-Initialise a kmeans object and then use the run() method.
-Several debugging methods are available which can help to
-show you the results of the algorithm.
-"""
 
-
-#import Image
+# import the necessary packages
 import random
 import os
 import  sys
@@ -21,75 +19,109 @@ from skimage import io, color,exposure
 from skimage.color import rgb2lab,deltaE_cie76
 from matplotlib import pyplot as plt
 
+
 """
-	CONSTANTS.
-	KNOWN_DISTANCE -- Initialize the known distance from the camera to the object, which in this case is 10 inches.
-	KNOWN_WIDTH    -- Initialize the known object width, which in this case, the piece of paper is 11 inches width.
-	FOCAL_VIEW     -- The field of vision of the camera, 78 degrees.
+	KNOWN_DISTANCE -- initialize the known distance from the camera to the object(bouy,inches)
+
+	KNOWN_WIDTH    -- initialize the known object width, which in this case is 15.35 for the competitions bouy.
+					  	https://www.boatfendersdirect.co.uk/products/75-a2-polyform-buoy-20-x-16.html
+
+	FOCAL_VIEW     -- the field of vision of the camera, derived from the diagonal FOV 78 degrees and an aspect ratio of 16:9 : 70.42 degrees. 
+		
+					  	https://stackoverflow.com/questions/25088543/estimate-visible-bounds-of-webcam-using-diagonal-fov?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+					  	http://vrguy.blogspot.com/2013/04/converting-diagonal-field-of-view-and.html
+
+    WIDTH_DIM      -- dimensions of video frame
+						720 x 1280 
 """
 
-KNOWN_DISTANCE = 10.0
-KNOWN_WIDTH = 15.354331
-FOCAL_VIEW = 78.0
- 
+KNOWN_DISTANCE = 78.7402 #10.0   
+KNOWN_WIDTH = 7.87402    #15.354331 
+FOCAL_VIEW = 70.42       
+WIDTH_DIM = 1280      
 
-"""Checks values integrity. If length of parameters of 
-   list equals 5 returns True.
-"""
 
+
+
+# check for values'integrity. return 1 if length of params is the expected.
 def receive(values):
+	
 	if len(values) == 5:
         	return True
 
-"""
-	Performs calculation on each region of interest found on the image (bouys and posts). 
-    Keyword arguments:
-    rois -- List of lists with description values of the ROIS, one ROI list e.g  Object ID,x1,y1,x2,y2.
-    Return -- Distances, Angles, Dominant color of each ROI.
-"""
-def get_distances(rois):
+
+# bouy 1  post 0 [id, x1,y1,x2,y2]
+# performs calculation on each region of interest found on the image (bouys and posts). 
+# param: rois -- list of lists with description values for each roi [ID,x1,y1,x2,y2]
+# return -- distances, angles, dominant color for each roi.
+def get_rois_data(rois):
+
 	
-	print(rois)
+	#create output list of lists
+	if not rois:
+		return False
+	
+	#number of rois
 	rowLength = len(rois)
-	colLength = len(rois[0]) - 1
+	#meters,angles,color
+	colLength = 3 
 	output = [[[0] for i in range(colLength)] for i in range(rowLength)]
-	print(output)
-	focalLength = initializeFocalLength(rois)
+
+	#initialize focal length x2-x1
+	width = int(rois[0][3] - rois[0][1])
+	focalLength = (width * KNOWN_DISTANCE) / KNOWN_WIDTH
 	
+	#iterate through all of the rois row by row.
 	for i in range(len(rois)):
-		width = int(rois[i][3] - rois[i][1])
+	  #compute distances
+		# substract x2 - x1
+		width = int(rois[i][3] - rois[i][1])  
+		#get inches to the object 
 		inches = distance2camera(KNOWN_WIDTH, focalLength, width)
-		angle = angle2camera(rois[i][0],rois[i][1],rois[i][2],rois[i][3])
-		output[i][0] = inches 
-		output[i][1] = angle
-		output[i][2] = 0
-		print ("Distance to object " + str(i) + " is "  +  str(inches)  + " inches.")
-		print ("Angle to object "    + str(i) + " is "  +  str(angle)   + " degrees.")
+		#convert inches to meters
+		meters = inches * .0254  
+	  #compute angles
+		#args x1,y1,x2,y2
+		angle = angle2camera(rois[i][1],rois[i][2],rois[i][3],rois[i][4])
+		#convert angles to radians 
+		radians = angle * 0.0174533
+		#trigonometric functions to get objects in a different position than the center
+		realmeters = meters/cos(radians)  
+	  #compute color of the object if needed(posts)
+        #-1 means no color, 0 means red , 1 means green
+		#colorofpost = -1  
+		#if(rois[0] = 1):
+		#	colorofpost = getColor(rois[i][1],rois[i][2],rois[i][3],rois[i][4],rois[i][5])  
+	  #save results
+		output[i][0] = realmeters 
+		output[i][1] = radians
+		#output[i][2] = colorofpost
+		output[i][2] = 1
+	  #print information for debugging
+		print ("Distance to object " + str(i) + " is "  +  str(realmeters)  + " meters.")
+		print ("Angle to object "    + str(i) + " is "  +  str(radians)   + " radians.")
+		#optional put text in image
 		#cv2.putText(image, str(round(inches,1)), (int(rois[i][2]),int(rois[i][3])), cv2.FONT_HERSHEY_SIMPLEX,.5, (0,0,0) ,1)
+    #return the results
 
 	return output
 	#print("Success")
 
-"""Function to obtain distances."""
+
+# function to obtain distances to rois.
 def distance2camera(C_WIDTH,C_FL,PIX_WIDTH):
 	#Compute and return the distance from the maker to the camera
 	return (C_WIDTH*C_FL)/PIX_WIDTH
 
-""" Initialize  the focal length of the camera."""
-def initializeFocalLength(rois):
 
-	width = int(rois[0][3] - rois[0][1])
-	return (width * KNOWN_DISTANCE) / KNOWN_WIDTH
-
-"""Gets angle to camera"""
+# gets angle to camera
 def angle2camera(x1,y1,x2,y2):
-	pixel = (x1+(x2-x1))/2
-	preangle = (pixel*FOCAL_VIEW)/1280
+	pixel = (x1+(x2-x1))/2  #gets center pixel of roi
+	preangle = (pixel*FOCAL_VIEW)/WIDTH_DIM
 	return 0 - ((FOCAL_VIEW/2) - preangle)
 
-"""
-Print ROI's parameters.
-"""
+
+# print ROI's parameters.
 def prints(rois):
 	
 	for row in rois:
@@ -312,8 +344,7 @@ def ROI(fn):
 
 
 
-def getColor(fn,left,upper,right,lower):
-
+def getColor(left,upper,right,lower,fn):
 
 	original = cv2.imread(fn)
 	print(left,upper,right,lower)
@@ -340,6 +371,7 @@ def getColor(fn,left,upper,right,lower):
 	k = Kmeans()
 	result = k.run(cropped_image)
 	print(result)
+	
 
 
 
