@@ -1,6 +1,6 @@
 import time
 from random import randint
-from distances import get_distances
+from distances import get_rois_data
 from darknet import execute, execute_test
 
 TIME_DIVIDER = 10.0
@@ -35,7 +35,7 @@ def call():
         data = execute_test()
         data = parse_data(data)
         # print(data)
-        distances = get_distances(data)
+        distances = get_rois_data(data)
         # print(distances)
         time.sleep(randint(1, 5) / TIME_DIVIDER)
 
