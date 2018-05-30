@@ -32,10 +32,10 @@ def call():
     print('-------DATOS DARKNET------')
     while True:
         data = execute()
-        # print(data)
+        print(data)
         if len(data):
             data = parse_data(data)
-            # print(data)
+            print(data)
             distances = get_rois_data(data)
             # print(distances)
         else:

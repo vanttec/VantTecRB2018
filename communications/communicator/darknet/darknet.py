@@ -146,7 +146,7 @@ meta = load_meta("vantec_cfg/obj.data")
 
 def execute():
     '''Funcion para tomar fotos y escanear imagen'''
-    cap = VideoCapture(1)
+    cap = VideoCapture(0)
     ret, frame = cap.read()
     height, width, channels = frame.shape
     cap.release()
