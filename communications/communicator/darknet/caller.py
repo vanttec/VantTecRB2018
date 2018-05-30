@@ -29,14 +29,13 @@ def parse_data(data):
 
 def call():
     '''Realiza llamadas a codigo de red neuronal en C y pasa datos a codigo path.py'''
-    start_time = time.time() # Use this for simulation of time
     print('-------DATOS DARKNET------')
-    while (time.time() - start_time) < MAX_TIME:
+    while True:
         data = execute()
+        # print(data)
         data = parse_data(data)
         # print(data)
         distances = get_rois_data(data)
         # print(distances)
-        time.sleep(randint(1, 5) / TIME_DIVIDER)
 
 call()

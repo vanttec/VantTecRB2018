@@ -145,6 +145,7 @@ net = load_net("vantec_cfg/yolo-vantec.cfg", "vantec_cfg/yolo-vantec.weights", 0
 meta = load_meta("vantec_cfg/obj.data")
 
 def execute():
+    '''Funcion para tomar fotos y escanear imagen'''
     cap = VideoCapture(1)
     ret, frame = cap.read()
     height, width, channels = frame.shape
@@ -162,5 +163,6 @@ def execute():
     return r
 
 def execute_test():
+    '''Funcion con imagen de prueba'''
     r = detect(net, meta, "alberca_4_augmented.jpg")
     return r
