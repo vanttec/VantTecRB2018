@@ -36,12 +36,17 @@ from matplotlib import pyplot as plt
 						720 x 1280 
 """
 
+
+
+
+
+WIDTH_DIM, HEIGTH_DIM = im.size()
+MIDDLE_PIX = WIDTH_DIM/2
 KNOWN_DISTANCE = 78.7402 #10.0   
 KNOWN_WIDTH = 7.87402    #15.354331 
 FOCAL_VIEW = 70.42       
-WIDTH_DIM = 1280      
 
-
+APPARENT_WIDTH = 0.0
 
 
 # check for values'integrity. return 1 if length of params is the expected.
@@ -75,33 +80,44 @@ def get_rois_data(rois):
 	#iterate through all of the rois row by row.
 	for i in range(len(rois)):
 	  #compute distances
+
 		# substract x2 - x1
 		width = int(rois[i][3] - rois[i][1])  
 		#get inches to the object 
 		inches = distance2camera(KNOWN_WIDTH, focalLength, width)
+
+		#apparent width of object in meters
+		APPARENT_WIDTH = (PIX_WIDTH*inches)/C_FL
+		APPARENT_WIDTH = APPARENT_WIDTH * .0254
+		print("Apparent object width (meters): " +  str(APPARENT_WIDTH) + " meters")
+		
 		#convert inches to meters
 		meters = inches * .0254 
-		print("Meters before radians are:" + str(meters)) 
+		#print("Meters before radians are:" + str(meters)) 
+
+
 	  #compute angles
 		#args x1,y1,x2,y2
-		angle = angle2camera(rois[i][1],rois[i][2],rois[i][3],rois[i][4])
+		#angle = angle2camera(rois[i][1],rois[i][2],rois[i][3],rois[i][4])
 		#convert angles to radians 
-		radians = angle * 0.0174533
+		#radians = angle * 0.0174533
 		#trigonometric functions to get objects in a different position than the center
-		realmeters = meters/math.cos(radians)  
+		#realmeters = meters/math.cos(radians)  
 	  #compute color of the object if needed(posts)
         #-1 means no color, 0 means red , 1 means green
 		#colorofpost = -1  
 		#if(rois[0] = 1):
 		#	colorofpost = getColor(rois[i][1],rois[i][2],rois[i][3],rois[i][4],rois[i][5])  
 	  #save results
-		output[i][0] = realmeters 
-		output[i][1] = radians
+		output[i][0] = meters 
+		#output[i][0] = realmeters 
+		output[i][1] = 0.0
 		#output[i][2] = colorofpost
 		output[i][2] = 1
 	  #print information for debugging
-		print ("Distance to object " + str(i) + " is "  +  str(realmeters)  + " meters.")
-		print ("Angle to object "    + str(i) + " is "  +  str(radians)   + " radians.")
+		print ("Distance to object " + str(i) + " is "  +  str(meters)  + " meters.")
+		#print ("Distance to object " + str(i) + " is "  +  str(realmeters)  + " meters.")
+		#print ("Angle to object "    + str(i) + " is "  +  str(radians)   + " radians.")
 		#optional put text in image
 		#cv2.putText(image, str(round(inches,1)), (int(rois[i][2]),int(rois[i][3])), cv2.FONT_HERSHEY_SIMPLEX,.5, (0,0,0) ,1)
     #return the results
