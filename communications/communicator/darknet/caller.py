@@ -33,10 +33,27 @@ def parse_data(data):
             results.append([0, val[2][0], val[2][2], val[2][1], val[2][3]])
     return results
 
+<<<<<<< HEAD
 def call(data_calib,images):
     '''Realiza llamadas a codigo de red neuronal en C y pasa datos a codigo path.py'''
+=======
+def obtain_data():
+>>>>>>> 6256ad92366ff80fc57d559a4c12a11590a058ec
     print('-------DATOS DARKNET------')
+    data = execute() #Llama darknet
+    # print(data)
+    if len(data):
+        data = parse_data(data)
+        # print(data)
+        distances = get_rois_data(data) # Obtiene datos de objetos
+        # print(distances)
+    else:
+        print('---------Nothing detected------------')
+
+def main():
+    '''AQUI SE ARMA LA CARNE'''
     while True:
+<<<<<<< HEAD
         data = execute(data_calib,images.pop(0))
         print(data)
         if len(data):
@@ -44,9 +61,24 @@ def call(data_calib,images):
             print(data)
             distances = get_rois_data(data) 
             print(distances)
+=======
+        print("Escribe reto")
+        reto = raw_input()
+        if reto == "navgps":
+            # No usa vision
+            continue
+        elif reto == "autonav":
+            obtain_data()
+        elif reto == "speed":
+            obtain_data()
+        elif reto == "autodock":
+            # No usa vision
+            continue
+>>>>>>> 6256ad92366ff80fc57d559a4c12a11590a058ec
         else:
-            print('---------Nothing detected------------')
+            obtain_data()
 
+<<<<<<< HEAD
 
 def calibration():
     
@@ -113,3 +145,6 @@ print(data_calib)
 images = load_images_from_folder('/home/vantec/Documents/VantTecRB2018/communications/communicator/darknet/Competencia')
 call(data_calib,images)
 
+=======
+main()
+>>>>>>> 6256ad92366ff80fc57d559a4c12a11590a058ec
