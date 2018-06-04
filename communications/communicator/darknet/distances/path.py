@@ -40,12 +40,12 @@ from matplotlib import pyplot as plt
 
 
 
-WIDTH_DIM, HEIGTH_DIM = im.size()
-MIDDLE_PIX = WIDTH_DIM/2
-KNOWN_DISTANCE = 78.7402 #10.0   
+
+#MIDDLE_PIX = WIDTH_DIM/2
+KNOWN_DISTANCE = 74.8 #10.0   
 KNOWN_WIDTH = 7.87402    #15.354331 
 FOCAL_VIEW = 70.42       
-
+focalLength = 627.29   #(width * KNOWN_DISTANCE) / KNOWN_WIDTH
 APPARENT_WIDTH = 0.0
 
 
@@ -56,9 +56,9 @@ def receive(values):
         	return True
 
 
-# bouy 1  post 0 [id, x1,y1,x2,y2]
+# bouy 1  post 0 [id, xc,yc,w,h]
 # performs calculation on each region of interest found on the image (bouys and posts). 
-# param: rois -- list of lists with description values for each roi [ID,x1,y1,x2,y2]
+# param: rois -- list of lists with description values for each roi [id, xc,yc,w,h]
 # return -- distances, angles, dominant color for each roi.
 def get_rois_data(rois):
 
@@ -73,54 +73,65 @@ def get_rois_data(rois):
 	colLength = 3 
 	output = [[[0] for i in range(colLength)] for i in range(rowLength)]
 
-	#initialize focal length x2-x1
-	width = int(rois[0][3] - rois[0][1])
-	focalLength = (width * KNOWN_DISTANCE) / KNOWN_WIDTH
-	
 	#iterate through all of the rois row by row.
 	for i in range(len(rois)):
 	  #compute distances
 
 		# substract x2 - x1
-		width = int(rois[i][3] - rois[i][1])  
+		width = int(rois[i][2]) 
+		print('CALLER DATA') 
+		print('width is' + str(width))
 		#get inches to the object 
 		inches = distance2camera(KNOWN_WIDTH, focalLength, width)
 
-		#apparent width of object in meters
-		APPARENT_WIDTH = (PIX_WIDTH*inches)/C_FL
+		APPARENT_WIDTH = (width*inches)/focalLength
 		APPARENT_WIDTH = APPARENT_WIDTH * .0254
-		print("Apparent object width (meters): " +  str(APPARENT_WIDTH) + " meters")
-		
+		print("Apparent object width (meters): " + str(APPARENT_WIDTH) + " meters")
 		#convert inches to meters
 		meters = inches * .0254 
 		#print("Meters before radians are:" + str(meters)) 
 
 
-	  #compute angles
-		#args x1,y1,x2,y2
-		#angle = angle2camera(rois[i][1],rois[i][2],rois[i][3],rois[i][4])
-		#convert angles to radians 
-		#radians = angle * 0.0174533
-		#trigonometric functions to get objects in a different position than the center
-		#realmeters = meters/math.cos(radians)  
+	    #compute angles
+		#args [id, xc,yc,w,h]
+		ANGLE_PER_PIXEL = 78/math.sqrt(480**2 + 640**2) 
+		difference = 320 - (rois[i][1])
+
+		if difference == 0:
+			angle = 0
+
+		elif difference < 0:
+			angle = ANGLE_PER_PIXEL * abs(difference)
+		elif difference > 0:
+			angle = -(ANGLE_PER_PIXEL * difference)
+	   
+		angle = angle * 0.0174533
+		y = meters
+		h = abs(y / math.cos(angle))
+		x = math.sin(abs(angle)) * h
+		if angle == 0:
+			x = 0
+		elif angle < 0:
+			if x > 0: 	
+				x = -x
+		elif angle > 0:
+			x = abs(x)
+		
+		coords = (x,y,h)
+
+		angle = angle / 0.0174533
 	  #compute color of the object if needed(posts)
         #-1 means no color, 0 means red , 1 means green
 		#colorofpost = -1  
 		#if(rois[0] = 1):
 		#	colorofpost = getColor(rois[i][1],rois[i][2],rois[i][3],rois[i][4],rois[i][5])  
 	  #save results
-		output[i][0] = meters 
+		#output[i][0] = meters 
+		output[i][0] = coords
 		#output[i][0] = realmeters 
-		output[i][1] = 0.0
+		output[i][1] = angle
 		#output[i][2] = colorofpost
 		output[i][2] = 1
-	  #print information for debugging
-		print ("Distance to object " + str(i) + " is "  +  str(meters)  + " meters.")
-		#print ("Distance to object " + str(i) + " is "  +  str(realmeters)  + " meters.")
-		#print ("Angle to object "    + str(i) + " is "  +  str(radians)   + " radians.")
-		#optional put text in image
-		#cv2.putText(image, str(round(inches,1)), (int(rois[i][2]),int(rois[i][3])), cv2.FONT_HERSHEY_SIMPLEX,.5, (0,0,0) ,1)
-    #return the results
 
 	return output
 	#print("Success")
@@ -129,7 +140,13 @@ def get_rois_data(rois):
 # function to obtain distances to rois.
 def distance2camera(C_WIDTH,C_FL,PIX_WIDTH):
 	#Compute and return the distance from the maker to the camera
-	return (C_WIDTH*C_FL)/PIX_WIDTH
+	print('KNOWN WIDTH: ' + str(C_WIDTH))
+	print('FOCAL LENGTH: ' + str(C_FL))
+	print('PIX_WIDTH: ' + str(PIX_WIDTH))
+	DISTANCE =  (C_WIDTH*C_FL)/PIX_WIDTH
+	print(str(DISTANCE))
+	print(str(DISTANCE*.0254))
+	return DISTANCE
 
 
 # gets angle to camera
