@@ -69,31 +69,31 @@ def get_rois_data(rois):
 	
 	#number of rois
 	rowLength = len(rois)
-	#meters,angles,color
+	#meters(x,y,h),angle,color
 	colLength = 3 
 	output = [[[0] for i in range(colLength)] for i in range(rowLength)]
 
 	#iterate through all of the rois row by row.
+	#args [id, xc,yc,w,h]
 	for i in range(len(rois)):
 	  #compute distances
 
-		# substract x2 - x1
+	#get width 
 		width = int(rois[i][2]) 
 		print('CALLER DATA') 
-		print('width is' + str(width))
 		#get inches to the object 
 		inches = distance2camera(KNOWN_WIDTH, focalLength, width)
 
-		APPARENT_WIDTH = (width*inches)/focalLength
-		APPARENT_WIDTH = APPARENT_WIDTH * .0254
-		print("Apparent object width (meters): " + str(APPARENT_WIDTH) + " meters")
-		#convert inches to meters
+	#apparent width
+		#APPARENT_WIDTH = (width*inches)/focalLength
+		#APPARENT_WIDTH = APPARENT_WIDTH * .0254
+		#print("Apparent object width (meters): " + str(APPARENT_WIDTH) + " meters")
+
+    #convert inches to meters
 		meters = inches * .0254 
-		#print("Meters before radians are:" + str(meters)) 
 
-
-	    #compute angles
-		#args [id, xc,yc,w,h]
+	#compute angles
+		
 		ANGLE_PER_PIXEL = 78/math.sqrt(480**2 + 640**2) 
 		difference = 320 - (rois[i][1])
 
@@ -102,6 +102,7 @@ def get_rois_data(rois):
 
 		elif difference < 0:
 			angle = ANGLE_PER_PIXEL * abs(difference)
+
 		elif difference > 0:
 			angle = -(ANGLE_PER_PIXEL * difference)
 	   
@@ -109,6 +110,7 @@ def get_rois_data(rois):
 		y = meters
 		h = abs(y / math.cos(angle))
 		x = math.sin(abs(angle)) * h
+
 		if angle == 0:
 			x = 0
 		elif angle < 0:
@@ -118,23 +120,20 @@ def get_rois_data(rois):
 			x = abs(x)
 		
 		coords = (x,y,h)
-
 		angle = angle / 0.0174533
+
 	  #compute color of the object if needed(posts)
         #-1 means no color, 0 means red , 1 means green
-		#colorofpost = -1  
-		#if(rois[0] = 1):
-		#	colorofpost = getColor(rois[i][1],rois[i][2],rois[i][3],rois[i][4],rois[i][5])  
+		colorofpost = 'n'  
+		if(rois[i][0] = 'p'):
+			colorofpost = getColor(rois[i][1],rois[i][2])  
 	  #save results
-		#output[i][0] = meters 
+
 		output[i][0] = coords
-		#output[i][0] = realmeters 
 		output[i][1] = angle
-		#output[i][2] = colorofpost
-		output[i][2] = 1
+		output[i][2] = colorofpost
 
 	return output
-	#print("Success")
 
 
 # function to obtain distances to rois.
@@ -379,7 +378,7 @@ def ROI(fn):
 
 
 
-def getColor(left,upper,right,lower,fn):
+def getColor(xc,yc):
 
 	original = cv2.imread(fn)
 	print(left,upper,right,lower)
