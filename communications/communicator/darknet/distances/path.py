@@ -124,17 +124,15 @@ def get_rois_data(rois):
         #-1 means no color, 0 means red , 1 means green
 		#colorofpost = -1  
 		#if(rois[0] = 1):
-		#	colorofpost = getColor(rois[i][1],rois[i][2],rois[i][3],rois[i][4],rois[i][5])  
+			colorofpost = getColor(rois[i][1],rois[i][2],rois[i][3],rois[i][4])  
 	  #save results
-		#output[i][0] = meters 
+		
 		output[i][0] = coords
-		#output[i][0] = realmeters 
 		output[i][1] = angle
-		#output[i][2] = colorofpost
-		output[i][2] = 1
+		output[i][2] = colorofpost
 
 	return output
-	#print("Success")
+	
 
 
 # function to obtain distances to rois.
@@ -379,33 +377,26 @@ def ROI(fn):
 
 
 
-def getColor(left,upper,right,lower,fn):
+def getColor(xc,yc,w,h):
 
-	original = cv2.imread(fn)
-	print(left,upper,right,lower)
-	centroidx = int(left + ((right-left)/2))
-	centroidy = int(upper + ((lower-upper)/2))
-	heigth = lower - upper
-	width = right - left
+	
+	width = w	
+	heigth = h
 	shiftright = int((width/2)/5)
 	shiftleft =  int((heigth/2)/5)
-	left = centroidx - shiftright
-	right = centroidx + shiftright
-	upper = centroidy - shiftleft
-	lower = centroidy + shiftleft
-	print(left,upper,right,lower)
-	print(centroidx)
-	print(centroidy)
+	left = xc - shiftright
+	right = xc + shiftright
+	upper = yc - shiftleft
+	lower = yc + shiftleft
 
 	#Crop ROI 
-	image_obj = Image.open(fn)
+	image_obj = Image.open('filename.jpg')
 	coords = (left,upper,right,lower)
 	cropped_image = image_obj.crop(coords)
-	#cropped_image.show()
-	#Run Kmeans
 	k = Kmeans()
 	result = k.run(cropped_image)
-	print(result)
+    result = result.pop()
+	return result
 	
 
 
