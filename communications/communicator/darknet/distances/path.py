@@ -63,77 +63,14 @@ def get_rois_data(rois):
 		return False
 
 	rowLength = len(rois)
-<<<<<<< HEAD
-	#meters(x,y,h),angle,color
-=======
->>>>>>> 46e6318f7e4fc3ca13b810aeec02c84b4ebf138c
+
 	colLength = 3 
 	output = [[[0] for i in range(colLength)] for i in range(rowLength)]
 
 	#iterate through all of the rois row by row.
 	#args [id, xc,yc,w,h]
 	for i in range(len(rois)):
-<<<<<<< HEAD
-	  #compute distances
 
-	#get width 
-		width = int(rois[i][2]) 
-		print('CALLER DATA') 
-		#get inches to the object 
-		inches = distance2camera(KNOWN_WIDTH, focalLength, width)
-
-	#apparent width
-		#APPARENT_WIDTH = (width*inches)/focalLength
-		#APPARENT_WIDTH = APPARENT_WIDTH * .0254
-		#print("Apparent object width (meters): " + str(APPARENT_WIDTH) + " meters")
-
-    #convert inches to meters
-		meters = inches * .0254 
-
-	#compute angles
-		
-		ANGLE_PER_PIXEL = 78/math.sqrt(480**2 + 640**2) 
-		difference = 320 - (rois[i][1])
-
-		if difference == 0:
-			angle = 0
-
-		elif difference < 0:
-			angle = ANGLE_PER_PIXEL * abs(difference)
-
-		elif difference > 0:
-			angle = -(ANGLE_PER_PIXEL * difference)
-	   
-		angle = angle * 0.0174533
-		y = meters
-		h = abs(y / math.cos(angle))
-		x = math.sin(abs(angle)) * h
-
-		if angle == 0:
-			x = 0
-		elif angle < 0:
-			if x > 0: 	
-				x = -x
-		elif angle > 0:
-			x = abs(x)
-		
-		coords = (x,y,h)
-		angle = angle / 0.0174533
-
-	  #compute color of the object if needed(posts)
-        #-1 means no color, 0 means red , 1 means green
-		colorofpost = 'n'  
-		if(rois[i][0] = 'p'):
-			colorofpost = getColor(rois[i][1],rois[i][2])  
-	  #save results
-
-		output[i][0] = coords
-		output[i][1] = angle
-		output[i][2] = colorofpost
-
-	return output
-
-=======
 	  #compute distances bouys
 		if(rois[i][0]) == 1:
 			#BOUYS
@@ -215,9 +152,8 @@ def get_rois_data(rois):
 			output[i][1] = angle_b
 			colorofpost = getColor(rois[i][1],rois[i][2],rois[i][3],rois[i][4])  
 			output[i][2] = colorofpost 
+
 	return output
-	
->>>>>>> 46e6318f7e4fc3ca13b810aeec02c84b4ebf138c
 
 # function to obtain distances to rois.
 def distance2camera(C_WIDTH,C_FL,PIX_WIDTH):
@@ -461,11 +397,7 @@ def ROI(fn):
 
 
 
-<<<<<<< HEAD
-def getColor(xc,yc):
-=======
 def getColor(xc,yc,w,h):
->>>>>>> 46e6318f7e4fc3ca13b810aeec02c84b4ebf138c
 
 	
 	width = w	
