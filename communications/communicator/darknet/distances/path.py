@@ -37,45 +37,43 @@ from matplotlib import pyplot as plt
 """
 
 
+#BOUYS
+KNOWN_DISTANCE_B = 74.8    #10.0   
+KNOWN_WIDTH_B = 7.87402    #15.354331
+FOCAL_LENGHT_B = 627.29    #(PIX_WIDTH * KNOWN_DISTANCE) / KNOWN_WIDTH
 
+#POSTS
+KNOWN_DISTANCE_P = 74.8    #10.0   
+KNOWN_WIDTH_P = 7.87402    #15.354331  
+FOCAL_LENGHT_P = 627.29    #(PIX_WIDTH * KNOWN_DISTANCE) / KNOWN_WIDTH
 
-
-
-#MIDDLE_PIX = WIDTH_DIM/2
-KNOWN_DISTANCE = 74.8 #10.0   
-KNOWN_WIDTH = 7.87402    #15.354331 
-FOCAL_VIEW = 70.42       
-focalLength = 627.29   #(width * KNOWN_DISTANCE) / KNOWN_WIDTH
-APPARENT_WIDTH = 0.0
-
-
-# check for values'integrity. return 1 if length of params is the expected.
-def receive(values):
-	
+#check for values'integrity. return 1 if length of params is the expected.
+def receive(values):	
 	if len(values) == 5:
         	return True
 
-
-# bouy 1  post 0 [id, xc,yc,w,h]
+# bouy 1 post 0 [id, xc,yc,w,h]
 # performs calculation on each region of interest found on the image (bouys and posts). 
 # param: rois -- list of lists with description values for each roi [id, xc,yc,w,h]
 # return -- distances, angles, dominant color for each roi.
 def get_rois_data(rois):
-
 	
-	#create output list of lists
+#create output list of lists
 	if not rois:
 		return False
-	
-	#number of rois
+
 	rowLength = len(rois)
+<<<<<<< HEAD
 	#meters(x,y,h),angle,color
+=======
+>>>>>>> 46e6318f7e4fc3ca13b810aeec02c84b4ebf138c
 	colLength = 3 
 	output = [[[0] for i in range(colLength)] for i in range(rowLength)]
 
 	#iterate through all of the rois row by row.
 	#args [id, xc,yc,w,h]
 	for i in range(len(rois)):
+<<<<<<< HEAD
 	  #compute distances
 
 	#get width 
@@ -135,6 +133,91 @@ def get_rois_data(rois):
 
 	return output
 
+=======
+	  #compute distances bouys
+		if(rois[i][0]) == 1:
+			#BOUYS
+			width_b = int(rois[i][2]) 
+			print('CALLER DATA') 
+			#get inches to the object 
+			inches = distance2camera(KNOWN_WIDTH, FOCAL_LENGHT_B, width_b)
+			#convert inches to meters
+			meters_b = inches * .0254 
+
+			#compute angles
+			#args [id, xc,yc,w,h]
+			ANGLE_PER_PIXEL = 78/math.sqrt(480**2 + 640**2) 
+			difference = 320 - (rois[i][1])
+
+			if difference == 0:
+				angle_b = 0
+			elif difference < 0:
+				angle_b = ANGLE_PER_PIXEL * abs(difference)
+			elif difference > 0:
+				angle_b = -(ANGLE_PER_PIXEL * difference)
+		
+			angle_b = angle_b * 0.0174533
+			y = meters_b
+			h = abs(y / math.cos(angle))
+			x = math.sin(abs(angle)) * h
+
+			if angle_b == 0:
+				x = 0
+			elif angle_b < 0:
+				if x > 0: 	
+					x = -x
+			elif angle_b > 0:
+				x = abs(x)
+			
+			coords = (x,y,h)
+
+			angle_b = angle_b / 0.0174533
+			output[i][0] = coords
+			output[i][1] = angle_b
+			output[i][2] = 'non_color'
+		else:
+			#BOUYS
+			width_p = int(rois[i][2]) 
+			#get inches to the object 
+			inches = distance2camera(KNOWN_WIDTH_P, FOCAL_LENGHT_P, width_p)
+			#convert inches to meters
+			meters_p= inches * .0254 
+
+			#compute angles
+			#args [id, xc,yc,w,h]
+			ANGLE_PER_PIXEL = 78/math.sqrt(480**2 + 640**2) 
+			difference = 320 - (rois[i][1])
+
+			if difference == 0:
+				angle_p = 0
+			elif difference < 0:
+				angle_p = ANGLE_PER_PIXEL * abs(difference)
+			elif difference > 0:
+				angle_p = -(ANGLE_PER_PIXEL * difference)
+		
+			angle_p = angle_b * 0.0174533
+			y = meters_p
+			h = abs(y / math.cos(angle))
+			x = math.sin(abs(angle)) * h
+
+			if angle_p == 0:
+				x = 0
+			elif angle_p < 0:
+				if x > 0: 	
+					x = -x
+			elif angle_p > 0:
+				x = abs(x)
+			
+			coords = (x,y,h)
+
+			angle_b = angle_b / 0.0174533
+			output[i][0] = coords
+			output[i][1] = angle_b
+			colorofpost = getColor(rois[i][1],rois[i][2],rois[i][3],rois[i][4])  
+			output[i][2] = colorofpost 
+	return output
+	
+>>>>>>> 46e6318f7e4fc3ca13b810aeec02c84b4ebf138c
 
 # function to obtain distances to rois.
 def distance2camera(C_WIDTH,C_FL,PIX_WIDTH):
@@ -378,34 +461,31 @@ def ROI(fn):
 
 
 
+<<<<<<< HEAD
 def getColor(xc,yc):
+=======
+def getColor(xc,yc,w,h):
+>>>>>>> 46e6318f7e4fc3ca13b810aeec02c84b4ebf138c
 
-	original = cv2.imread(fn)
-	print(left,upper,right,lower)
-	centroidx = int(left + ((right-left)/2))
-	centroidy = int(upper + ((lower-upper)/2))
-	heigth = lower - upper
-	width = right - left
+	
+	width = w	
+	heigth = h
 	shiftright = int((width/2)/5)
 	shiftleft =  int((heigth/2)/5)
-	left = centroidx - shiftright
-	right = centroidx + shiftright
-	upper = centroidy - shiftleft
-	lower = centroidy + shiftleft
-	print(left,upper,right,lower)
-	print(centroidx)
-	print(centroidy)
+	left = xc - shiftright
+	right = xc + shiftright
+	upper = yc - shiftleft
+	lower = yc + shiftleft
 
 	#Crop ROI 
-	image_obj = Image.open(fn)
+	image_obj = Image.open('filename.jpg')
 	coords = (left,upper,right,lower)
 	cropped_image = image_obj.crop(coords)
-	#cropped_image.show()
-	#Run Kmeans
 	k = Kmeans()
 	result = k.run(cropped_image)
-	print(result)
-	
+	result = result.pop()
+	return result
+
 
 
 
