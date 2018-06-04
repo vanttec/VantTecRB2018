@@ -41,99 +41,120 @@ from matplotlib import pyplot as plt
 
 
 
-#MIDDLE_PIX = WIDTH_DIM/2
-KNOWN_DISTANCE = 74.8 #10.0   
-KNOWN_WIDTH = 7.87402    #15.354331 
-FOCAL_VIEW = 70.42       
-focalLength = 627.29   #(width * KNOWN_DISTANCE) / KNOWN_WIDTH
-APPARENT_WIDTH = 0.0
+#BOUYS
+KNOWN_DISTANCE_B = 74.8    #10.0   
+KNOWN_WIDTH_B = 7.87402    #15.354331
+FOCAL_LENGHT_B = 627.29    #(PIX_WIDTH * KNOWN_DISTANCE) / KNOWN_WIDTH
 
+#POSTS
+KNOWN_DISTANCE_P = 74.8    #10.0   
+KNOWN_WIDTH_P = 7.87402    #15.354331  
+FOCAL_LENGHT_P = 627.29    #(PIX_WIDTH * KNOWN_DISTANCE) / KNOWN_WIDTH
 
 # check for values'integrity. return 1 if length of params is the expected.
-def receive(values):
-	
+def receive(values):	
 	if len(values) == 5:
         	return True
-
 
 # bouy 1  post 0 [id, xc,yc,w,h]
 # performs calculation on each region of interest found on the image (bouys and posts). 
 # param: rois -- list of lists with description values for each roi [id, xc,yc,w,h]
 # return -- distances, angles, dominant color for each roi.
 def get_rois_data(rois):
-
 	
-	#create output list of lists
+#create output list of lists
 	if not rois:
 		return False
-	
-	#number of rois
+
 	rowLength = len(rois)
-	#meters,angles,color
 	colLength = 3 
 	output = [[[0] for i in range(colLength)] for i in range(rowLength)]
 
 	#iterate through all of the rois row by row.
 	for i in range(len(rois)):
-	  #compute distances
+	  #compute distances bouys
+		if(rois[i][0]) == 1:
+			#BOUYS
+			width_b = int(rois[i][2]) 
+			print('CALLER DATA') 
+			#get inches to the object 
+			inches = distance2camera(KNOWN_WIDTH, FOCAL_LENGHT_B, width_b)
+			#convert inches to meters
+			meters_b = inches * .0254 
 
-		# substract x2 - x1
-		width = int(rois[i][2]) 
-		print('CALLER DATA') 
-		print('width is' + str(width))
-		#get inches to the object 
-		inches = distance2camera(KNOWN_WIDTH, focalLength, width)
+			#compute angles
+			#args [id, xc,yc,w,h]
+			ANGLE_PER_PIXEL = 78/math.sqrt(480**2 + 640**2) 
+			difference = 320 - (rois[i][1])
 
-		APPARENT_WIDTH = (width*inches)/focalLength
-		APPARENT_WIDTH = APPARENT_WIDTH * .0254
-		print("Apparent object width (meters): " + str(APPARENT_WIDTH) + " meters")
-		#convert inches to meters
-		meters = inches * .0254 
-		#print("Meters before radians are:" + str(meters)) 
-
-
-	    #compute angles
-		#args [id, xc,yc,w,h]
-		ANGLE_PER_PIXEL = 78/math.sqrt(480**2 + 640**2) 
-		difference = 320 - (rois[i][1])
-
-		if difference == 0:
-			angle = 0
-
-		elif difference < 0:
-			angle = ANGLE_PER_PIXEL * abs(difference)
-		elif difference > 0:
-			angle = -(ANGLE_PER_PIXEL * difference)
-	   
-		angle = angle * 0.0174533
-		y = meters
-		h = abs(y / math.cos(angle))
-		x = math.sin(abs(angle)) * h
-		if angle == 0:
-			x = 0
-		elif angle < 0:
-			if x > 0: 	
-				x = -x
-		elif angle > 0:
-			x = abs(x)
+			if difference == 0:
+				angle_b = 0
+			elif difference < 0:
+				angle_b = ANGLE_PER_PIXEL * abs(difference)
+			elif difference > 0:
+				angle_b = -(ANGLE_PER_PIXEL * difference)
 		
-		coords = (x,y,h)
+			angle_b = angle_b * 0.0174533
+			y = meters_b
+			h = abs(y / math.cos(angle))
+			x = math.sin(abs(angle)) * h
 
-		angle = angle / 0.0174533
-	  #compute color of the object if needed(posts)
-        #-1 means no color, 0 means red , 1 means green
-		#colorofpost = -1  
-		#if(rois[0] = 1):
+			if angle_b == 0:
+				x = 0
+			elif angle_b < 0:
+				if x > 0: 	
+					x = -x
+			elif angle_b > 0:
+				x = abs(x)
+			
+			coords = (x,y,h)
+
+			angle_b = angle_b / 0.0174533
+			output[i][0] = coords
+			output[i][1] = angle_b
+			output[i][2] = 'non_color'
+		else:
+			#BOUYS
+			width_p = int(rois[i][2]) 
+			#get inches to the object 
+			inches = distance2camera(KNOWN_WIDTH_P, FOCAL_LENGHT_P, width_p)
+			#convert inches to meters
+			meters_p= inches * .0254 
+
+			#compute angles
+			#args [id, xc,yc,w,h]
+			ANGLE_PER_PIXEL = 78/math.sqrt(480**2 + 640**2) 
+			difference = 320 - (rois[i][1])
+
+			if difference == 0:
+				angle_p = 0
+			elif difference < 0:
+				angle_p = ANGLE_PER_PIXEL * abs(difference)
+			elif difference > 0:
+				angle_p = -(ANGLE_PER_PIXEL * difference)
+		
+			angle_p = angle_b * 0.0174533
+			y = meters_p
+			h = abs(y / math.cos(angle))
+			x = math.sin(abs(angle)) * h
+
+			if angle_p == 0:
+				x = 0
+			elif angle_p < 0:
+				if x > 0: 	
+					x = -x
+			elif angle_p > 0:
+				x = abs(x)
+			
+			coords = (x,y,h)
+
+			angle_b = angle_b / 0.0174533
+			output[i][0] = coords
+			output[i][1] = angle_b
 			colorofpost = getColor(rois[i][1],rois[i][2],rois[i][3],rois[i][4])  
-	  #save results
-		
-		output[i][0] = coords
-		output[i][1] = angle
-		output[i][2] = colorofpost
-
+			output[i][2] = colorofpost 
 	return output
 	
-
 
 # function to obtain distances to rois.
 def distance2camera(C_WIDTH,C_FL,PIX_WIDTH):
@@ -395,9 +416,9 @@ def getColor(xc,yc,w,h):
 	cropped_image = image_obj.crop(coords)
 	k = Kmeans()
 	result = k.run(cropped_image)
-    result = result.pop()
+	result = result.pop()
 	return result
-	
+
 
 
 
