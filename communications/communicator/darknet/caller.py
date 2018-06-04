@@ -27,18 +27,34 @@ def parse_data(data):
             results.append([0, val[2][0], val[2][1], val[2][2], val[2][3]])
     return results
 
-def call():
-    '''Realiza llamadas a codigo de red neuronal en C y pasa datos a codigo path.py'''
+def obtain_data():
     print('-------DATOS DARKNET------')
-    while True:
-        data = execute()
-        print(data)
-        if len(data):
-            data = parse_data(data)
-            print(data)
-            distances = get_rois_data(data)
-            # print(distances)
-        else:
-            print('---------Nothing detected------------')
+    data = execute() #Llama darknet
+    # print(data)
+    if len(data):
+        data = parse_data(data)
+        # print(data)
+        distances = get_rois_data(data) # Obtiene datos de objetos
+        # print(distances)
+    else:
+        print('---------Nothing detected------------')
 
-call()
+def main():
+    '''AQUI SE ARMA LA CARNE'''
+    while True:
+        print("Escribe reto")
+        reto = raw_input()
+        if reto == "navgps":
+            # No usa vision
+            continue
+        elif reto == "autonav":
+            obtain_data()
+        elif reto == "speed":
+            obtain_data()
+        elif reto == "autodock":
+            # No usa vision
+            continue
+        else:
+            obtain_data()
+
+main()
