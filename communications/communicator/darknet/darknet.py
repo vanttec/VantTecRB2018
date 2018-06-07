@@ -1,7 +1,9 @@
 from ctypes import *
 import math
 import random
-
+from cv2 import *
+from distances import get_rois_data
+import cv2
 def sample(probs):
     s = sum(probs)
     probs = [a/s for a in probs]
@@ -139,15 +141,136 @@ def detect(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45):
     free_image(im)
     free_detections(dets, num)
     return res
-    
-if __name__ == "__main__":
+
+net = load_net("vantec_cfg/yolo-vantec.cfg", "vantec_cfg/yolo-vantec.weights", 0)
+meta = load_meta("vantec_cfg/obj.data")
+
+def execute(data_calib,framed):
+    '''Funcion para tomar fotos y escanear imagen'''
+    '''
+    cap = VideoCapture(0)
+    ret, framed = cap.read()
+    '''
+    #undistort image
+    frame = undistorted_image(framed,data_calib)
+    drawframe = frame
+    drawsquares = frame.copy()
+    height, width, channels = frame.shape
+    print(width)
+    print(height)
+
+    #cap.release()
+    filename = "filename.jpg"
+    imwrite(filename,frame) #save image
+
     #net = load_net("cfg/densenet201.cfg", "/home/pjreddie/trained/densenet201.weights", 0)
     #im = load_image("data/wolf.jpg", 0, 0)
     #meta = load_meta("cfg/imagenet1k.data")
     #r = classify(net, meta, im)
     #print r[:10]
-    net = load_net("vantec_cfg/yolo-vantec.cfg", "vantec_cfg/yolo-vantec.weights", 0)
-    meta = load_meta("vantec_cfg/obj.data")
 
+
+    #x1,y1,width,heigth
+    r = detect(net, meta, "filename.jpg")
+    #print(r)
+    for f in r:
+        id = f[0]
+        print('id  is :' + str(id))
+        v  = f[2] 
+        xc = int(v[0])
+        yc = int(v[1])
+        w =  int(v[2])
+        h =  int(v[3])
+
+        #make rectangles into squares
+        if w < h:
+            minimum = w
+        else: 
+            minimum = h
+        print('min is' + str(minimum))
+        wh = int(v[2] / 2) 
+        hh = int(v[3] / 2)
+        x = int(xc - wh)
+        y = int(yc-  hh)
+        #darknet data
+        print('DARKNET DATA')
+        print('x : ' + str(x))
+        print('y : ' + str(y))
+        print('w : ' + str(w))
+        print('h : ' + str(h))
+        
+        #if(id == 'b'):
+            #no transform
+            #cv2.rectangle(drawframe, (x,y), (x+minimum,y+minimum), (0,0,255))
+            #no transform
+        cv2.rectangle(drawframe, (x,y), (x+w,y+h), (0,0,255))
+        #else:
+            #cv2.rectangle(drawsquares, (x,y), (x+w,y+h), (0,0,255))
+            #cv2.rectangle(drawframe, (x,y), (x+w,y+h), (0,0,255))
+        
+
+    
+
+    if len(r):
+
+            data = parse_data(r)
+            print(data)
+            distances = get_rois_data(data) 
+            #put text
+            for i,d in enumerate(distances) :
+                dist = d[0]  #tuple
+                x = dist[0]
+                y = dist[1]
+                h = dist[2]
+                
+                f = r[i]
+                v  = f[2] 
+                xc = int(v[0])
+                yc = int(v[1])              
+
+                #distances
+                cv2.putText(drawframe,str(round(x,2)), (xc,yc), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
+                cv2.putText(drawframe,str(round(y,2)), (xc,yc+10), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
+                cv2.putText(drawframe,str(round(h,2)), (xc,yc+20), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
+                #angles
+                cv2.putText(drawframe,str(round(d[1],2)), (xc,yc+30), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
+
+    cv2.imshow("preview", drawframe)
+    #cv2.imshow("squares", drawsquares)
+    #cv2.imshow("distorted", framed)
+
+    k = cv2.waitKey(0)
+    if k == 27:         # wait for ESC key to exit
+        cv2.destroyAllWindows()
+    
+    #cap.release()
+   
+
+
+    return r
+
+
+def parse_data(data):
+    results = []
+    for val in data:
+        if val[0] == 'b':
+            results.append([1, val[2][0], val[2][2], val[2][1], val[2][3]])
+        else:
+            results.append([0, val[2][0], val[2][2], val[2][1], val[2][3]])
+    return results
+
+
+
+def execute_test():
+    '''Funcion con imagen de prueba'''
     r = detect(net, meta, "alberca_4_augmented.jpg")
     return r
+
+def undistorted_image(img,data_calib):
+
+	mtx = data_calib[0]
+	dist = data_calib[1] 
+	newcameramtx = data_calib[3] 
+	new_image = cv2.undistort(img, mtx, dist, None, newcameramtx)
+	return new_image
+	

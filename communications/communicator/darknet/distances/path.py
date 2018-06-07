@@ -1,95 +1,180 @@
-"""MODULES IMPORT."""
+"""	
+	OVER-ALL METHODS DESCRIPTIONS.
 
+	Color detection.- Kmeans clustering algorithm.
+	Distances to objects.- Triangle Similarity for Object/Marker to Camera Distance.
+	Angles to objects.-
 """
-Kmeans clustering algorithm for colour detection in images
-Initialise a kmeans object and then use the run() method.
-Several debugging methods are available which can help to
-show you the results of the algorithm.
-"""
 
-
-#import Image
+# import the necessary packages
 import random
 import os
 import  sys
 import cv2
 import numpy as np
 from PIL import Image
+import math
 from glob import glob
 from datetime  import datetime
 from skimage import io, color,exposure
 from skimage.color import rgb2lab,deltaE_cie76
 from matplotlib import pyplot as plt
 
+
 """
-	CONSTANTS.
-	KNOWN_DISTANCE -- Initialize the known distance from the camera to the object, which in this case is 10 inches.
-	KNOWN_WIDTH    -- Initialize the known object width, which in this case, the piece of paper is 11 inches width.
-	FOCAL_VIEW     -- The field of vision of the camera, 78 degrees.
+	KNOWN_DISTANCE -- initialize the known distance from the camera to the object(bouy,inches)
+
+	KNOWN_WIDTH    -- initialize the known object width, which in this case is 15.35 for the competitions bouy.
+					  	https://www.boatfendersdirect.co.uk/products/75-a2-polyform-buoy-20-x-16.html
+
+	FOCAL_VIEW     -- the field of vision of the camera, derived from the diagonal FOV 78 degrees and an aspect ratio of 16:9 : 70.42 degrees. 
+		
+					  	https://stackoverflow.com/questions/25088543/estimate-visible-bounds-of-webcam-using-diagonal-fov?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+					  	http://vrguy.blogspot.com/2013/04/converting-diagonal-field-of-view-and.html
+
+    WIDTH_DIM      -- dimensions of video frame
+						720 x 1280 
 """
 
-KNOWN_DISTANCE = 10.0
-KNOWN_WIDTH = 15.354331
-FOCAL_VIEW = 78.0
- 
 
-"""Checks values integrity. If length of parameters of 
-   list equals 5 returns True.
-"""
+#BOUYS
+KNOWN_DISTANCE_B = 74.8    #10.0   
+KNOWN_WIDTH_B = 7.87402    #15.354331
+FOCAL_LENGHT_B = 627.29    #(PIX_WIDTH * KNOWN_DISTANCE) / KNOWN_WIDTH
 
-def receive(values):
+#POSTS
+KNOWN_DISTANCE_P = 74.8    #10.0   
+KNOWN_WIDTH_P = 7.87402    #15.354331  
+FOCAL_LENGHT_P = 627.29    #(PIX_WIDTH * KNOWN_DISTANCE) / KNOWN_WIDTH
+
+#check for values'integrity. return 1 if length of params is the expected.
+def receive(values):	
 	if len(values) == 5:
         	return True
 
-"""
-	Performs calculation on each region of interest found on the image (bouys and posts). 
-    Keyword arguments:
-    rois -- List of lists with description values of the ROIS, one ROI list e.g  Object ID,x1,y1,x2,y2.
-    Return -- Distances, Angles, Dominant color of each ROI.
-"""
-def get_distances(rois):
+# bouy 1 post 0 [id, xc,yc,w,h]
+# performs calculation on each region of interest found on the image (bouys and posts). 
+# param: rois -- list of lists with description values for each roi [id, xc,yc,w,h]
+# return -- distances, angles, dominant color for each roi.
+def get_rois_data(rois):
 	
-	print(rois)
+#create output list of lists
+	if not rois:
+		return False
+
 	rowLength = len(rois)
-	colLength = len(rois[0]) - 1
+
+	colLength = 3 
 	output = [[[0] for i in range(colLength)] for i in range(rowLength)]
-	print(output)
-	focalLength = initializeFocalLength(rois)
-	
+
+	#iterate through all of the rois row by row.
+	#args [id, xc,yc,w,h]
 	for i in range(len(rois)):
-		width = int(rois[i][3] - rois[i][1])
-		inches = distance2camera(KNOWN_WIDTH, focalLength, width)
-		angle = angle2camera(rois[i][0],rois[i][1],rois[i][2],rois[i][3])
-		output[i][0] = inches 
-		output[i][1] = angle
-		output[i][2] = 0
-		print ("Distance to object " + str(i) + " is "  +  str(inches)  + " inches.")
-		print ("Angle to object "    + str(i) + " is "  +  str(angle)   + " degrees.")
-		#cv2.putText(image, str(round(inches,1)), (int(rois[i][2]),int(rois[i][3])), cv2.FONT_HERSHEY_SIMPLEX,.5, (0,0,0) ,1)
+
+	  #compute distances bouys
+		if(rois[i][0]) == 1:
+			#BOUYS
+			width_b = int(rois[i][2]) 
+			print('CALLER DATA') 
+			#get inches to the object 
+			inches = distance2camera(KNOWN_WIDTH, FOCAL_LENGHT_B, width_b)
+			#convert inches to meters
+			meters_b = inches * .0254 
+
+			#compute angles
+			#args [id, xc,yc,w,h]
+			ANGLE_PER_PIXEL = 78/math.sqrt(480**2 + 640**2) 
+			difference = 320 - (rois[i][1])
+
+			if difference == 0:
+				angle_b = 0
+			elif difference < 0:
+				angle_b = ANGLE_PER_PIXEL * abs(difference)
+			elif difference > 0:
+				angle_b = -(ANGLE_PER_PIXEL * difference)
+		
+			angle_b = angle_b * 0.0174533
+			y = meters_b
+			h = abs(y / math.cos(angle))
+			x = math.sin(abs(angle)) * h
+
+			if angle_b == 0:
+				x = 0
+			elif angle_b < 0:
+				if x > 0: 	
+					x = -x
+			elif angle_b > 0:
+				x = abs(x)
+			
+			coords = (x,y,h)
+
+			angle_b = angle_b / 0.0174533
+			output[i][0] = coords
+			output[i][1] = angle_b
+			output[i][2] = 'non_color'
+		else:
+			#BOUYS
+			width_p = int(rois[i][2]) 
+			#get inches to the object 
+			inches = distance2camera(KNOWN_WIDTH_P, FOCAL_LENGHT_P, width_p)
+			#convert inches to meters
+			meters_p= inches * .0254 
+
+			#compute angles
+			#args [id, xc,yc,w,h]
+			ANGLE_PER_PIXEL = 78/math.sqrt(480**2 + 640**2) 
+			difference = 320 - (rois[i][1])
+
+			if difference == 0:
+				angle_p = 0
+			elif difference < 0:
+				angle_p = ANGLE_PER_PIXEL * abs(difference)
+			elif difference > 0:
+				angle_p = -(ANGLE_PER_PIXEL * difference)
+		
+			angle_p = angle_b * 0.0174533
+			y = meters_p
+			h = abs(y / math.cos(angle))
+			x = math.sin(abs(angle)) * h
+
+			if angle_p == 0:
+				x = 0
+			elif angle_p < 0:
+				if x > 0: 	
+					x = -x
+			elif angle_p > 0:
+				x = abs(x)
+			
+			coords = (x,y,h)
+
+			angle_b = angle_b / 0.0174533
+			output[i][0] = coords
+			output[i][1] = angle_b
+			colorofpost = getColor(rois[i][1],rois[i][2],rois[i][3],rois[i][4])  
+			output[i][2] = colorofpost 
 
 	return output
-	#print("Success")
 
-"""Function to obtain distances."""
+# function to obtain distances to rois.
 def distance2camera(C_WIDTH,C_FL,PIX_WIDTH):
 	#Compute and return the distance from the maker to the camera
-	return (C_WIDTH*C_FL)/PIX_WIDTH
+	print('KNOWN WIDTH: ' + str(C_WIDTH))
+	print('FOCAL LENGTH: ' + str(C_FL))
+	print('PIX_WIDTH: ' + str(PIX_WIDTH))
+	DISTANCE =  (C_WIDTH*C_FL)/PIX_WIDTH
+	print(str(DISTANCE))
+	print(str(DISTANCE*.0254))
+	return DISTANCE
 
-""" Initialize  the focal length of the camera."""
-def initializeFocalLength(rois):
 
-	width = int(rois[0][3] - rois[0][1])
-	return (width * KNOWN_DISTANCE) / KNOWN_WIDTH
-
-"""Gets angle to camera"""
+# gets angle to camera
 def angle2camera(x1,y1,x2,y2):
-	pixel = (x1+(x2-x1))/2
-	preangle = (pixel*FOCAL_VIEW)/1280
+	pixel = (x1+(x2-x1))/2  #gets center pixel of roi
+	preangle = (pixel*FOCAL_VIEW)/WIDTH_DIM
 	return 0 - ((FOCAL_VIEW/2) - preangle)
 
-"""
-Print ROI's parameters.
-"""
+
+# print ROI's parameters.
 def prints(rois):
 	
 	for row in rois:
@@ -312,34 +397,27 @@ def ROI(fn):
 
 
 
-def getColor(fn,left,upper,right,lower):
+def getColor(xc,yc,w,h):
 
-
-	original = cv2.imread(fn)
-	print(left,upper,right,lower)
-	centroidx = int(left + ((right-left)/2))
-	centroidy = int(upper + ((lower-upper)/2))
-	heigth = lower - upper
-	width = right - left
+	
+	width = w	
+	heigth = h
 	shiftright = int((width/2)/5)
 	shiftleft =  int((heigth/2)/5)
-	left = centroidx - shiftright
-	right = centroidx + shiftright
-	upper = centroidy - shiftleft
-	lower = centroidy + shiftleft
-	print(left,upper,right,lower)
-	print(centroidx)
-	print(centroidy)
+	left = xc - shiftright
+	right = xc + shiftright
+	upper = yc - shiftleft
+	lower = yc + shiftleft
 
 	#Crop ROI 
-	image_obj = Image.open(fn)
+	image_obj = Image.open('filename.jpg')
 	coords = (left,upper,right,lower)
 	cropped_image = image_obj.crop(coords)
-	#cropped_image.show()
-	#Run Kmeans
 	k = Kmeans()
 	result = k.run(cropped_image)
-	print(result)
+	result = result.pop()
+	return result
+
 
 
 
