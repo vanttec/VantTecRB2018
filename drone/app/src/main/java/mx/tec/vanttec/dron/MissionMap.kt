@@ -9,16 +9,18 @@ import com.google.android.gms.maps.model.*
 import dji.common.mission.waypoint.Waypoint
 import dji.common.mission.waypoint.WaypointAction
 import dji.common.mission.waypoint.WaypointActionType
+import dji.common.model.LocationCoordinate2D
 import io.reactivex.Observable
 
 class MissionMap(private val fragmentManager: FragmentManager) : GoogleMap.OnMapClickListener,
-        OnMapReadyCallback {
+        OnMapReadyCallback,
+        GoogleMap.OnMarkerClickListener {
 
     private val mMarkers = ArrayList<Marker>()
-    private val defaultAltitude = 12f
     private var gMap: GoogleMap? = null
     private var droneMarker: Marker? = null
     private lateinit var waypointListener: WayPointDialog.WayPointConfigListener
+    private var waypoints = HashMap<LatLng, Waypoint>()
 
     var shouldAddPin = false
         private set
@@ -29,6 +31,8 @@ class MissionMap(private val fragmentManager: FragmentManager) : GoogleMap.OnMap
                 markWaypoint(point)
                 val waypoint = Waypoint(point.latitude, point.longitude, height)
                 waypoint.addAction(WaypointAction(WaypointActionType.STAY, time))
+
+                waypoints[point] = waypoint
 
                 it.onNext(waypoint)
             }
@@ -54,10 +58,19 @@ class MissionMap(private val fragmentManager: FragmentManager) : GoogleMap.OnMap
             mMarkers.add(marker)
     }
 
+    fun clearWaypointMarkers() {
+        for(marker in mMarkers)
+            marker.remove()
+
+        mMarkers.clear()
+    }
+
     override fun onMapReady(googleMap: GoogleMap) {
         if (gMap == null) {
+            googleMap.setOnMapClickListener(this) // add the listener for click for a map object
+            googleMap.setOnMarkerClickListener(this)
+
             gMap = googleMap
-            gMap?.setOnMapClickListener(this)// add the listener for click for a map object
         }
 
         val tec = LatLng(25.65, -100.290943)
@@ -68,15 +81,39 @@ class MissionMap(private val fragmentManager: FragmentManager) : GoogleMap.OnMap
     override fun onMapClick(point: LatLng) {
         if (shouldAddPin) {
             // Open waypoint dialog
-            val waypointDialog = WayPointDialog.instantiate(point, defaultAltitude)
+            val waypointDialog = WayPointDialog.instantiate(point)
 
             waypointDialog.listener = waypointListener
-            waypointDialog.show(fragmentManager, "waypoint_dialog")
+            waypointDialog.show(fragmentManager, WAYPOINT_DIALOG_TAG)
         }
     }
 
+    override fun onMarkerClick(marker: Marker): Boolean {
+        val waypoint = waypoints[marker.position]
+
+        if (waypoint != null) {
+            val waypointDialog = WayPointDialog.instantiate(waypoint)
+
+            waypointDialog.listener = object : WayPointDialog.WayPointConfigListener {
+                override fun onWayPointConfigured(point: LatLng, height: Float, time: Int) {
+                    waypoint.coordinate = LocationCoordinate2D(point.latitude, point.longitude)
+                    waypoint.altitude = height
+                    waypoint.getActionAtIndex(0).actionParam = time
+                }
+
+                override fun onWayPointCancelled() { /*Do nothing*/ }
+            }
+
+            waypointDialog.show(fragmentManager, WAYPOINT_DIALOG_TAG)
+
+            return true
+        }
+
+        return false
+    }
+
     // Drone state
-    fun updateMarker(position: LatLng, heading: Float) {
+    fun updateDroneMarker(position: LatLng, heading: Float) {
         if(droneMarker == null) {
             val options = MarkerOptions()
             val icon = BitmapDescriptorFactory.fromResource(R.drawable.aircraft)
@@ -99,5 +136,9 @@ class MissionMap(private val fragmentManager: FragmentManager) : GoogleMap.OnMap
 
     fun moveCamera(cameraUpdate: CameraUpdate) {
         gMap?.moveCamera(cameraUpdate)
+    }
+
+    companion object {
+        private const val WAYPOINT_DIALOG_TAG = "waypoint_dialog"
     }
 }

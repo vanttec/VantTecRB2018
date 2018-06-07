@@ -3,7 +3,6 @@ package mx.tec.vanttec.dron
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.SurfaceTexture
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -11,9 +10,9 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.TextureView
-import android.widget.Toast
+import android.view.SurfaceHolder
 import android.view.WindowManager
+import android.widget.Toast
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.SupportMapFragment
@@ -22,7 +21,6 @@ import com.google.android.gms.maps.model.*
 import dji.common.camera.SettingsDefinitions
 import dji.common.error.DJIError
 import dji.common.mission.waypoint.*
-import dji.sdk.base.BaseProduct
 import dji.sdk.camera.VideoFeeder
 import dji.sdk.codec.DJICodecManager
 import dji.sdk.mission.waypoint.WaypointMissionOperator
@@ -63,7 +61,7 @@ class MissionSetupActivity : AppCompatActivity() {
         val sdkManagerCallback = SDKManagerCallback()
 
         sdkManagerCallback.sdkObservable.subscribe { sdk ->
-            val missionBuilder = WaypointMission.Builder()
+            var missionBuilder = WaypointMission.Builder()
 
             runOnUiThread {
                 setContentView(R.layout.activity_mission_setup)
@@ -78,27 +76,28 @@ class MissionSetupActivity : AppCompatActivity() {
                     missionBuilder.addWaypoint(it)
                 }
 
-                val surfaceTextureObservable = Observable.create<Triple<SurfaceTexture, Int, Int>> {
-                    val listener = object : TextureView.SurfaceTextureListener {
-                        override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
-                            it.onNext(Triple(surface, width, height))
+                clearWaypoints.setOnClickListener {
+                    missionMap.clearWaypointMarkers()
+                    missionBuilder = WaypointMission.Builder()
+                }
+
+
+                val surfaceHolderObservable = Observable.create<Triple<SurfaceHolder, Int, Int>> {
+                    val callback = object : SurfaceHolder.Callback {
+                        override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
+                            if (holder != null)
+                                it.onNext(Triple(holder, width, height))
                         }
 
-                        override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {
-                            it.onNext(Triple(surface, width, height))
-                        }
+                        override fun surfaceDestroyed(holder: SurfaceHolder?) { }
 
-                        override fun onSurfaceTextureDestroyed(surface: SurfaceTexture): Boolean {
-                            it.onComplete()
-                            return true
-                        }
+                        override fun surfaceCreated(holder: SurfaceHolder?) { }
 
-                        override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {}
                     }
-                    liveFeed.surfaceTextureListener = listener
+                    liveFeed.holder.addCallback(callback)
                 }.publish().autoConnect()
 
-             surfaceTextureObservable.subscribe { (surface, width, height) ->
+                surfaceHolderObservable.subscribe { (surface, width, height) ->
                     val codecManager = DJICodecManager(this, surface, width, height)
                     VideoFeeder.VideoDataCallback { bytes, i ->
                         codecManager.sendDataToDecoder(bytes, i)
@@ -107,18 +106,18 @@ class MissionSetupActivity : AppCompatActivity() {
             }
 
             sdkManagerCallback.productObservable.subscribe { product ->
-                if(product is Aircraft){
+                if(product is Aircraft) {
                     product.flightController.setStateCallback { state ->
                         runOnUiThread {
                             val pos = LatLng(state.aircraftLocation.latitude, state.aircraftLocation.longitude)
                             val head = product.flightController.compass.heading
-                            missionMap.updateMarker(pos, head)
+                            missionMap.updateDroneMarker(pos, head)
                         }
                     }
 
                     val operator = sdk.missionControl.waypointMissionOperator
 
-                    takeOff.setOnClickListener {
+                    launch.setOnClickListener {
                         configWayPointMission(operator, product, missionBuilder)
                     }
                 }
@@ -196,7 +195,7 @@ class MissionSetupActivity : AppCompatActivity() {
         }
     }
 
-    private fun switchCameraMode(product : BaseProduct, cameraMode: SettingsDefinitions.CameraMode) {
+    private fun switchCameraMode(product : Aircraft, cameraMode: SettingsDefinitions.CameraMode) {
         product.camera?.setMode(cameraMode) { error ->
             if (error == null) {
                 setResultToToast("Switch Camera Mode Succeeded")
@@ -207,7 +206,7 @@ class MissionSetupActivity : AppCompatActivity() {
     }
 
     private fun configWayPointMission(waypointMissionOperator: WaypointMissionOperator,
-                                      product: BaseProduct,
+                                      product: Aircraft,
                                       missionBuilder: WaypointMission.Builder) {
         val mSpeed = 3.0f
         missionBuilder.finishedAction(WaypointMissionFinishedAction.GO_HOME)
@@ -216,16 +215,18 @@ class MissionSetupActivity : AppCompatActivity() {
                 .maxFlightSpeed(mSpeed)
                 .flightPathMode(WaypointMissionFlightPathMode.NORMAL)
 
-        val error = waypointMissionOperator.loadMission(missionBuilder.build())
-        if (error == null) {
-            setResultToToast("loadWaypoint succeeded")
-            uploadWayPointMission(waypointMissionOperator, product)
-        } else {
-            setResultToToast("loadWaypoint failed " + error.description)
+        product.flightController.setGoHomeHeightInMeters(30) {
+            val error = waypointMissionOperator.loadMission(missionBuilder.build())
+            if (error == null) {
+                setResultToToast("loadWaypoint succeeded")
+                uploadWayPointMission(waypointMissionOperator, product)
+            } else {
+                setResultToToast("loadWaypoint failed " + error.description)
+            }
         }
     }
 
-    private fun uploadWayPointMission(waypointMissionOperator: WaypointMissionOperator, product: BaseProduct) {
+    private fun uploadWayPointMission(waypointMissionOperator: WaypointMissionOperator, product: Aircraft) {
         waypointMissionOperator.uploadMission { error ->
             if (error == null) {
                 waypointMissionOperator.addListener(object : WaypointMissionOperatorListener {
@@ -257,7 +258,7 @@ class MissionSetupActivity : AppCompatActivity() {
         }
     }
 
-    private fun startWaypointMission(waypointMissionOperator: WaypointMissionOperator, product: BaseProduct) {
+    private fun startWaypointMission(waypointMissionOperator: WaypointMissionOperator, product: Aircraft) {
         switchCameraMode(product, SettingsDefinitions.CameraMode.SHOOT_PHOTO)
 
         waypointMissionOperator.startMission { error ->

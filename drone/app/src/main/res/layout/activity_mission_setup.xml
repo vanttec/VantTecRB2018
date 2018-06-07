@@ -5,6 +5,7 @@
     xmlns:custom="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="horizontal"
     tools:context="mx.tec.vanttec.dron.MissionSetupActivity">
 
     <LinearLayout
@@ -27,6 +28,10 @@
             android:layout_width="wrap_content"
             android:layout_height="24dp" />
 
+        <dji.ux.widget.dashboard.AltitudeWidget
+            android:layout_width="wrap_content"
+            android:layout_height="24dp" />
+
     </LinearLayout>
 
     <fragment
@@ -40,7 +45,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/flightStatusBar" />
 
-    <TextureView
+    <SurfaceView
         android:id="@+id/liveFeed"
         android:layout_width="150dp"
         android:layout_height="100dp"
@@ -70,6 +75,15 @@
             app:srcCompat="@drawable/ic_pin_drop" />
 
         <ImageButton
+            android:id="@+id/clearWaypoints"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:layout_marginEnd="@dimen/margin"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/clear_waypoints"
+            app:srcCompat="@drawable/places_ic_clear" />
+
+        <ImageButton
             android:id="@+id/locate"
             android:layout_width="wrap_content"
             android:layout_height="24dp"
@@ -79,7 +93,7 @@
             app:srcCompat="@drawable/ic_my_location" />
 
         <ImageButton
-            android:id="@+id/takeOff"
+            android:id="@+id/launch"
             android:layout_width="wrap_content"
             android:layout_height="24dp"
             android:background="@android:color/transparent"

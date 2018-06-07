@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.EditText
 import com.google.android.gms.maps.model.LatLng
+import dji.common.mission.waypoint.Waypoint
 
 class WayPointDialog : DialogFragment() {
     var listener: WayPointConfigListener? = null
@@ -26,7 +27,7 @@ class WayPointDialog : DialogFragment() {
         latitude.setText(arguments?.getDouble(LAT_ARG).toString())
         longitud.setText(arguments?.getDouble(LNG_ARG).toString())
         height.setText(arguments?.getFloat(HEIGHT_ARG).toString())
-        time.setText("0")
+        time.setText(arguments?.getFloat(TIME_ARG).toString())
 
         builder.setView(view)
 
@@ -56,14 +57,30 @@ class WayPointDialog : DialogFragment() {
         private const val LAT_ARG = "lat_argument"
         private const val LNG_ARG = "lng_argument"
         private const val HEIGHT_ARG = "height_argument"
+        private const val TIME_ARG = "time_argument"
 
-        fun instantiate(point: LatLng, height: Float) : WayPointDialog {
+        fun instantiate(point: LatLng, height: Float = 12.0f, time: Double = 0.0) : WayPointDialog {
             val dlg = WayPointDialog()
             val bnd = Bundle()
 
             bnd.putDouble(LAT_ARG, point.latitude)
             bnd.putDouble(LNG_ARG, point.longitude)
             bnd.putFloat(HEIGHT_ARG, height)
+            bnd.putDouble(TIME_ARG, time)
+
+            dlg.arguments = bnd
+
+            return dlg
+        }
+
+        fun instantiate(waypoint: Waypoint) : WayPointDialog {
+            val dlg = WayPointDialog()
+            val bnd = Bundle()
+
+            bnd.putDouble(LAT_ARG, waypoint.coordinate.latitude)
+            bnd.putDouble(LNG_ARG, waypoint.coordinate.longitude)
+            bnd.putFloat(HEIGHT_ARG, waypoint.altitude)
+            bnd.putDouble(TIME_ARG, waypoint.getActionAtIndex(0).actionParam / 1000.0) // Time in s
 
             dlg.arguments = bnd
 
