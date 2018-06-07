@@ -147,21 +147,21 @@ meta = load_meta("vantec_cfg/obj.data")
 
 
 
-def execute(data_calib,framed):
+def execute(data_calib):
 
     '''Funcion para tomar fotos y escanear imagen'''
-    '''
+    
     cap = VideoCapture(0)
     ret, raw_frame = cap.read()
-    '''
-
+    #cv2.imshow("jaja", raw_frame)
+    
     #undistort image
     frame = undistorted_image(raw_frame,data_calib)
     #for debugging
     drawing_frame = frame
     drawing_frame_squares = frame.copy()
     height, width, channels = frame.shape
-    #cap.release()
+    cap.release()
     filename = "filename.jpg"
     #save image
     imwrite(filename,frame) 
@@ -236,12 +236,14 @@ def execute(data_calib,framed):
                 cv2.putText(drawing_frame,str(round(d[1],2)), (xc,yc+30), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
 
     cv2.imshow("ROIS", drawing_frame)
-    cv2.imshow("ROIS AS SQUARES", drawing_frame_squares)
-
+    cv2.waitKey(20)
+    
+    #cv2.imshow("ROIS AS SQUARES", drawing_frame_squares)
+    '''
     k = cv2.waitKey(0)
     if k == 27:         # wait for ESC key to exit
         cv2.destroyAllWindows()
-    #cap.release()
+    '''
     return r
 
 

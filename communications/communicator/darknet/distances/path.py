@@ -34,9 +34,9 @@ from matplotlib import pyplot as plt
     WIDTH_DIM      --   Dimensions of video frame
 						480 x 640 
 
-	ANGLE_PER_PIXEL = 78/math.sqrt(480**2 + 640**2) 
+	
 """
-
+ANGLE_PER_PIXEL = 78/math.sqrt(480**2 + 640**2) 
 
 #BOUYS (INCHES)
 KNOWN_DISTANCE_B = 74.8    #unknown
@@ -158,6 +158,9 @@ def get_rois_data(rois):
 			output[i][1] = angle_p
 			colorofpost = getColor(rois[i][1],rois[i][2],rois[i][3],rois[i][4])  
 			output[i][2] = colorofpost 
+	
+	print("____Datos____")
+	print(output)
 
 	return output
 
@@ -238,7 +241,7 @@ class Kmeans(object):
 
             self.oldClusters = [cluster.centroid for cluster in self.clusters]
 
-            print(iterations)
+            #print(iterations)
 
             for pixel in self.pixels:
                 self.assignClusters(pixel)
