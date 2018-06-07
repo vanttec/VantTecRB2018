@@ -33,7 +33,9 @@ from matplotlib import pyplot as plt
 					  	http://vrguy.blogspot.com/2013/04/converting-diagonal-field-of-view-and.html
 
     WIDTH_DIM      -- dimensions of video frame
-						720 x 1280 
+						480 x 640 
+
+	ANGLE_PER_PIXEL = 78/math.sqrt(480**2 + 640**2) 
 """
 
 
@@ -72,18 +74,17 @@ def get_rois_data(rois):
 	for i in range(len(rois)):
 
 	  #compute distances bouys
+
 		if(rois[i][0]) == 1:
 			#BOUYS
 			width_b = int(rois[i][2]) 
-			print('CALLER DATA') 
 			#get inches to the object 
-			inches = distance2camera(KNOWN_WIDTH, FOCAL_LENGHT_B, width_b)
+			inches = distance2camera(KNOWN_WIDTH_B, FOCAL_LENGHT_B, width_b)
 			#convert inches to meters
 			meters_b = inches * .0254 
-
 			#compute angles
+
 			#args [id, xc,yc,w,h]
-			ANGLE_PER_PIXEL = 78/math.sqrt(480**2 + 640**2) 
 			difference = 320 - (rois[i][1])
 
 			if difference == 0:
@@ -93,11 +94,13 @@ def get_rois_data(rois):
 			elif difference > 0:
 				angle_b = -(ANGLE_PER_PIXEL * difference)
 		
+			#degrees to radians
 			angle_b = angle_b * 0.0174533
 			y = meters_b
 			h = abs(y / math.cos(angle))
 			x = math.sin(abs(angle)) * h
 
+			#modified sign depending on angle
 			if angle_b == 0:
 				x = 0
 			elif angle_b < 0:
@@ -106,23 +109,27 @@ def get_rois_data(rois):
 			elif angle_b > 0:
 				x = abs(x)
 			
+			#form tuple
 			coords = (x,y,h)
 
+			#chnge back to degreees
 			angle_b = angle_b / 0.0174533
+
+			#setting the result
 			output[i][0] = coords
 			output[i][1] = angle_b
 			output[i][2] = 'non_color'
 		else:
-			#BOUYS
+
+			#POSTS
 			width_p = int(rois[i][2]) 
 			#get inches to the object 
 			inches = distance2camera(KNOWN_WIDTH_P, FOCAL_LENGHT_P, width_p)
 			#convert inches to meters
-			meters_p= inches * .0254 
+			meters_p = inches * .0254 
 
 			#compute angles
 			#args [id, xc,yc,w,h]
-			ANGLE_PER_PIXEL = 78/math.sqrt(480**2 + 640**2) 
 			difference = 320 - (rois[i][1])
 
 			if difference == 0:
@@ -132,7 +139,7 @@ def get_rois_data(rois):
 			elif difference > 0:
 				angle_p = -(ANGLE_PER_PIXEL * difference)
 		
-			angle_p = angle_b * 0.0174533
+			angle_p = angle_p * 0.0174533
 			y = meters_p
 			h = abs(y / math.cos(angle))
 			x = math.sin(abs(angle)) * h
@@ -147,9 +154,9 @@ def get_rois_data(rois):
 			
 			coords = (x,y,h)
 
-			angle_b = angle_b / 0.0174533
+			angle_p = angle_p / 0.0174533
 			output[i][0] = coords
-			output[i][1] = angle_b
+			output[i][1] = angle_p
 			colorofpost = getColor(rois[i][1],rois[i][2],rois[i][3],rois[i][4])  
 			output[i][2] = colorofpost 
 
@@ -395,8 +402,6 @@ def ROI(fn):
 	return left,upper,right,lower
 
 
-
-
 def getColor(xc,yc,w,h):
 
 	
@@ -416,8 +421,10 @@ def getColor(xc,yc,w,h):
 	k = Kmeans()
 	result = k.run(cropped_image)
 	result = result.pop()
-	return result
-
+	if(result[0 > result[1]):
+		return 'r'
+	return 'g'
+	
 
 
 
