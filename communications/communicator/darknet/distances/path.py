@@ -1,9 +1,8 @@
 """	
 	OVER-ALL METHODS DESCRIPTIONS.
-
 	Color detection.- Kmeans clustering algorithm.
 	Distances to objects.- Triangle Similarity for Object/Marker to Camera Distance.
-	Angles to objects.-
+	Angles to objects.- Using camera calibration, fundamental matrix, aspect ratio and FOV 78 d
 """
 
 # import the necessary packages
@@ -32,21 +31,25 @@ from matplotlib import pyplot as plt
 					  	https://stackoverflow.com/questions/25088543/estimate-visible-bounds-of-webcam-using-diagonal-fov?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
 					  	http://vrguy.blogspot.com/2013/04/converting-diagonal-field-of-view-and.html
 
-    WIDTH_DIM      -- dimensions of video frame
-						720 x 1280 
+    WIDTH_DIM      --   Dimensions of video frame
+						480 x 640 
+
+	
 """
+ANGLE_PER_PIXEL = 78/math.sqrt(480**2 + 640**2) 
 
+#BOUYS (INCHES)
+KNOWN_DISTANCE_B = 74.8    #unknown
+KNOWN_WIDTH_B = 7.87402    #15.354331 inches width of contest's bouys 
+FOCAL_LENGHT_B = 627.29    #(PIX_WIDTH_B * KNOWN_DISTANCE_B) / KNOWN_WIDTH_B
 
-#BOUYS
-KNOWN_DISTANCE_B = 74.8    #10.0   
-KNOWN_WIDTH_B = 7.87402    #15.354331
-FOCAL_LENGHT_B = 627.29    #(PIX_WIDTH * KNOWN_DISTANCE) / KNOWN_WIDTH
+#POSTS(INCHES)
+KNOWN_DISTANCE_P = 74.8    #unknown  
+KNOWN_WIDTH_P = 7.87402    #unknown  
+FOCAL_LENGHT_P = 627.29    #(PIX_WIDTH_P * KNOWN_DISTANCE_P) / KNOWN_WIDTH_P
 
-#POSTS
-KNOWN_DISTANCE_P = 74.8    #10.0   
-KNOWN_WIDTH_P = 7.87402    #15.354331  
-FOCAL_LENGHT_P = 627.29    #(PIX_WIDTH * KNOWN_DISTANCE) / KNOWN_WIDTH
-
+FOCAL_VIEW =  78.0
+WIDTH_DIM =  640.0
 #check for values'integrity. return 1 if length of params is the expected.
 def receive(values):	
 	if len(values) == 5:
@@ -57,13 +60,11 @@ def receive(values):
 # param: rois -- list of lists with description values for each roi [id, xc,yc,w,h]
 # return -- distances, angles, dominant color for each roi.
 def get_rois_data(rois):
-	
-#create output list of lists
+	#if is empty, return
 	if not rois:
 		return False
-
 	rowLength = len(rois)
-
+	#create output list of lists
 	colLength = 3 
 	output = [[[0] for i in range(colLength)] for i in range(rowLength)]
 
@@ -71,33 +72,32 @@ def get_rois_data(rois):
 	#args [id, xc,yc,w,h]
 	for i in range(len(rois)):
 
-	  #compute distances bouys
+	   #buoys
 		if(rois[i][0]) == 1:
-			#BOUYS
+		  #distances(meters)
 			width_b = int(rois[i][2]) 
-			print('CALLER DATA') 
 			#get inches to the object 
-			inches = distance2camera(KNOWN_WIDTH, FOCAL_LENGHT_B, width_b)
+			inches = distance2camera(KNOWN_WIDTH_B, FOCAL_LENGHT_B, width_b)
 			#convert inches to meters
 			meters_b = inches * .0254 
-
-			#compute angles
-			#args [id, xc,yc,w,h]
-			ANGLE_PER_PIXEL = 78/math.sqrt(480**2 + 640**2) 
+			#difference of pixels from center
 			difference = 320 - (rois[i][1])
-
+		  #compute angles
+			#if difference is 0, angle must be 0
 			if difference == 0:
 				angle_b = 0
+			#if difference is negative, angle must be negative
 			elif difference < 0:
 				angle_b = ANGLE_PER_PIXEL * abs(difference)
+			#if difference is negative, angle must be positive
 			elif difference > 0:
 				angle_b = -(ANGLE_PER_PIXEL * difference)
-		
+		  #degrees to radians
 			angle_b = angle_b * 0.0174533
 			y = meters_b
-			h = abs(y / math.cos(angle))
-			x = math.sin(abs(angle)) * h
-
+			h = abs(y / math.cos(angle_b))
+			x = math.sin(abs(angle_b)) * h
+		  #modify x's sign depending on angle sign
 			if angle_b == 0:
 				x = 0
 			elif angle_b < 0:
@@ -105,38 +105,41 @@ def get_rois_data(rois):
 					x = -x
 			elif angle_b > 0:
 				x = abs(x)
-			
+			#form tuple
 			coords = (x,y,h)
-
+			#change back to degreees
 			angle_b = angle_b / 0.0174533
+
+			#setting the result
 			output[i][0] = coords
 			output[i][1] = angle_b
-			output[i][2] = 'non_color'
+			output[i][2] = 'dont care'
+		#posts
 		else:
-			#BOUYS
+		  #distances(meters)
 			width_p = int(rois[i][2]) 
 			#get inches to the object 
 			inches = distance2camera(KNOWN_WIDTH_P, FOCAL_LENGHT_P, width_p)
 			#convert inches to meters
-			meters_p= inches * .0254 
-
-			#compute angles
-			#args [id, xc,yc,w,h]
-			ANGLE_PER_PIXEL = 78/math.sqrt(480**2 + 640**2) 
+			meters_p = inches * .0254 
+		  #compute angles
+		  	#if difference is 0, angle must be 0
 			difference = 320 - (rois[i][1])
-
+			#if difference is 0, angle must be 0
 			if difference == 0:
 				angle_p = 0
+		    #if difference is negative, angle must be negative
 			elif difference < 0:
 				angle_p = ANGLE_PER_PIXEL * abs(difference)
+			#if difference is positive, angle must be positive
 			elif difference > 0:
 				angle_p = -(ANGLE_PER_PIXEL * difference)
-		
-			angle_p = angle_b * 0.0174533
+			#degrees to radians
+			angle_p = angle_p * 0.0174533
 			y = meters_p
-			h = abs(y / math.cos(angle))
-			x = math.sin(abs(angle)) * h
-
+			h = abs(y / math.cos(angle_p))
+			x = math.sin(abs(angle_p)) * h
+			#modify x's sign depending on angle sign
 			if angle_p == 0:
 				x = 0
 			elif angle_p < 0:
@@ -144,44 +147,47 @@ def get_rois_data(rois):
 					x = -x
 			elif angle_p > 0:
 				x = abs(x)
-			
+			#form tuple
 			coords = (x,y,h)
 
-			angle_b = angle_b / 0.0174533
+			#change back to degreees
+			angle_p = angle_p / 0.0174533
+
+			#setting the result
 			output[i][0] = coords
-			output[i][1] = angle_b
+			output[i][1] = angle_p
 			colorofpost = getColor(rois[i][1],rois[i][2],rois[i][3],rois[i][4])  
 			output[i][2] = colorofpost 
+	
+	print("____Datos____")
+	print(output)
 
 	return output
 
-# function to obtain distances to rois.
+
+#Compute and return the distance from the marker to the camera
 def distance2camera(C_WIDTH,C_FL,PIX_WIDTH):
-	#Compute and return the distance from the maker to the camera
-	print('KNOWN WIDTH: ' + str(C_WIDTH))
-	print('FOCAL LENGTH: ' + str(C_FL))
-	print('PIX_WIDTH: ' + str(PIX_WIDTH))
-	DISTANCE =  (C_WIDTH*C_FL)/PIX_WIDTH
-	print(str(DISTANCE))
-	print(str(DISTANCE*.0254))
-	return DISTANCE
+	#print('KNOWN WIDTH: ' + str(C_WIDTH))
+	#print('FOCAL LENGTH: ' + str(C_FL))
+	#print('PIX_WIDTH: ' + str(PIX_WIDTH))
+	return (C_WIDTH*C_FL)/PIX_WIDTH
 
 
-# gets angle to camera
+#Compute and return the angle from the camera perspecive
 def angle2camera(x1,y1,x2,y2):
-	pixel = (x1+(x2-x1))/2  #gets center pixel of roi
-	preangle = (pixel*FOCAL_VIEW)/WIDTH_DIM
-	return 0 - ((FOCAL_VIEW/2) - preangle)
+	#get center pixel of roi
+	pixel = (x1+(x2-x1))/2 
+	preangle = int((pixel*FOCAL_VIEW)/WIDTH_DIM)
+	return int(0 - ((FOCAL_VIEW/2) - preangle))
 
-
-# print ROI's parameters.
+#print ROI's parameters.
 def prints(rois):
-	
 	for row in rois:
    		for val in row:
         		print('{:4}'.format(val))
 
  
+#K-MEANS CLUSTERING
 class Cluster(object):
 
     def __init__(self):
@@ -235,7 +241,7 @@ class Kmeans(object):
 
             self.oldClusters = [cluster.centroid for cluster in self.clusters]
 
-            print(iterations)
+            #print(iterations)
 
             for pixel in self.pixels:
                 self.assignClusters(pixel)
@@ -281,16 +287,10 @@ class Kmeans(object):
 
         return True
 
-    # The remaining methods are used for debugging
-    def showImage(self):
-        self.image.show()
-
     def showCentroidColours(self):
 
         for cluster in self.clusters:
             image = Image.new("RGB", (200, 200), cluster.centroid)
-		#print len(self.pixels)
-        #image.show()
 
     def showClustering(self):
 
@@ -312,9 +312,6 @@ class Kmeans(object):
             .reshape((h, w, 3))
 
         colourMap = Image.fromarray(localPixels)
-        #colourMap.show()
-
-
 
 def displayImage(screen, px, topleft, prior):
 
@@ -377,8 +374,6 @@ def mainLoop(screen, px):
 	return ( topleft + bottomright )
 
 
-
-
 def ROI(fn):
 
 	input_loc = fn
@@ -395,16 +390,13 @@ def ROI(fn):
 	return left,upper,right,lower
 
 
-
-
 def getColor(xc,yc,w,h):
 
-	
 	width = w	
 	heigth = h
 	shiftright = int((width/2)/5)
 	shiftleft =  int((heigth/2)/5)
-	left = xc - shiftright
+	left =  xc - shiftright
 	right = xc + shiftright
 	upper = yc - shiftleft
 	lower = yc + shiftleft
@@ -416,8 +408,10 @@ def getColor(xc,yc,w,h):
 	k = Kmeans()
 	result = k.run(cropped_image)
 	result = result.pop()
-	return result
-
+	if(result[0] > result[1]):
+		return 'r'
+	return 'g'
+	
 
 
 

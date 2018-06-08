@@ -8,9 +8,9 @@ from glob import glob
 import os
 import sys
 
-
 TIME_DIVIDER = 10.0
 MAX_TIME = 60
+
 
 def generate_data():
     '''Funcion para generar coordenadas aleatorias de objetos'''
@@ -33,23 +33,13 @@ def parse_data(data):
             results.append([0, val[2][0], val[2][2], val[2][1], val[2][3]])
     return results
 
-def call(data_calib,images):
-    '''Realiza llamadas a codigo de red neuronal en C y pasa datos a codigo path.py'''
-    print('-------DATOS DARKNET------')
-    data = execute(data_calib,images.pop()) #Llama darknet
-    # print(data)
-    if len(data):
-        data = parse_data(data)
-        # print(data)
-        distances = get_rois_data(data) # Obtiene datos de objetos
-        # print(distances)
-    else:
-        print('---------Nothing detected------------')
 
-def main():
-    '''AQUI SE ARMA LA CARNE'''
+def main(data_calib):
+    '''AQUI SE ARMA LA CARNita ASAdiuxx'''
     while True:
-        data = execute(data_calib,images.pop(0))
+        print('-------DATOS DARKNET------')
+        #execute, send image and datos para undistort la imagen(camera calibration), esto ultimo lo hace la funcion execute
+        data = execute(data_calib)
         print(data)
         if len(data):
             data = parse_data(data)
@@ -57,8 +47,8 @@ def main():
             distances = get_rois_data(data) 
             print(distances)
         else:
-            obtain_data()
-
+            print('---------Nothing detected------------')
+            #obtain_data()
 
 def calibration():
     
@@ -120,8 +110,11 @@ def load_images_from_folder(folder):
     return images
 
 
+#CALL METHOD FOR CAMERA CALIBRATION, receives a list with parameters for image undistortion.
 data_calib = calibration()
-print(data_calib)
+print data_calib
+#READS ALL THE TEST IMAGES
 images = load_images_from_folder('/home/vantec/Documents/VantTecRB2018/communications/communicator/darknet/Competencia')
-call(data_calib,images)
+#STARTS
+main(data_calib)
 
