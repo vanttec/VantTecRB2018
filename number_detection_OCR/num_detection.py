@@ -11,12 +11,11 @@ from PIL import Image
 
 
 
-
 def analyze(image,number_template,xc,yc,xy_c):
 
 	#Display current ROI to be analized
 	img_roi = image.copy()
-	
+
 	#preprocessinfg before Object Character Recognition
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 	gray = cv2.GaussianBlur(gray,(5,5),0)
@@ -25,16 +24,16 @@ def analyze(image,number_template,xc,yc,xy_c):
 
 	#Display processed ROI
 	gray = cv2.medianBlur(gray, 3)
-	
 
 
-	#Write the grayscale image to disk as a temporary file 
+
+	#Write the grayscale image to disk as a temporary file
     #Load the image as a PIL/Pillow image, make a mosaic and apply OCR, and then delete the temporary file
 	filename = "{}.png".format(os.getpid())
 	cv2.imwrite(filename, gray)
 	fn = filename
 	images_names = [fn] * 4
-	images = map(Image.open, images_names) 
+	images = map(Image.open, images_names)
 	os.remove(filename)
 	widths, heights = images[0].size
 	total_width = widths * 4
@@ -68,11 +67,11 @@ def analyze(image,number_template,xc,yc,xy_c):
 			xy_c[1] =  [2,xc,yc]
 		elif (int(text[0]) == 3 and number_template == text[0]):
 			xy_c[2] =  [3,xc,yc]
-		
-		return xy_c	
+
+		return xy_c
 	return xy_c
-	
-	
+
+
 
 
 
@@ -81,7 +80,7 @@ rois = []
 
 #Recorrer todas las imagenes de los docks y numeros. Folder con todos las fotos de los docks.
 for fn in glob('test_images/*.png'):
- 
+
 	img = cv2.imread(fn,0)
 	img2 = img.copy()
 	detected = cv2.imread(fn,1)
@@ -109,8 +108,8 @@ for fn in glob('test_images/*.png'):
 		rois.append(roi)
 		cv2.rectangle(img,top_left, bottom_right, 255, 2)
 		cv2.imshow('ALL TEMPLATE MATCHES',img)
-	
-	
+
+
 	#Detectar en cada roi si es un numero o no, si lo es  imprimir  el numero
 	xy_c = [[0,0,0],[0,0,0],[0,0,0]]
 	for coords in rois:
@@ -125,18 +124,18 @@ for fn in glob('test_images/*.png'):
 		xc = x + int(w /2)
 		yc = y + int(h /2)
 		cropped_image = rgb[y:y+h, x:x+w]
-		
-		
+
+
 		result = analyze(cropped_image,number_template,xc,yc,xy_c)
 		xy_c =  result
-		
-		
+
+
 		'''
 		if(result is False or result is None):
 			continue
-		else: 
+		else:
 			if(int(result) == num_to_detect):
-				print("NUMBER DETECTED:	" + str(result ))	
+				print("NUMBER DETECTED:	" + str(result ))
 				cv2.rectangle(detected,top_left, bottom_right, 100, 2)
 				rois=[]
 				#call get_distances con identificador 'N', definir parametros para los carteles.
@@ -145,20 +144,15 @@ for fn in glob('test_images/*.png'):
 
 	#centers detected
 	print ("X & Y Coordinates for DOCKS 1, 2, 3")
-	
+
 	for index,i in enumerate(result):
 		print('Dock : ' + str((index+1)) +  ' ' + str(i[1:]))
 	result =[]
-	
+
 	cv2.imshow('ROI DETECTED',detected)
-	
+
 	if(result is False or result is None):
 		print('NUMBER ' + str(num_to_detect) + ' NOT FOUND IN THIS IMAGE')
-		
-	cv2.waitKey(0)	
+
+	cv2.waitKey(0)
 	rois = []
-
-	
-
-
-
