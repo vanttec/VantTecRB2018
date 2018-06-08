@@ -1,1 +1,1 @@
-from path import receive, get_rois_data
+from .path import receive, get_rois_data

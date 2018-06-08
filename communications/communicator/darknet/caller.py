@@ -33,9 +33,11 @@ def parse_data(data):
             results.append([0, val[2][0], val[2][2], val[2][1], val[2][3]])
     return results
 
-
+'''
 def main(data_calib):
-    '''AQUI SE ARMA LA CARNita ASAdiuxx'''
+
+
+   #AQUI SE ARMA LA CARNita ASAdiuxx
     while True:
         print('-------DATOS DARKNET------')
         #execute, send image and datos para undistort la imagen(camera calibration), esto ultimo lo hace la funcion execute
@@ -49,6 +51,28 @@ def main(data_calib):
         else:
             print('---------Nothing detected------------')
             #obtain_data()
+'''
+
+
+def main(data_calib,images):
+
+
+    '''AQUI SE ARMA LA CARNita ASAdiuxx'''
+    while True:
+        print('-------DATOS DARKNET------')
+        #execute, send image and datos para undistort la imagen(camera calibration), esto ultimo lo hace la funcion execute
+        data = execute(data_calib,images.pop())
+        print(data)
+        if len(data):
+            data = parse_data(data)
+            print(data)
+            distances = get_rois_data(data) 
+            print(distances)
+        else:
+            print('---------Nothing detected------------')
+            #obtain_data()
+
+
 
 def calibration():
     
@@ -112,9 +136,9 @@ def load_images_from_folder(folder):
 
 #CALL METHOD FOR CAMERA CALIBRATION, receives a list with parameters for image undistortion.
 data_calib = calibration()
-print data_calib
+print (data_calib)
 #READS ALL THE TEST IMAGES
 images = load_images_from_folder('/home/vantec/Documents/VantTecRB2018/communications/communicator/darknet/Competencia')
 #STARTS
-main(data_calib)
+main(data_calib,images)
 

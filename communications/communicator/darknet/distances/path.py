@@ -202,10 +202,10 @@ class Cluster(object):
         R = [colour[0] for colour in self.pixels]
         G = [colour[1] for colour in self.pixels]
         B = [colour[2] for colour in self.pixels]
-
-        R = sum(R) / len(R)
-        G = sum(G) / len(G)
-        B = sum(B) / len(B)
+        if( len(R) != 0 and len(G) != 0 and len(B) != 0):
+			R = sum(R) / len(R)
+			G = sum(G) / len(G)
+			B = sum(B) / len(B)
 
         self.centroid = (R, G, B)
         self.pixels = []
@@ -215,7 +215,7 @@ class Cluster(object):
 
 class Kmeans(object):
 
-    def __init__(self, k=2, max_iterations=5, min_distance=5.0, size=200):
+    def __init__(self, k=2, max_iterations=2, min_distance=5.0, size=200):
         self.k = k
         self.max_iterations = max_iterations
         self.min_distance = min_distance
@@ -407,7 +407,10 @@ def getColor(xc,yc,w,h):
 	cropped_image = image_obj.crop(coords)
 	k = Kmeans()
 	result = k.run(cropped_image)
-	result = result.pop()
+	if not result:
+		print('what')
+		
+	print(result)
 	if(result[0] > result[1]):
 		return 'r'
 	return 'g'
