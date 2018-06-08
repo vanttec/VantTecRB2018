@@ -61,57 +61,74 @@ def search_display(img, template):
     FLANN_INDEX_LSH = 6
     index_params= dict(
             algorithm = FLANN_INDEX_LSH,
-            table_number = 6, # 12
-            key_size = 12,     # 20
-            multi_probe_level = 1 # 2
+            table_number = 12, # 6
+            key_size = 20,     # 12
+            multi_probe_level = 2 # 1
     )
 
-    orb = cv2.ORB_create(edgeThreshold=10, patchSize=10)
+    orb = cv2.ORB_create()
     matcher = cv2.FlannBasedMatcher(index_params, dict())
     
     tkp, tdes = orb.detectAndCompute(template, None)
     qkp, qdes = orb.detectAndCompute(img, None)
+
+    kp_img = cv2.drawKeypoints(template, tkp, None)
 
     matches = matcher.knnMatch(qdes,tdes,2)
 
     good = []
 
     # ratio test as per Lowe's paper
-    for m,n in matches:
-        if m.distance < 0.7 * n.distance:
-            good.append(m)
+    for match in matches:
+        if len(match) == 2:
+            m, n = match
+            if m.distance < 0.7 * n.distance:
+                good.append(m)
 
     if len(good) > min_matches:
 	src_pts = np.float32([ qkp[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
 	dst_pts = np.float32([ tkp[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
-	M, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC,5.0)
-	matchesMask = mask.ravel().tolist()
-	h,w,d = img1.shape
-	pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
-	dst = cv.perspectiveTransform(pts,M)
-	img = cv.polylines(img,[np.int32(dst)],True,255,3, cv.LINE_AA)
-    else:
-	print( "Not enough matches are found - {}/{}".format(len(good), min_matches) )
-	matchesMask = None
+	
+        M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
+        
+        h, w = template.shape
 
-    match_img = cv2.drawMatches(img,qkp,template,tkp,good,None, flags=2, matchesMask=matchesMask)
+        trans = cv2.warpPerspective(img, M, (w,h))
+        return trans
+    #    matchesMask = mask.ravel().tolist()
 
-    cv2.namedWindow('matches', cv2.WINDOW_NORMAL)
-    cv2.resizeWindow('matches', 600, 600)
-    cv2.imshow('matches', match_img)
-    cv2.waitKey()
 
-    return 0
+	
+    #    h,w = template.shape
+    #    pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
+    #    dst = cv2.perspectiveTransform(pts,M)
+    #    
+    #    img = cv2.polylines(img,[np.int32(dst)],True,255,3, cv2.LINE_AA)
+    #else:
+    #    print( "Not enough matches are found - {}/{}".format(len(good), min_matches) )
+    #    matchesMask = None
+
+    #match_img = cv2.drawMatches(img,qkp,template,tkp,good,None, flags=2, matchesMask=matchesMask)
+
+    #cv2.namedWindow('matches', cv2.WINDOW_NORMAL)
+    #cv2.resizeWindow('matches', 600, 600)
+    #cv2.imshow('matches', match_img)
+    #cv2.waitKey()
+
+    return None
 
 def number_recognition(img):
     net.make_graph(img)
 
 def main():
-    img = cv2.imread('test.jpg')
-    template = cv2.imread('test-crop.jpg')
-    #display = search_display(img, template)
-    number = search_number(template)
-    #print(number_recognition(number))
+    img = cv2.imread('box_in_scene.png')
+    template = cv2.imread('box.png')
+    
+    display = search_display(img, template)
+    
+    if display is not None:
+        number = search_number(template)
+        #print(number_recognition(number))
 
 if __name__ == '__main__':
     main()
