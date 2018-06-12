@@ -49,7 +49,7 @@ KNOWN_WIDTH_P = 7.87402    #unknown
 FOCAL_LENGHT_P = 627.29    #(PIX_WIDTH_P * KNOWN_DISTANCE_P) / KNOWN_WIDTH_P
 
 FOCAL_VIEW =  78.0
-WIDTH_DIM =  640.0
+WIDTH_DIM  =  640.0
 #check for values'integrity. return 1 if length of params is the expected.
 def receive(values):	
 	if len(values) == 5:
