@@ -407,6 +407,7 @@ def getColor(xc,yc,w,h):
 	cropped_image = image_obj.crop(coords)
 	k = Kmeans()
 	result = k.run(cropped_image)
+	
 	if not result:
 		print('what')
 		
