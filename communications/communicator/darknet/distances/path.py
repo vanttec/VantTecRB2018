@@ -6,6 +6,7 @@
 """
 
 # import the necessary packages
+
 import random
 import os
 import  sys
@@ -184,38 +185,38 @@ def angle2camera(x1,y1,x2,y2):
 def prints(rois):
 	for row in rois:
    		for val in row:
-        		print('{:4}'.format(val))
+        		print(('{:4}'.format(val)))
 
  
 #K-MEANS CLUSTERING
 class Cluster(object):
 
-    def __init__(self):
-        self.pixels = []
-        self.centroid = None
+	def __init__(self):
+		self.pixels = []
+		self.centroid = None
 
-    def addPoint(self, pixel):
-        self.pixels.append(pixel)
+	def addPoint(self, pixel):
+		self.pixels.append(pixel)
 
-    def setNewCentroid(self):
+	def setNewCentroid(self):
 
-        R = [colour[0] for colour in self.pixels]
-        G = [colour[1] for colour in self.pixels]
-        B = [colour[2] for colour in self.pixels]
-        if( len(R) != 0 and len(G) != 0 and len(B) != 0):
+		R = [colour[0] for colour in self.pixels]
+		G = [colour[1] for colour in self.pixels]
+		B = [colour[2] for colour in self.pixels]
+		if( len(R) != 0 and len(G) != 0 and len(B) != 0):
 			R = sum(R) / len(R)
 			G = sum(G) / len(G)
 			B = sum(B) / len(B)
 
-        self.centroid = (R, G, B)
-        self.pixels = []
+		self.centroid = (R, G, B)
+		self.pixels = []
 
-        return self.centroid
+		return self.centroid
 
 
 class Kmeans(object):
 
-    def __init__(self, k=2, max_iterations=2, min_distance=5.0, size=200):
+    def __init__(self, k=3, max_iterations=2, min_distance=5.0, size=200):
         self.k = k
         self.max_iterations = max_iterations
         self.min_distance = min_distance
@@ -225,12 +226,13 @@ class Kmeans(object):
         self.image = image
         self.image.thumbnail(self.size)
         self.pixels = np.array(image.getdata(), dtype=np.uint8)
-
+        self.pixels = self.pixels.tolist()
+        print(self.pixels)
         self.clusters = [None for i in range(self.k)]
         self.oldClusters = None
-
+       
         randomPixels = random.sample(self.pixels, self.k)
-
+        print(type(randomPixels))
         for idx in range(self.k):
             self.clusters[idx] = Cluster()
             self.clusters[idx].centroid = randomPixels[idx]
@@ -266,7 +268,7 @@ class Kmeans(object):
 
     def calcDistance(self, a, b):
 
-        result = np.sqrt(sum((a - b) ** 2))
+        result = np.sqrt(sum((np.array(a) - np.array(b)) ** 2))
         return result
 
     def shouldExit(self, iterations):
@@ -396,21 +398,25 @@ def getColor(xc,yc,w,h):
 	heigth = h
 	shiftright = int((width/2)/5)
 	shiftleft =  int((heigth/2)/5)
-	left =  xc - shiftright
-	right = xc + shiftright
-	upper = yc - shiftleft
-	lower = yc + shiftleft
+	left =  int(xc - shiftright)
+	right = int(xc + shiftright)
+	upper = int(yc - shiftleft)
+	lower = int(yc + shiftleft)
 
 	#Crop ROI 
 	image_obj = Image.open('filename.jpg')
 	coords = (left,upper,right,lower)
 	cropped_image = image_obj.crop(coords)
-	k = Kmeans()
-	result = k.run(cropped_image)
+	k = Kmeans
+	#result = k.run(cropped_image)
 	
-	if not result:
-		print('what')
+	#if not result:
+	#	print('what')
 		
+	#result = k.run(cropped_image)
+	#if not result:
+	#	print('what')
+	result = [10,20,30]	
 	print(result)
 	if(result[0] > result[1]):
 		return 'r'

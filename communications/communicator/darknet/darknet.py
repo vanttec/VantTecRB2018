@@ -123,7 +123,8 @@ def classify(net, meta, im):
     return res
 
 def detect(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45):
-    im = load_image(image, 0, 0)
+    # For python3 added encode('utf.8')
+    im = load_image(image.encode('utf-8'), 0, 0)
     num = c_int(0)
     pnum = pointer(num)
     predict_image(net, im)
@@ -142,8 +143,9 @@ def detect(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45):
     free_detections(dets, num)
     return res
 
-net = load_net("vantec_cfg/yolo-vantec.cfg", "vantec_cfg/yolo-vantec.weights", 0)
-meta = load_meta("vantec_cfg/obj.data")
+# For python4 added b before directions
+net = load_net(b"vantec_cfg/yolo-vantec.cfg", b"vantec_cfg/yolo-vantec.weights", 0)
+meta = load_meta(b"vantec_cfg/obj.data")
 
 
 
