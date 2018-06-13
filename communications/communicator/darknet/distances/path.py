@@ -19,6 +19,12 @@ from datetime  import datetime
 from skimage import io, color,exposure
 from skimage.color import rgb2lab,deltaE_cie76
 from matplotlib import pyplot as plt
+from numpy import array
+# import the necessary packages
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+import argparse
+from .utils import *
 
 
 """
@@ -394,27 +400,32 @@ def ROI(fn):
 
 def getColor(xc,yc,w,h):
 
-	width = w	
-	heigth = h
-	shiftright = int((width/2)/5)
-	shiftleft =  int((heigth/2)/5)
-	left =  int(xc - shiftright)
-	right = int(xc + shiftright)
-	upper = int(yc - shiftleft)
-	lower = int(yc + shiftleft)
+	x = int(xc - w/2)
+	y = int(yc - h/2)
+	w = int(w)
+	h = int(h)
+	#Crop ROI
+	 
+	image = cv2.imread('filename.jpg',1)
+	
+	imaget = image[y:y+h,x:x+w]
+	cv2.imshow('image',image)
+	cv2.waitKey(0) 
+	image = cv2.cvtColor(imaget, cv2.COLOR_BGR2RGB)
 
-	#Crop ROI 
-	image_obj = Image.open('filename.jpg')
-	coords = (left,upper,right,lower)
-	cropped_image = image_obj.crop(coords)
-	k = Kmeans()
-	#result = k.run(cropped_image)
-	#if not result:
-	#	print('what')
-	result = [10,20,30]	
-	print(result)
-	if(result[0] > result[1]):
-		return 'r'
+
+	# reshape the 
+	# image to be a list of pixels
+	
+	image = image.reshape((image.shape[0] * image.shape[1], 3))
+
+	# cluster the pixel intensities
+	clt = KMeans(n_clusters = 1)
+	clt.fit(image)
+	print(clt.cluster_centers_)
+	# build a histogram of clusters and then create a figure
+	# representing the number of pixels labeled to each color
+	
 	return 'g'
 	
 
