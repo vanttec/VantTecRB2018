@@ -22,7 +22,6 @@ import dji.common.camera.SettingsDefinitions
 import dji.common.error.DJIError
 import dji.common.mission.waypoint.*
 import dji.sdk.camera.VideoFeeder
-import dji.sdk.codec.DJICodecManager
 import dji.sdk.mission.waypoint.WaypointMissionOperator
 import dji.sdk.mission.waypoint.WaypointMissionOperatorListener
 import dji.sdk.products.Aircraft
@@ -80,29 +79,6 @@ class MissionSetupActivity : AppCompatActivity() {
                     missionMap.clearWaypointMarkers()
                     missionBuilder = WaypointMission.Builder()
                 }
-
-
-                val surfaceHolderObservable = Observable.create<Triple<SurfaceHolder, Int, Int>> {
-                    val callback = object : SurfaceHolder.Callback {
-                        override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
-                            if (holder != null)
-                                it.onNext(Triple(holder, width, height))
-                        }
-
-                        override fun surfaceDestroyed(holder: SurfaceHolder?) { }
-
-                        override fun surfaceCreated(holder: SurfaceHolder?) { }
-
-                    }
-                    liveFeed.holder.addCallback(callback)
-                }.publish().autoConnect()
-
-                surfaceHolderObservable.subscribe { (surface, width, height) ->
-                    val codecManager = DJICodecManager(this, surface, width, height)
-                    VideoFeeder.VideoDataCallback { bytes, i ->
-                        codecManager.sendDataToDecoder(bytes, i)
-                    }
-                }
             }
 
             sdkManagerCallback.productObservable.subscribe { product ->
@@ -120,6 +96,17 @@ class MissionSetupActivity : AppCompatActivity() {
                     launch.setOnClickListener {
                         configWayPointMission(operator, product, missionBuilder)
                     }
+
+                    val videoFeedObservable = Observable.create<Pair<ByteArray, Int>> {
+                        VideoFeeder.getInstance().primaryVideoFeed.setCallback { data, size ->
+                            it.onNext(Pair(data, size))
+                        }
+                    }.publish().autoConnect()
+
+
+                    val numberDetector = ImageDetector(this, liveFeed.holder, videoFeedObservable)
+
+                    
                 }
             }
         }
