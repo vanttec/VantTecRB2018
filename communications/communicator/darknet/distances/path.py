@@ -20,7 +20,8 @@ from skimage import io, color,exposure
 from skimage.color import rgb2lab,deltaE_cie76
 from matplotlib import pyplot as plt
 
-
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
 """
 	KNOWN_DISTANCE -- initialize the known distance from the camera to the object(bouy,inches)
 
@@ -61,6 +62,7 @@ def receive(values):
 # param: rois -- list of lists with description values for each roi [id, xc,yc,w,h]
 # return -- distances, angles, dominant color for each roi.
 def get_rois_data(rois):
+
 	#if is empty, return
 	if not rois:
 		return False
@@ -396,32 +398,25 @@ def getColor(xc,yc,w,h):
 
 	width = w	
 	heigth = h
-	shiftright = int((width/2)/5)
-	shiftleft =  int((heigth/2)/5)
-	left =  int(xc - shiftright)
-	right = int(xc + shiftright)
-	upper = int(yc - shiftleft)
-	lower = int(yc + shiftleft)
-
-	#Crop ROI 
-	image_obj = Image.open('filename.jpg')
-	coords = (left,upper,right,lower)
-	cropped_image = image_obj.crop(coords)
-	k = Kmeans
-	#result = k.run(cropped_image)
+	shift_w = int((width/2))
+	shift_h =  int((heigth/2))
+	left =  int(xc - shift_w)
+	right = int(xc + shift_w)
+	upper = int(yc - shift_h)
+	lower = int(yc + shift_h)
 	
-	#if not result:
-	#	print('what')
-		
-	#result = k.run(cropped_image)
-	#if not result:
-	#	print('what')
-	result = [10,20,30]	
-	print(result)
+	original = cv2.imread('filename.png',1)
+	crop_img = original[upper:lower, left:right]
+	image = cv2.cvtColor(crop_img, cv2.COLOR_BGR2RGB)
+	image = image.reshape((image.shape[0] * image.shape[1], 3))
+	clt = KMeans(n_clusters = 1)
+	clt.fit(image)
+	result = clt.cluster_centers_
 	if(result[0] > result[1]):
 		return 'r'
-	return 'g'
+	else:
+		return 'g'
+
+
 	
-
-
 

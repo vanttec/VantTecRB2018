@@ -139,6 +139,7 @@ data_calib = calibration()
 print (data_calib)
 #READS ALL THE TEST IMAGES
 images = load_images_from_folder('/home/vantec/Documents/VantTecRB2018/communications/communicator/darknet/Competencia')
-#STARTS
+#STARTS DEBUGGING
 main(data_calib,images)
-
+#STARTS RT
+#main(data_calib)
