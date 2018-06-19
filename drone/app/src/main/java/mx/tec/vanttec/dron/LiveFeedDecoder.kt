@@ -20,8 +20,6 @@ import org.opencv.android.Utils
 import org.opencv.core.Mat
 import org.opencv.utils.Converters
 
-data class LiveFeedData(val buffer: ByteArray, val length: Int)
-
 class LiveFeedDecoder(context: Context,
                       private val surfaceHolder: SurfaceHolder,
                       private val liveFeedObservable: Observable<LiveFeedData>) : Runnable {
@@ -184,6 +182,7 @@ class LiveFeedDecoder(context: Context,
         }
 
     }
-}
 
-class MissingCodecException(mime: String) : Exception("No decoder found for $mime")
+    data class LiveFeedData(val buffer: ByteArray, val length: Int)
+    class MissingCodecException(mime: String) : Exception("No decoder found for $mime")
+}

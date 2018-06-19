@@ -97,9 +97,9 @@ class MissionSetupActivity : AppCompatActivity() {
                         configWayPointMission(operator, product, missionBuilder)
                     }
 
-                    val videoFeedObservable = Observable.create<LiveFeedData> {
+                    val videoFeedObservable = Observable.create<LiveFeedDecoder.LiveFeedData> {
                         VideoFeeder.getInstance().primaryVideoFeed.setCallback { data, length ->
-                            it.onNext(LiveFeedData(data, length))
+                            it.onNext(LiveFeedDecoder.LiveFeedData(data, length))
                         }
                     }.publish().autoConnect()
 

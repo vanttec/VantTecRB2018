@@ -5,8 +5,6 @@ import org.opencv.core.MatOfKeyPoint
 import org.opencv.core.Size
 import org.opencv.features2d.ORB
 
-private val orb = ORB.create()
-
 class DetectorData(image: Mat) {
     val keyPoints = MatOfKeyPoint()
     val descriptors = Mat()
@@ -26,4 +24,8 @@ class DetectorData(image: Mat) {
     operator fun component1() = keyPoints
     operator fun component2() = descriptors
     operator fun component3() = size
+
+    companion object {
+        private val orb = ORB.create()
+    }
 }
