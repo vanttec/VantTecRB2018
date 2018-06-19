@@ -159,7 +159,7 @@ def execute(data_calib,img):
     drawing_frame_squares = frame.copy()
     height, width, channels = frame.shape
     #cap.release()
-    filename = "filename.jpg"
+    filename = "filename.png"
     #save image
     imwrite(filename,frame) 
 
@@ -170,7 +170,7 @@ def execute(data_calib,img):
     #print r[:10]
 
     #[id,xc,yc,w,h]
-    r = detect(net, meta, "filename.jpg")
+    r = detect(net, meta, "filename.png")
     
 
     #The following is just for drawing rois as squares, and see is there is an improvement in the distances' accuracy.
