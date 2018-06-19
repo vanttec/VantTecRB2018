@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.media.MediaCodec
 import android.media.MediaCodecList
 import android.media.MediaFormat
+import android.renderscript.Allocation
 import android.renderscript.Element
 import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicYuvToRGB
@@ -15,23 +16,19 @@ import android.view.Surface
 import android.view.SurfaceHolder
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
-import org.opencv.calib3d.Calib3d
-import org.opencv.core.*
-import org.opencv.features2d.FlannBasedMatcher
-import org.opencv.imgproc.Imgproc
-import android.renderscript.Allocation
 import org.opencv.android.Utils
+import org.opencv.core.Mat
 import org.opencv.utils.Converters
 
-class ImageDetector(context: Context,
-                     private val surfaceHolder: SurfaceHolder,
-                     private val liveFeedObservable: Observable<Pair<ByteArray, Int>>) : Runnable {
+data class LiveFeedData(val buffer: ByteArray, val length: Int)
 
-    var template: DetectorData? = null
+class LiveFeedDecoder(context: Context,
+                      private val surfaceHolder: SurfaceHolder,
+                      private val liveFeedObservable: Observable<LiveFeedData>) : Runnable {
 
     // Drone live feed is 720p
-    private val maxWidth = 1280
-    private val maxHeight = 720
+    private val nativeWidth = 1280
+    private val nativeHeight = 720
 
     // Constants
     private val tag = "NumberDetector"
@@ -40,12 +37,7 @@ class ImageDetector(context: Context,
     // Async observables
     private val inputBufferObservable : Observable<Pair<MediaCodec, Int>>
     private val outputBufferObservable : Observable<Pair<MediaCodec, Int>>
-    private val surfaceObservable : Observable<Surface>
-
-    // Descriptor matching vars
-    private val minMatches = 10
-    private val flannParamsPath = "/path/to/yaml" // TODO: GET PATH
-    private val matcher = FlannBasedMatcher.create()
+    private val surfaceObservable : Observable<Triple<Surface, Int, Int>>
 
     // Live feed YUV to RGB vars
     private val rs = RenderScript.create(context)
@@ -55,7 +47,7 @@ class ImageDetector(context: Context,
     private val inference = TensorFlowInferenceInterface(context.assets, "number_detector")
 
     init {
-        val format = MediaFormat.createVideoFormat(mime, maxWidth, maxHeight)
+        val format = MediaFormat.createVideoFormat(mime, nativeWidth, nativeHeight)
         val decoderName = MediaCodecList(MediaCodecList.REGULAR_CODECS)
                 .findDecoderForFormat(format)
 
@@ -101,70 +93,20 @@ class ImageDetector(context: Context,
             throw MissingCodecException(mime)
         }
 
-        surfaceObservable = Observable.create<Surface> {
+        surfaceObservable = Observable.create<Triple<Surface, Int, Int>> {
             surfaceHolder.addCallback(object : SurfaceHolder.Callback {
                 override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-                    it.onNext(holder.surface)
+                    it.onNext(Triple(holder.surface, width, height))
                 }
 
                 override fun surfaceDestroyed(holder: SurfaceHolder) {
                     it.onComplete()
                 }
 
-                override fun surfaceCreated(holder: SurfaceHolder) {
-                    it.onNext(holder.surface)
-                }
+                override fun surfaceCreated(holder: SurfaceHolder) { /* Do nothing */ }
 
             })
         }.publish().autoConnect()
-    }
-
-    private fun findTarget(image: Mat, template: DetectorData) : Mat? {
-        val (tkp, tdes, tsize) = template
-        val (qkp, qdes) = DetectorData(image)
-
-        val matches = ArrayList<MatOfDMatch>()
-        val goodMatches = ArrayList<DMatch>()
-
-        matcher.read(flannParamsPath)
-        matcher.knnMatch(qdes, tdes, matches, 2)
-
-        for(match in matches) {
-            val match = match.toList()
-
-            if(match.size == 2) {
-                val (m,n) = match
-
-                if(m.distance < 0.7 * n.distance)
-                    goodMatches.add(n)
-            }
-        }
-
-        if(goodMatches.size > minMatches) {
-            val srcPts = ArrayList<Point>()
-            val dstPts = ArrayList<Point>()
-
-            val qkp = qkp.toList()
-            val tkp = tkp.toList()
-
-            for(m in goodMatches) {
-                srcPts.add(qkp[m.queryIdx].pt)
-                dstPts.add(tkp[m.trainIdx].pt)
-            }
-
-            val srcPtsMat = MatOfPoint2f(*srcPts.toTypedArray())
-            val dstPtsMat = MatOfPoint2f(*dstPts.toTypedArray())
-
-            val mat = Calib3d.findHomography(srcPtsMat, dstPtsMat, Calib3d.RANSAC, 5.0)
-
-            val foundImg = Mat()
-
-            Imgproc.warpPerspective(image, foundImg, mat, tsize)
-
-            return foundImg
-        }
-
-        return null
     }
 
     private fun decodeYUV(data: ByteArray, width: Int, height: Int) : Bitmap {
@@ -189,8 +131,10 @@ class ImageDetector(context: Context,
     override fun run() {
         val startTime = System.currentTimeMillis()
         var liveFeedData : ByteArray? = null
-        var liveFeedLen : Int? = null
+        var liveFeedLen : Int = 0
         var surface : Surface? = null
+        var prewiewW : Int = 0
+        var previewH : Int = 0
 
         liveFeedObservable.subscribe { (data, len) ->
             liveFeedData = data
@@ -203,22 +147,19 @@ class ImageDetector(context: Context,
 
             if(liveFeedData != null) {
                 buffer.put(liveFeedData)
-                decoder.queueInputBuffer(index, 0, liveFeedLen!!, presentationTime, 0)
+                decoder.queueInputBuffer(index, 0, liveFeedLen, presentationTime, 0)
             }
         }
 
-        surfaceObservable.subscribe {
-            surface = it
+        surfaceObservable.subscribe { (s, w, h) ->
+            surface = s
+            prewiewW = w
+            previewH = h
         }
 
         outputBufferObservable.subscribe { (decoder, index) ->
             val frameData = decoder.getOutputBuffer(index).array()
-            val frameFormat = decoder.getOutputFormat(index)
-
-            val width = frameFormat.getInteger(MediaFormat.KEY_WIDTH)
-            val height = frameFormat.getInteger(MediaFormat.KEY_HEIGHT)
-
-            val frameBitmap = decodeYUV(frameData, width, height)
+            val frameBitmap = decodeYUV(frameData, nativeWidth, nativeHeight)
 
             val template = template
 

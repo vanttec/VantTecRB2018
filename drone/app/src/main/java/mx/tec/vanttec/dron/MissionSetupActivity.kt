@@ -10,7 +10,6 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.SurfaceHolder
 import android.view.WindowManager
 import android.widget.Toast
 
@@ -26,6 +25,7 @@ import dji.sdk.mission.waypoint.WaypointMissionOperator
 import dji.sdk.mission.waypoint.WaypointMissionOperatorListener
 import dji.sdk.products.Aircraft
 import dji.sdk.sdkmanager.DJISDKManager
+
 import io.reactivex.Observable
 
 import kotlinx.android.synthetic.main.activity_mission_setup.*
@@ -97,16 +97,14 @@ class MissionSetupActivity : AppCompatActivity() {
                         configWayPointMission(operator, product, missionBuilder)
                     }
 
-                    val videoFeedObservable = Observable.create<Pair<ByteArray, Int>> {
-                        VideoFeeder.getInstance().primaryVideoFeed.setCallback { data, size ->
-                            it.onNext(Pair(data, size))
+                    val videoFeedObservable = Observable.create<LiveFeedData> {
+                        VideoFeeder.getInstance().primaryVideoFeed.setCallback { data, length ->
+                            it.onNext(LiveFeedData(data, length))
                         }
                     }.publish().autoConnect()
 
 
-                    val numberDetector = ImageDetector(this, liveFeed.holder, videoFeedObservable)
-
-                    
+                    val decoder = LiveFeedDecoder(this, liveFeed.holder, videoFeedObservable)
                 }
             }
         }

@@ -1,11 +1,13 @@
 package mx.tec.vanttec.dron
 
+import org.opencv.calib3d.Calib3d
 import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
 import org.opencv.core.Size
 import org.opencv.core.Mat
 import java.util.ArrayList
 import org.opencv.core.MatOfPoint
+import org.opencv.features2d.FlannBasedMatcher
 import org.opencv.imgproc.Moments
 
 // colorLow: Scalar(59.0, 69.0, 0.0)
@@ -16,6 +18,11 @@ private val hFOV  = Math.toRadians(73.7)
 private const val altitude = 20.0
 private const val minThresh = 0.0
 
+
+// Descriptor matching vars
+private val minMatches = 10
+private val flannParamsPath = "/path/to/yaml" // TODO: GET PATH
+private val matcher = FlannBasedMatcher.create()
 
 fun  mainMap(srcImg: Mat, colorLow: Scalar, colorHigh: Scalar) : List<Pair<Int, Int>> {
     val size = srcImg.size()
@@ -71,7 +78,7 @@ fun  mainMap(srcImg: Mat, colorLow: Scalar, colorHigh: Scalar) : List<Pair<Int, 
         }
     }
 
-    val (total_meters_x, total_meters_y) = getDistanceFieldOfView(altitude, hFOV, vFOV)
+    val (totalMetersX, totalMetersY) = getDistanceFieldOfView(altitude, hFOV, vFOV)
 
     //Draw contours
     val output = ArrayList<Pair<Int, Int>>();
@@ -79,8 +86,8 @@ fun  mainMap(srcImg: Mat, colorLow: Scalar, colorHigh: Scalar) : List<Pair<Int, 
         //I draw a black little empty circle in the centroid position
         Imgproc.circle(imgRGB, c, 5, Scalar(255.0, 0.0, 0.0), -1)
         val yModified = 480 - c.y
-        val x = Math.round((c.x * total_meters_x * 8.55) / size.width).toInt()
-        val y = Math.round((yModified * total_meters_y * 7.6) / size.height).toInt()
+        val x = Math.round((c.x * totalMetersX * 8.55) / size.width).toInt()
+        val y = Math.round((yModified * totalMetersY * 7.6) / size.height).toInt()
         Imgproc.putText(imgRGB, "($x,$y)", c, Core.FONT_HERSHEY_SIMPLEX, 0.3, Scalar(0.0, 0.0, 0.0))
         output.add(Pair(x, y))
     }
@@ -93,4 +100,52 @@ private fun getDistanceFieldOfView(h: Double, hFOV: Double, vFOV: Double) : Pair
     val yDist = Math.tan(vFOV / 2) * h * 2
 
     return Pair(xDist, yDist)
+}
+
+fun findTarget(image: Mat, template: DetectorData) : Mat? {
+    val (tkp, tdes, tsize) = template
+    val (qkp, qdes) = DetectorData(image)
+
+    val matches = ArrayList<MatOfDMatch>()
+    val goodMatches = ArrayList<DMatch>()
+
+    matcher.read(flannParamsPath)
+    matcher.knnMatch(qdes, tdes, matches, 2)
+
+    for(match in matches) {
+        val match = match.toList()
+
+        if(match.size == 2) {
+            val (m,n) = match
+
+            if(m.distance < 0.7 * n.distance)
+                goodMatches.add(n)
+        }
+    }
+
+    if(goodMatches.size > minMatches) {
+        val srcPts = ArrayList<Point>()
+        val dstPts = ArrayList<Point>()
+
+        val qkp = qkp.toList()
+        val tkp = tkp.toList()
+
+        for(m in goodMatches) {
+            srcPts.add(qkp[m.queryIdx].pt)
+            dstPts.add(tkp[m.trainIdx].pt)
+        }
+
+        val srcPtsMat = MatOfPoint2f(*srcPts.toTypedArray())
+        val dstPtsMat = MatOfPoint2f(*dstPts.toTypedArray())
+
+        val mat = Calib3d.findHomography(srcPtsMat, dstPtsMat, Calib3d.RANSAC, 5.0)
+
+        val foundImg = Mat()
+
+        Imgproc.warpPerspective(image, foundImg, mat, tsize)
+
+        return foundImg
+    }
+
+    return null
 }
