@@ -1,11 +1,16 @@
+'''
+Module to communicate drone and the station
+'''
 import socket
+from rx import Observable
+from my_observable import PrintObserver
 
 HOST = "127.0.0.1"
 PORT = 5000
 END = 'kthanksbye'
 
-def main():
-    # Make it a callback
+def drone_communicate(observer):
+    '''Socket with rx python'''
     my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     my_socket.bind((HOST, PORT))
     my_socket.listen(1)
@@ -26,29 +31,30 @@ def main():
         print("Received data")
         conn.send("holi".encode())
 
-        if eoh != -1:
-            break
-        # split the header and keep data (img)
+        if eoh == -1:
+            continue
+        # split the header and keep data
         header, data = header[:eoh], header[eoh + len(END):]
         header = header.decode()
-        # if mamalon
+
         # Dock number
         if header == "DockNum":
-            # callback with base number
-            pass
+            observer.on_next(data)
+
         # Map
-        if header == "Map":
-            # Positions List
-            pass
+        elif header == "Map":
+            observer.on_next(data)
+
         # Dock photo
         else:
-            # TODO: Instead of writing, collect the binary and send it
             # Analyse header
             # "DockPhoto,12,424,532"
             try:
                 start, length, offset, size = header.split(',')
             except ValueError:
-                print("Unknown header", header)
+                observer.on_error("Unknow header")
+                observer.on_error(header)
+                # print("Unknown header", header)
                 continue
             if start == "DockPhoto":
                 length, offset, size = map(int, [length, offset, size])
@@ -56,9 +62,12 @@ def main():
                 if offset + size == length:
                     fhand.write(img_data)
                     img_data = b''
+                    observer.on_next("Image")
                 else:
                     img_data += data
-           
     conn.close()
+    observer.on_completed()
 
-main()
+source = Observable.create(drone_communicate)
+
+source.subscribe(PrintObserver())
