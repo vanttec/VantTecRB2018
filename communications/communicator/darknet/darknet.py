@@ -151,70 +151,42 @@ meta = load_meta(b"vantec_cfg/obj.data")
 
 def execute(data_calib,img):
 
-    
-    #undistort image
+    #Undistort image
     frame = undistorted_image(img,data_calib)
-    #for debugging
-    drawing_frame = frame
-    drawing_frame_squares = frame.copy()
-    height, width, channels = frame.shape
-    #cap.release()
-    filename = "filename.jpg"
-    #save image
+    drawing_frame = frame.copy()
+    #Save image
+    filename = "filename.png"
     imwrite(filename,frame) 
+    #Call CNN
+    r = detect(net, meta, "filename.png")
 
-    #net = load_net("cfg/densenet201.cfg", "/home/pjreddie/trained/densenet201.weights", 0)
-    #im = load_image("data/wolf.jpg", 0, 0)
-    #meta = load_meta("cfg/imagenet1k.data")
-    #r = classify(net, meta, im)
-    #print r[:10]
-
-    #[id,xc,yc,w,h]
-    r = detect(net, meta, "filename.jpg")
-    
-
-    #The following is just for drawing rois as squares, and see is there is an improvement in the distances' accuracy.
+    #Iterate detected objects
     for f in r:
-        #get id
+        #Unpack data
         id = f[0]
-        #get coordinates
         v  = f[2] 
         xc = int(v[0])
         yc = int(v[1])
         w =  int(v[2])
         h =  int(v[3])
-        #make rectangles into squares
-        if w < h:
-            minimum = w
-        else: 
-            minimum = h
-        
+
         wh = int(v[2] / 2) 
         hh = int(v[3] / 2)
         x =  int(xc - wh)
         y =  int(yc-  hh)
-        
-        #if bouy
-        if(id == 'b'):
-            #draw the ROIS as squares
-            cv2.rectangle(drawing_frame_squares, (x,y), (x+minimum,y+minimum), (0,0,255))
-            #draw the ROIS unchanged
-            cv2.rectangle(drawing_frame, (x,y), (x+w,y+h), (0,0,255))
-        #if post
-        else:
-            #draw unchanged roi in both windows
-            cv2.rectangle(drawing_frame_squares, (x,y), (x+w,y+h), (0,0,255))
-            cv2.rectangle(drawing_frame, (x,y), (x+w,y+h), (0,0,255))
+      
+        #Draw rois
+        cv2.rectangle(drawing_frame, (x,y), (x+w,y+h), (0,0,255))
     
-    #Parse data and
+    #Parse data 
     if len(r):
             data = parse_data(r)
             print(data)
             distances = get_rois_data(data) 
 
-            #put text on image
-            for i,d in enumerate(distances) :
-                #tuple
+            #Iterate objects
+            for i,d in enumerate(distances):
+                #Unpack data
                 dist = d[0]  
                 x = dist[0]
                 y = dist[1]
@@ -225,14 +197,13 @@ def execute(data_calib,img):
                 xc = int(v[0])
                 yc = int(v[1])              
 
-                #distances
+                #Put text distances and angles
                 cv2.putText(drawing_frame,str(round(x,2)), (xc,yc), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
                 cv2.putText(drawing_frame,str(round(y,2)), (xc,yc+10), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
                 cv2.putText(drawing_frame,str(round(h,2)), (xc,yc+20), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
-                #angles
                 cv2.putText(drawing_frame,str(round(d[1],2)), (xc,yc+30), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
 
-    cv2.imshow("ROIS", drawing_frame)
+    cv2.imshow("Rois", drawing_frame)
     cv2.waitKey(0)
     return r
 
@@ -241,74 +212,46 @@ def execute(data_calib,img):
 def execute(data_calib):
  
     #Funcion para tomar fotos y escanear imagen
-    
     cap = VideoCapture(0)
     ret, raw_frame = cap.read()
-    #cv2.imshow("jaja", raw_frame)
-    
-    #undistort image
+    #Undistort image
     frame = undistorted_image(raw_frame,data_calib)
-    #for debugging
-    drawing_frame = frame
-    drawing_frame_squares = frame.copy()
+    drawing_frame = frame.copy()
     height, width, channels = frame.shape
     cap.release()
-    filename = "filename.jpg"
-    #save image
+    filename = "filename.png"
+    #Save image
     imwrite(filename,frame) 
-
-    #net = load_net("cfg/densenet201.cfg", "/home/pjreddie/trained/densenet201.weights", 0)
-    #im = load_image("data/wolf.jpg", 0, 0)
-    #meta = load_meta("cfg/imagenet1k.data")
-    #r = classify(net, meta, im)
-    #print r[:10]
-
-    #[id,xc,yc,w,h]
-    r = detect(net, meta, "filename.jpg")
+    #Call CNN
+    r = detect(net, meta, "filename.png")
     
-
-    #The following is just for drawing rois as squares, and see is there is an improvement in the distances' accuracy.
+    #Iterate detected objects
     for f in r:
-        #get id
+
+        #Unpack data
         id = f[0]
-        #get coordinates
         v  = f[2] 
         xc = int(v[0])
         yc = int(v[1])
         w =  int(v[2])
         h =  int(v[3])
-        #make rectangles into squares
-        if w < h:
-            minimum = w
-        else: 
-            minimum = h
-        
         wh = int(v[2] / 2) 
         hh = int(v[3] / 2)
         x =  int(xc - wh)
         y =  int(yc-  hh)
-        
-        #if bouy
-        if(id == 'b'):
-            #draw the ROIS as squares
-            cv2.rectangle(drawing_frame_squares, (x,y), (x+minimum,y+minimum), (0,0,255))
-            #draw the ROIS unchanged
-            cv2.rectangle(drawing_frame, (x,y), (x+w,y+h), (0,0,255))
-        #if post
-        else:
-            #draw unchanged roi in both windows
-            cv2.rectangle(drawing_frame_squares, (x,y), (x+w,y+h), (0,0,255))
-            cv2.rectangle(drawing_frame, (x,y), (x+w,y+h), (0,0,255))
+
+        #Drawn rois
+        cv2.rectangle(drawing_frame, (x,y), (x+w,y+h), (0,0,255))
     
-    #Parse data and
+    #Parse data 
     if len(r):
             data = parse_data(r)
             print(data)
             distances = get_rois_data(data) 
 
-            #put text on image
+            #Put text on image
             for i,d in enumerate(distances) :
-                #tuple
+                #Unpack data
                 dist = d[0]  
                 x = dist[0]
                 y = dist[1]
@@ -319,14 +262,13 @@ def execute(data_calib):
                 xc = int(v[0])
                 yc = int(v[1])              
 
-                #distances
+                # #Put text distances and angles
                 cv2.putText(drawing_frame,str(round(x,2)), (xc,yc), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
                 cv2.putText(drawing_frame,str(round(y,2)), (xc,yc+10), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
                 cv2.putText(drawing_frame,str(round(h,2)), (xc,yc+20), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
-                #angles
                 cv2.putText(drawing_frame,str(round(d[1],2)), (xc,yc+30), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
 
-    cv2.imshow("ROIS", drawing_frame)
+    cv2.imshow("Rois", drawing_frame)
     cv2.waitKey(20)
     return r
 '''
