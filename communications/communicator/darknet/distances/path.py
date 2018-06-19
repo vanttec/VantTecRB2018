@@ -400,6 +400,7 @@ def ROI(fn):
 
 def getColor(xc,yc,w,h):
 
+<<<<<<< HEAD
 	x = int(xc - w/2)
 	y = int(yc - h/2)
 	w = int(w)
@@ -426,6 +427,34 @@ def getColor(xc,yc,w,h):
 	# build a histogram of clusters and then create a figure
 	# representing the number of pixels labeled to each color
 	
+=======
+	width = w	
+	heigth = h
+	shiftright = int((width/2)/5)
+	shiftleft =  int((heigth/2)/5)
+	left =  int(xc - shiftright)
+	right = int(xc + shiftright)
+	upper = int(yc - shiftleft)
+	lower = int(yc + shiftleft)
+
+	#Crop ROI 
+	image_obj = Image.open('filename.jpg')
+	coords = (left,upper,right,lower)
+	cropped_image = image_obj.crop(coords)
+	k = Kmeans
+	#result = k.run(cropped_image)
+	
+	#if not result:
+	#	print('what')
+		
+	#result = k.run(cropped_image)
+	#if not result:
+	#	print('what')
+	result = [10,20,30]	
+	print(result)
+	if(result[0] > result[1]):
+		return 'r'
+>>>>>>> f0cc878297571c8c52436063d1ba86b07cdd265b
 	return 'g'
 	
 
