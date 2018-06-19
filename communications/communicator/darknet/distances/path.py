@@ -62,6 +62,7 @@ def receive(values):
 # param: rois -- list of lists with description values for each roi [id, xc,yc,w,h]
 # return -- distances, angles, dominant color for each roi.
 def get_rois_data(rois):
+
 	#if is empty, return
 	if not rois:
 		return False
