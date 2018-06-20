@@ -159,7 +159,7 @@ def get_rois_data(rois):
 			#setting the result
 			output[i][0] = coords
 			output[i][1] = angle_p
-			colorofpost = getColor(rois[i][1],rois[i][2],rois[i][3],rois[i][4])  
+			colorofpost = getColor(rois[i][1],rois[i][3],rois[i][2],rois[i][4])  
 			output[i][2] = colorofpost 
 	
 	print("____Datos____")
@@ -412,6 +412,7 @@ def getColor(xc,yc,w,h):
 	clt = KMeans(n_clusters = 1)
 	clt.fit(image)
 	result = clt.cluster_centers_
+	result = result[0]
 	if(result[0] > result[1]):
 		return 'r'
 	else:
