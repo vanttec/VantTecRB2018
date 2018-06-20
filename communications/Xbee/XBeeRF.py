@@ -24,7 +24,7 @@ def Sender():
 
  #****************************************************************************************#
     # TODO: Replace with the serial port where your local module is connected to.
-    PORT = "COM3" #La estacion
+    PORT = "/dev/ttyUSB0" #La estacion
     # TODO: Replace with the baud rate of your local module.
     BAUD_RATE = 9600
     DATA_TO_SEND = "Starting conversation..." #Inicia la conversacion con esto
@@ -105,6 +105,6 @@ def Receiver2Sender():
             device.close()
 
 Sender()
-Receiver2Sender()
+# Receiver2Sender()
 #La conversacion comienza teniendo a uno de los dos escuchando y al otro dando la primer palabra
 #El que escucha es Receiver2Server

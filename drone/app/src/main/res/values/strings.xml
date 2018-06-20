@@ -16,4 +16,8 @@
     <string name="lng_hint">Longitude (°)</string>
     <string name="time_hint">Time (s)</string>
     <string name="alt_hint">Height (m)</string>
+
+    <string name="setting_base_addr">Base address</string>
+    <string name="setting_base_port">Base port</string>
+    <string name="setting_default_alt">Default Altitude</string>
 </resources>

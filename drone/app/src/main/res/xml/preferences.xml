@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference android:key="base_addr"
+        android:title="@string/setting_base_addr"
+        android:defaultValue="192.168.0.201"
+        android:inputType="tektx" />
+    <EditTextPreference android:key="base_port"
+        android:title="@string/setting_base_port"
+        android:defaultValue="5000"
+        android:inputType="number" />
+    <EditTextPreference android:key="def_alt"
+        android:title="@string/setting_default_alt"
+        android:defaultValue="" />
+</PreferenceScreen>

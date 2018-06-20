@@ -20,9 +20,8 @@ import org.opencv.android.Utils
 import org.opencv.core.Mat
 import org.opencv.utils.Converters
 
-class LiveFeedDecoder(context: Context,
-                      private val surfaceHolder: SurfaceHolder,
-                      private val liveFeedObservable: Observable<LiveFeedData>) : Runnable {
+class LiveFeedDecoder(context: Context, private val liveFeedObservable: Observable<LiveFeedData>) :
+        Runnable {
 
     // Drone live feed is 720p
     private val nativeWidth = 1280
@@ -35,14 +34,10 @@ class LiveFeedDecoder(context: Context,
     // Async observables
     private val inputBufferObservable : Observable<Pair<MediaCodec, Int>>
     private val outputBufferObservable : Observable<Pair<MediaCodec, Int>>
-    private val surfaceObservable : Observable<Triple<Surface, Int, Int>>
 
     // Live feed YUV to RGB vars
     private val rs = RenderScript.create(context)
     private val yuvToRGB = ScriptIntrinsicYuvToRGB.create(rs, Element.U8_4(rs))
-
-    // Number detection DNN
-    private val inference = TensorFlowInferenceInterface(context.assets, "number_detector")
 
     init {
         val format = MediaFormat.createVideoFormat(mime, nativeWidth, nativeHeight)
@@ -90,21 +85,6 @@ class LiveFeedDecoder(context: Context,
         } else {
             throw MissingCodecException(mime)
         }
-
-        surfaceObservable = Observable.create<Triple<Surface, Int, Int>> {
-            surfaceHolder.addCallback(object : SurfaceHolder.Callback {
-                override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-                    it.onNext(Triple(holder.surface, width, height))
-                }
-
-                override fun surfaceDestroyed(holder: SurfaceHolder) {
-                    it.onComplete()
-                }
-
-                override fun surfaceCreated(holder: SurfaceHolder) { /* Do nothing */ }
-
-            })
-        }.publish().autoConnect()
     }
 
     private fun decodeYUV(data: ByteArray, width: Int, height: Int) : Bitmap {
@@ -131,8 +111,6 @@ class LiveFeedDecoder(context: Context,
         var liveFeedData : ByteArray? = null
         var liveFeedLen : Int = 0
         var surface : Surface? = null
-        var prewiewW : Int = 0
-        var previewH : Int = 0
 
         liveFeedObservable.subscribe { (data, len) ->
             liveFeedData = data
@@ -149,36 +127,13 @@ class LiveFeedDecoder(context: Context,
             }
         }
 
-        surfaceObservable.subscribe { (s, w, h) ->
-            surface = s
-            prewiewW = w
-            previewH = h
-        }
-
-        outputBufferObservable.subscribe { (decoder, index) ->
+        outputBufferObservable.map { (decoder, index) ->
             val frameData = decoder.getOutputBuffer(index).array()
             val frameBitmap = decodeYUV(frameData, nativeWidth, nativeHeight)
 
-            val template = template
-
-            val canvas = surface?.lockHardwareCanvas()
-
-            if(template != null) {
-                val frameMat = Mat()
-                val matchData = ArrayList<Byte>()
-
-                Utils.bitmapToMat(frameBitmap, frameMat)
-
-                val matchMat = findTarget(frameMat, template)
-
-                Converters.Mat_to_vector_char(matchMat, matchData)
-
-                inference.feed("img", matchData.toByteArray(), matchData.size.toLong())
-            }
-
-            canvas?.drawBitmap(frameBitmap, 0f, 0f, Paint())
-
             decoder.releaseOutputBuffer(index, System.nanoTime())
+
+            frameBitmap
         }
 
     }
