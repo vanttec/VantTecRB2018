@@ -2,14 +2,13 @@
 Module to receive data from drone
 '''
 import socket
+import json
 
 HOST = "127.0.0.1"
 PORT = 5000
 END = 'kthanksbye'
-DOCK_NUM = 0
-MAP_DATA = ''
 
-def receive():
+def receive(global_data):
     my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     my_socket.bind((HOST, PORT))
     my_socket.listen(1)
@@ -27,8 +26,6 @@ def receive():
         # end-of-header in buffer yet_
         eoh = header.find(b'kthanksbye')
 
-        conn.send("holi".encode())
-
         if eoh == -1:
             continue
         # split the header and keep data
@@ -37,14 +34,14 @@ def receive():
 
         # Dock number
         if header == "DockNum":
+            conn.send("Ack docknum".encode())
             data = data.decode()
-            global DOCK_NUM
-            DOCK_NUM = data
+            global_data.dock_num = data
         # Map
         elif header == "Map":
+            conn.send("Ack map".encode())
             data = data.decode()
-            global MAP_DATA
-            MAP_DATA = data
+            global_data.map_data = json.loads(data)
         # Dock photo
         else:
             # Analyse header
@@ -60,7 +57,7 @@ def receive():
                 if offset + size == length:
                     fhand.write(img_data)
                     img_data = b''
-                    print("Received Image")
+                    conn.send("Ack img".encode())
                 else:
                     img_data += data
         header = b''

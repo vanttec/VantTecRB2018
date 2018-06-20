@@ -1,11 +1,8 @@
 import time
 from digi.xbee.devices import XBeeDevice
 import json
-from .comunicacion import xbee
 
-xbee = xbee()
-
-def subscriber():
+def subscriber(xbee):
     '''Esto es para el bote, el bote envia a la estacion cada 500ms'''
     #****************************************************************************************#
     # Replace with the serial port where your local module is connected to.

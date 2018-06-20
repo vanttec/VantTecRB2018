@@ -1,11 +1,8 @@
 import time
 from digi.xbee.devices import XBeeDevice
 import json
-from .comunicacion import xbee
 
-xbee = xbee()
-
-def publisher():
+def publisher(xbee):
     '''Xbee station'''
     #****************************************************************************************#
     # TODO: Replace with the serial port where your local module is connected to.
