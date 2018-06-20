@@ -2,8 +2,6 @@
 Module to communicate drone and the station
 '''
 import socket
-from rx import Observable
-from my_observable import PrintObserver
 
 HOST = "127.0.0.1"
 PORT = 5000
@@ -17,7 +15,7 @@ def drone_communicate(observer):
     conn, addr = my_socket.accept()
     print("Connection from: " + str(addr))
     header = b''
-    fhand = open("file.jpg", "wb")
+    fhand = open("file.jpg", "wb+")
     img_data = b''
 
     while True:
@@ -28,7 +26,7 @@ def drone_communicate(observer):
         # end-of-header in buffer yet_
         eoh = header.find(b'kthanksbye')
 
-        print("Received data")
+        print("--------------------")
         conn.send("holi".encode())
 
         if eoh == -1:
@@ -39,16 +37,18 @@ def drone_communicate(observer):
 
         # Dock number
         if header == "DockNum":
+            data = data.decode()
             observer.on_next(data)
 
         # Map
         elif header == "Map":
+            data = data.decode()
             observer.on_next(data)
 
         # Dock photo
         else:
             # Analyse header
-            # "DockPhoto,12,424,532"
+            # "DockPhoto,500,424,12"
             try:
                 start, length, offset, size = header.split(',')
             except ValueError:
@@ -65,9 +65,6 @@ def drone_communicate(observer):
                     observer.on_next("Image")
                 else:
                     img_data += data
+        header = b''
     conn.close()
     observer.on_completed()
-
-source = Observable.create(drone_communicate)
-
-source.subscribe(PrintObserver())

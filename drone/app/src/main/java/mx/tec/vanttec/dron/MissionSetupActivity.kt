@@ -10,7 +10,6 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.SurfaceHolder
 import android.view.WindowManager
 import android.widget.Toast
 
@@ -22,11 +21,11 @@ import dji.common.camera.SettingsDefinitions
 import dji.common.error.DJIError
 import dji.common.mission.waypoint.*
 import dji.sdk.camera.VideoFeeder
-import dji.sdk.codec.DJICodecManager
 import dji.sdk.mission.waypoint.WaypointMissionOperator
 import dji.sdk.mission.waypoint.WaypointMissionOperatorListener
 import dji.sdk.products.Aircraft
 import dji.sdk.sdkmanager.DJISDKManager
+
 import io.reactivex.Observable
 
 import kotlinx.android.synthetic.main.activity_mission_setup.*
@@ -80,29 +79,6 @@ class MissionSetupActivity : AppCompatActivity() {
                     missionMap.clearWaypointMarkers()
                     missionBuilder = WaypointMission.Builder()
                 }
-
-
-                val surfaceHolderObservable = Observable.create<Triple<SurfaceHolder, Int, Int>> {
-                    val callback = object : SurfaceHolder.Callback {
-                        override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
-                            if (holder != null)
-                                it.onNext(Triple(holder, width, height))
-                        }
-
-                        override fun surfaceDestroyed(holder: SurfaceHolder?) { }
-
-                        override fun surfaceCreated(holder: SurfaceHolder?) { }
-
-                    }
-                    liveFeed.holder.addCallback(callback)
-                }.publish().autoConnect()
-
-                surfaceHolderObservable.subscribe { (surface, width, height) ->
-                    val codecManager = DJICodecManager(this, surface, width, height)
-                    VideoFeeder.VideoDataCallback { bytes, i ->
-                        codecManager.sendDataToDecoder(bytes, i)
-                    }
-                }
             }
 
             sdkManagerCallback.productObservable.subscribe { product ->
@@ -120,6 +96,15 @@ class MissionSetupActivity : AppCompatActivity() {
                     launch.setOnClickListener {
                         configWayPointMission(operator, product, missionBuilder)
                     }
+
+                    val videoFeedObservable = Observable.create<LiveFeedDecoder.LiveFeedData> {
+                        VideoFeeder.getInstance().primaryVideoFeed.setCallback { data, length ->
+                            it.onNext(LiveFeedDecoder.LiveFeedData(data, length))
+                        }
+                    }.publish().autoConnect()
+
+
+                    val decoder = LiveFeedDecoder(this, liveFeed.holder, videoFeedObservable)
                 }
             }
         }

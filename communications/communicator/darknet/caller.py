@@ -53,27 +53,6 @@ def main(data_calib):
             #obtain_data()
 '''
 
-
-def main(data_calib,images):
-
-
-    '''AQUI SE ARMA LA CARNita ASAdiuxx'''
-    while True:
-        print('-------DATOS DARKNET------')
-        #execute, send image and datos para undistort la imagen(camera calibration), esto ultimo lo hace la funcion execute
-        data = execute(data_calib,images.pop())
-        print(data)
-        if len(data):
-            data = parse_data(data)
-            print(data)
-            distances = get_rois_data(data) 
-            print(distances)
-        else:
-            print('---------Nothing detected------------')
-            #obtain_data()
-
-
-
 def calibration():
     
     #Termination criteria
