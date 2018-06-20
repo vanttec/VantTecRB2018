@@ -34,6 +34,7 @@ import math
 	FOV_V = 53.0
 	FOV_H = 67.0
 	HEIGTH_DRONE = 20.0 meters
+
 '''
 
 
@@ -52,10 +53,10 @@ HEIGTH_DRONE = 20.0
 
 def getDistanceFieldOfView(H,FOV_H,FOV_V):
 	
-	XDIST = int(math.tan(FOV_H/2)*H*2)
-	YDIST = int(math.tan(FOV_V/2)*H*2)
-	print("FIELD OF VIEW IN METERS HORIZONTAL:" + str(XDIST))
-	print("FIELD OF VIEW IN METERS VERTICAL:" + str(YDIST))
+	XDIST = math.tan(FOV_H/2)*H*2
+	YDIST = math.tan(FOV_V/2)*H*2
+	print(XDIST)
+	print(YDIST)
 	DIST = [XDIST,YDIST]
 	return DIST
 
@@ -76,9 +77,23 @@ def map():
 	#BLURR GRAYSCALE
 	img = cv2.blur(img_noblur, (7,7)) 
 
+
+	
 	#THRESHOLD HSV
 	hsv = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2HSV)
 	img_hsv = cv2.inRange(hsv, (59, 69, 0), (255, 255,255))
+
+
+	#THRESHOLD HSV
+	img_hsv_post = cv2.inRange(hsv,( 96,2,255), (164,42,255))
+	kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(3,3))
+	canny_edge_post = cv2.Canny(img_hsv_post, 100, 80)
+	dilated_post = cv2.dilate(canny_edge_post, kernel)
+
+
+	#SUM THEM UP
+	final_post =  cv2.add(img_hsv_post ,dilated_post)
+
 
 	#CANNY AND DILATE
 	kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(3,3))
@@ -90,6 +105,16 @@ def map():
 
 	#Get contours
 	image, contours0, hierarchy  = cv2.findContours(final, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+
+	#Get contourspost
+	image, contourspost, hierarchy  = cv2.findContours(final_post, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+
+
+	#largest area
+	c = max(contourspost, key = cv2.contourArea)
+	x,y,w,h = cv2.boundingRect(c)
+	# draw the book contour (in green)
+	cv2.rectangle(img_ori,(x,y),(x+w,y+h),(0,255,0),2)
 
 	#Get moments
 	moments  = [cv2.moments(cnt) for cnt in contours0]
@@ -112,8 +137,8 @@ def map():
 		cv2.circle(img_bgr,c,5,(255,0,0),-1)
 
 		y_modified = 480 - c[1]
-		x = int(  ((c[0] * total_meters_x * 8.55)/WIDTH) )
-		y = int(((y_modified * total_meters_y * 7.6)/HEIGTH))
+		x = round((c[0] * total_meters_x * 8.55)/WIDTH,2)
+		y = round((y_modified * total_meters_y * 7.6)/HEIGTH,2)
 		cv2.putText(img_bgr, "(" + str(x) + "," + str(y) + ")", (c[0],c[1]), cv2.FONT_HERSHEY_SIMPLEX,.3, (0, 0,0))
 		output.append((x,y))
 	
@@ -122,8 +147,10 @@ def map():
 	cv2.imshow('HSV TH',img_hsv)
 	cv2.imshow('CENTERS',img_bgr)
 	cv2.imshow('ORIGINAL',img_ori)
+	cv2.imshow('POST',dilated_post)
 	cv2.imshow('DILATED TH', dilated)
 	cv2.imshow('FINAL', final)
+	cv2.imshow('FINALpost', final_post)
 	cv2.waitKey(0)
 
 	return output
@@ -131,5 +158,5 @@ def map():
 
 result = map()
 for i in result:
-		print i
+		print(i)
 
