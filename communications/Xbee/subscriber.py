@@ -1,20 +1,18 @@
 import time
 from digi.xbee.devices import XBeeDevice
 import json
-from comunicacion import *
-from ..darknet
+from .comunicacion import xbee
+
 xbee = xbee()
 
 def subscriber():
-#Esto es para el bote, el bote envia a la estacion cada 500ms
-     #****************************************************************************************#
-
-    # TODO: Replace with the serial port where your local module is connected to.
+    '''Esto es para el bote, el bote envia a la estacion cada 500ms'''
+    #****************************************************************************************#
+    # Replace with the serial port where your local module is connected to.
     PORT = "/dev/ttyUSB0"
-    # TODO: Replace with the baud rate of your local module.
+    # Replace with the baud rate of your local module.
     BAUD_RATE = 9600
      #****************************************************************************************#
-
 
     print(" +-------------------------------------------------+")
     print(" |                       Bote                      |")
@@ -41,8 +39,3 @@ def subscriber():
     finally:
         if device is not None and device.is_open():
             device.close()
-
-#Sender()
-subscriber()
-#La conversacion comienza teniendo a uno de los dos escuchando y al otro dando la primer palabra
-#El que escucha es Receiver2Server

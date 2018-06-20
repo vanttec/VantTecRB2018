@@ -8,22 +8,6 @@ from glob import glob
 import os
 import sys
 
-TIME_DIVIDER = 10.0
-MAX_TIME = 60
-
-
-def generate_data():
-    '''Funcion para generar coordenadas aleatorias de objetos'''
-    result = []
-    for i in range(10):
-        identifier = randint(0,1)
-        x1 = randint(1, 50)
-        y1 = randint(50, 100)
-        x2 = randint(50, 100)
-        y2 = randint(1, 50)
-        result.append([identifier, x1, y1, x2, y2])
-    return result
-
 def parse_data(data):
     results = []
     for val in data:
@@ -33,16 +17,20 @@ def parse_data(data):
             results.append([0, val[2][0], val[2][2], val[2][1], val[2][3]])
     return results
 
-'''
-def main(data_calib):
 
+def main_caller(data_calib):
+    '''Main function to be threaded to call darknet and and get images'''
+    #CALL METHOD FOR CAMERA CALIBRATION, receives a list with parameters for image undistortion.
+    data_calib = calibration()
+    print(data_calib)
 
-   #AQUI SE ARMA LA CARNita ASAdiuxx
+    #AQUI SE ARMA LA CARNita ASAdiuxx
     while True:
         print('-------DATOS DARKNET------')
         #execute, send image and datos para undistort la imagen(camera calibration), esto ultimo lo hace la funcion execute
         data = execute(data_calib)
         print(data)
+
         if len(data):
             data = parse_data(data)
             print(data)
@@ -51,32 +39,9 @@ def main(data_calib):
         else:
             print('---------Nothing detected------------')
             #obtain_data()
-'''
-
-
-
-def main(data_calib,img):
-
-
-   #AQUI SE ARMA LA CARNita ASAdiuxx
-    while True:
-        print('-------DATOS DARKNET------')
-        #execute, send image and datos para undistort la imagen(camera calibration), esto ultimo lo hace la funcion execute
-        data = execute(data_calib,img.pop())
-        print(data)
-        if len(data):
-            data = parse_data(data)
-            print(data)
-            distances = get_rois_data(data) 
-            print(distances)
-        else:
-            print('---------Nothing detected------------')
-            #obtain_data()
-
 
 
 def calibration():
-    
     #Termination criteria
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
@@ -133,14 +98,3 @@ def load_images_from_folder(folder):
         if img is not None:
             images.append(img)
     return images
-
-
-#CALL METHOD FOR CAMERA CALIBRATION, receives a list with parameters for image undistortion.
-data_calib = calibration()
-print (data_calib)
-#READS ALL THE TEST IMAGES
-images = load_images_from_folder('/home/vantec/Documents/VantTecRB2018/communications/communicator/darknet/Competencia')
-#STARTS DEBUGGING
-main(data_calib,images)
-#STARTS RT
-#main(data_calib)

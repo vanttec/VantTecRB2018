@@ -1,9 +1,12 @@
 import time
 from digi.xbee.devices import XBeeDevice
 import json
-from comunicacion import *
+from .comunicacion import xbee
+
 xbee = xbee()
+
 def publisher():
+    '''Xbee station'''
     #****************************************************************************************#
     # TODO: Replace with the serial port where your local module is connected to.
     PORT = "/dev/ttyUSB0" #La estacion
@@ -51,5 +54,3 @@ def publisher():
     finally:
         if device is not None and device.is_open():
             device.close()
-
-publisher()

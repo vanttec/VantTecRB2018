@@ -1,4 +1,4 @@
 '''
 Neural net module
 '''
-from .my_observable import PrintObserver
+from .caller import main_caller
