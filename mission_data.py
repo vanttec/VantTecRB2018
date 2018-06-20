@@ -17,4 +17,3 @@ class MissionBoatData:
         },
         self.received_dock_img = False
         self.boat_xb = boat_xb
-        self.station_xb = station_xb

@@ -2,7 +2,7 @@ import time
 from digi.xbee.devices import XBeeDevice
 import json
 
-def subscriber(xbee):
+def subscriber(xbee, imu):
     '''Esto es para el bote, el bote envia a la estacion cada 500ms'''
     #****************************************************************************************#
     # Replace with the serial port where your local module is connected to.
@@ -18,7 +18,6 @@ def subscriber(xbee):
 
     try:
         device.open()
-
         device.flush_queues()
 
         print("Waiting conversation...\n")
@@ -28,6 +27,10 @@ def subscriber(xbee):
                 #Imprime el json para prueba
                 jmessage = json.loads(bytes(xbee_message.data).decode()) 
                 print(jmessage)
+                coords = imu.get_gps_coords()
+                lat = coords['latitude']
+                lon = coords['longitud']
+                xbee.set_target(lat,lon)
                 REMOTE_NODE_ID = "vtecstation" #El nodo con el que se quiere comunicar.
                 xbee_network = device.get_network()
                 remote_device = xbee_network.discover_device(REMOTE_NODE_ID) #Aqui debe enviarlo al servidor

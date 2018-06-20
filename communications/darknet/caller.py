@@ -1,12 +1,12 @@
 import time
 from random import randint
-from distances import get_rois_data
-from darknet import execute, execute_test
 import numpy as np
 import cv2
 from glob import glob
 import os
 import sys
+from .distances import get_rois_data
+from .darknet import execute, execute_test
 
 def parse_data(data):
     results = []

@@ -2,8 +2,8 @@ from ctypes import *
 import math
 import random
 from cv2 import *
-from distances import get_rois_data
 import cv2
+from .distances import get_rois_data
 
 def sample(probs):
     s = sum(probs)

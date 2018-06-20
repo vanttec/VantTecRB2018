@@ -37,6 +37,7 @@ PORT = 	'/dev/ttyUSB0'
 '''
 
 class Imu:
+	'''Class to access imu data'''
 	def __init__(self):
 		self.northYaw = 0
 		self.earthRadious = EARTH_RADIUOS
@@ -305,6 +306,6 @@ class Imu:
 		longitude2 = longitude1 + (x_distance / EARTH_RADIUOS) * (180 / math.pi) / math.cos(latitude1 * math.pi/180)
 
 		return {
-			'latitude': latitude2
+			'latitude': latitude2,
 			'longitud': longitude2
 		}
