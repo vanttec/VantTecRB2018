@@ -54,14 +54,15 @@ def main(data_calib):
 '''
 
 
-def main(data_calib,images):
+
+def main(data_calib,img):
 
 
-    '''AQUI SE ARMA LA CARNita ASAdiuxx'''
+   #AQUI SE ARMA LA CARNita ASAdiuxx
     while True:
         print('-------DATOS DARKNET------')
         #execute, send image and datos para undistort la imagen(camera calibration), esto ultimo lo hace la funcion execute
-        data = execute(data_calib,images.pop())
+        data = execute(data_calib,img.pop())
         print(data)
         if len(data):
             data = parse_data(data)

@@ -16,7 +16,7 @@ import time
 from digi.xbee.devices import XBeeDevice
 import json
 from comunicacion import *
-xbee = xbee()
+xbee = xbee('modulos')
 
 ########################
 
@@ -105,6 +105,6 @@ def Receiver2Sender():
             device.close()
 
 Sender()
-#eceiver2Sender()
+#Receiver2Sender()
 #La conversacion comienza teniendo a uno de los dos escuchando y al otro dando la primer palabra
 #El que escucha es Receiver2Server
