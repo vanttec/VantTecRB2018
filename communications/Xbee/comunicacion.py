@@ -5,6 +5,8 @@ class xbee(object):
         self.challenge = 'speed'
         self.latitude = 'HDDD.DDDDDD'
         self.longitude = 'HDDD.DDDDDD'
+        self.target_lat = 'HDDD.DDDDD'
+        self.target_lon = 'HDDD.DDDDD'
 
 
     def set_challenge(self, chal='N'):
@@ -13,7 +15,11 @@ class xbee(object):
     def set_latlong(self, latitude, longitude):
     	self.latitude = latitude
     	self.longitude = longitude
-
+        
+    def set_target(self, lat, lon):
+        self.target_lat = lat
+        self.target_lon = lon
+        
     def send(self):
         return json.dumps(self, default=jsonDefault)
 
