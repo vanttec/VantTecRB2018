@@ -6,9 +6,10 @@ import socket
 HOST = "127.0.0.1"
 PORT = 5000
 END = 'kthanksbye'
+DOCK_NUM = 0
+MAP_DATA = ''
 
-def drone_communicate(observer):
-    '''Socket with rx python'''
+def drone_communicate():
     my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     my_socket.bind((HOST, PORT))
     my_socket.listen(1)
@@ -38,13 +39,13 @@ def drone_communicate(observer):
         # Dock number
         if header == "DockNum":
             data = data.decode()
-            observer.on_next(data)
-
+            global DOCK_NUM
+            DOCK_NUM = data
         # Map
         elif header == "Map":
             data = data.decode()
-            observer.on_next(data)
-
+            global MAP_DATA
+            MAP_DATA = data
         # Dock photo
         else:
             # Analyse header
@@ -52,9 +53,7 @@ def drone_communicate(observer):
             try:
                 start, length, offset, size = header.split(',')
             except ValueError:
-                observer.on_error("Unknow header")
-                observer.on_error(header)
-                # print("Unknown header", header)
+                print("Unknown header", header)
                 continue
             if start == "DockPhoto":
                 length, offset, size = map(int, [length, offset, size])
@@ -62,9 +61,8 @@ def drone_communicate(observer):
                 if offset + size == length:
                     fhand.write(img_data)
                     img_data = b''
-                    observer.on_next("Image")
+                    print("Received Image")
                 else:
                     img_data += data
         header = b''
     conn.close()
-    observer.on_completed()

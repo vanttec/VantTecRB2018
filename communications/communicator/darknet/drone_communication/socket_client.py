@@ -11,26 +11,25 @@ def send_data():
     my_socket = socket.socket()
     my_socket.connect((host, port))
 
-    # messages = ['DockNumkthanksbye3421',
-    #             'DockNumkthanksbye21',
-    #             'DockNumkthanksbye1',
-    #             'DockNumkthanksbye3',
-    #             'DockNumkthanksbye2',
-    #             'Mapkthanksbye89205,205020.59303,4930',
-    #             'Mapkthanksbye85.935,50.593,4930,ghtiw',
-    #             'DockPhoto,500,480,10kthanksbye57khgs23iurih']
-
-    message = input('-> ')
-    while message != 'q':
-        my_socket.send(message.encode())
-        data = my_socket.recv(1024).decode()
-        print('Received from server: ' + data)
-        message = input('-> ')
-
-    # for message in messages:
+    # message = input('-> ')
+    # while message != 'q':
     #     my_socket.send(message.encode())
     #     data = my_socket.recv(1024).decode()
     #     print('Received from server: ' + data)
+    #     message = input('-> ')
+
+    messages = ['DockNumkthanksbye3421',
+                'DockNumkthanksbye21',
+                'DockNumkthanksbye1',
+                'DockNumkthanksbye3',
+                'DockNumkthanksbye2',
+                'Mapkthanksbye89205,205020.59303,4930',
+                'Mapkthanksbye85.935,50.593,4930,ghtiw',
+                'DockPhoto,500,480,10kthanksbye57khgs23iurih']
+
+    for message in messages:
+        my_socket.send(message.encode())
+        data = my_socket.recv(1024).decode()
+        print('Received from server: ' + data)
 
     my_socket.close()
-
