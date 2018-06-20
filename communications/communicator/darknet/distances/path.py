@@ -19,9 +19,9 @@ from datetime  import datetime
 from skimage import io, color,exposure
 from skimage.color import rgb2lab,deltaE_cie76
 from matplotlib import pyplot as plt
+
 from sklearn.cluster import KMeans
-
-
+import matplotlib.pyplot as plt
 """
 	KNOWN_DISTANCE -- initialize the known distance from the camera to the object(bouy,inches)
 
@@ -416,7 +416,7 @@ def getColor(xc,yc,w,h):
 		return 'r'
 	else:
 		return 'g'
-	
+
 
 	
 

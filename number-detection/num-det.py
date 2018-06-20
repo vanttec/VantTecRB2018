@@ -68,11 +68,13 @@ def search_display(img, template):
 
     orb = cv2.ORB_create()
     matcher = cv2.FlannBasedMatcher(index_params, dict())
+
+    # matcher.write("flann_params.yaml")
     
     tkp, tdes = orb.detectAndCompute(template, None)
     qkp, qdes = orb.detectAndCompute(img, None)
 
-    kp_img = cv2.drawKeypoints(template, tkp, None)
+    # kp_img = cv2.drawKeypoints(template, tkp, None)
 
     matches = matcher.knnMatch(qdes,tdes,2)
 
@@ -86,14 +88,16 @@ def search_display(img, template):
                 good.append(m)
 
     if len(good) > min_matches:
-	src_pts = np.float32([ qkp[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
-	dst_pts = np.float32([ tkp[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
+        src_pts = np.float32([ qkp[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
+        dst_pts = np.float32([ tkp[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
 	
         M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
         
         h, w = template.shape
 
         trans = cv2.warpPerspective(img, M, (w,h))
+
+        cv2.imshow('trans', trans)
         return trans
     #    matchesMask = mask.ravel().tolist()
 

@@ -1,32 +1,36 @@
-
 #include <Servo.h>
 const int PIN_X8R_2 = A0;
 const int PIN_X8R_5 = A2;
-const int PIN_X8R_4 = A1; 
+const int PIN_X8R_4 = A1;
+const int PIN_X8R_6 = A3; 
 
 String inputString;
 
 byte Thruster_left = 3;
 byte Thruster_right = 5;
-int rled = 11;
-int bled = 12;
-int gled = 13;
+int rled = 12;
+int bled = 10;
+int gled = 9;
+int peri = 6;
 
-
+Servo periscope;
 Servo left;
 Servo right;
 
 float channel4;
 float channel5;
 float channel2;
+float channel6;
 
 void setup() {
   left.attach(Thruster_left);
   right.attach(Thruster_right);
+  periscope.attach(peri);
 
   pinMode(PIN_X8R_4, INPUT);
   pinMode(PIN_X8R_2, INPUT);
   pinMode(PIN_X8R_5, INPUT);
+  pinMode(PIN_X8R_6, INPUT);
   pinMode(rled, OUTPUT);
   pinMode(bled, OUTPUT);
   pinMode(gled, OUTPUT);
@@ -34,63 +38,69 @@ void setup() {
   left.writeMicroseconds(1500); // send "stop" signal to ESC.
   right.writeMicroseconds(1500); // send "stop" signal to ESC.
   Serial.begin(115200);
-  delay(7000); // delay to allow the ESC to recognize the stopped signal
+  delay(2000); // delay to allow the ESC to recognize the stopped signal
 }
 
 void loop() {
     read_values();
     select();
+    set_Cam();    
 }
+
 void read_values(){
     channel4 = pulseIn(PIN_X8R_4, HIGH);
     channel2 = pulseIn(PIN_X8R_2, HIGH);
     channel5 = pulseIn(PIN_X8R_5, HIGH);
+    channel6 = pulseIn(PIN_X8R_6, HIGH);
   }
+
+void set_Cam() {
+#TODO adjust heights
+  if (channel6 < 1300) {
+    //up
+    periscope.write(180);
+  }
+
+  else if (channel6 > 1600){
+    //down
+    periscope.write(0);
+  }
+
+  else {
+    //middle
+    periscope.write(90);
+  }
+}
 
 void select() {
   //Use channel 5 to select between manual or autonomous mode
   if (channel5 < 1300) {
     Serial.println(0);
-    analogWrite(bled,255); 
-     manual_Mode();
+    digitalWrite(bled, HIGH);
+    digitalWrite(gled, LOW);
+    digitalWrite(rled, LOW);
+    manual_Mode();
   }
   else if ( channel5 > 1600) {
     Serial.println(1);
-    analogWrite(gled,255); 
+    digitalWrite(gled, HIGH);
+    digitalWrite(bled, LOW);
+    digitalWrite(rled, LOW);
     autonomous_Mode();
   }
   else {
-      Serial.println(2);  
-      analogWrite(rled,255); 
-      right.writeMicroseconds(1500);
-      left.writeMicroseconds(1500);
-  }
-}
-void adelante(){
-    int signal = 1700;
-    left.writeMicroseconds(signal); // Send signal to ESC.
-    right.writeMicroseconds(signal);
-  }
-  void atras(){
-    int signal = 1300;
-    left.writeMicroseconds(signal); // Send signal to ESC.
-    right.writeMicroseconds(signal);
+    Serial.println(2);  
+    right.writeMicroseconds(1500);
+    left.writeMicroseconds(1500);
+    digitalWrite(gled, LOW);
+    digitalWrite(bled, LOW);
+    digitalWrite(rled, LOW);
+
     }
-  void girar_dere(){
-    
-    int signal = 1300;
-    left.writeMicroseconds(signal); // Send signal to ESC.
-    signal = 1700;
-    right.writeMicroseconds(signal);
-  }
-  void girar_izq(){
-    int signal = 1700;
-    left.writeMicroseconds(signal); // Send signal to ESC.
-    signal = 1300;
-    right.writeMicroseconds(signal);
-  }
-  void manual_Mode() {
-//void for manual movement
+}
+
+void manual_Mode() {
+  //void for manual movement
   float Y;
   float R;
   float L;
@@ -113,20 +123,20 @@ void adelante(){
     signal = map(channel4, 975, 2025, 1100, 1900);
     right.writeMicroseconds(signal);   //thrusters at zero
   }
-  /*else if ((channel4 < 1450) & (channel2 < 1450 || channel2 > 1550)) {    //Control for turning left
+  else if ((channel4 < 1450) & (channel2 < 1450 || channel2 > 1550)) {    //Control for turning left
     Y = (channel2-(channel2-1500)*(1500-channel4)/525);
     R = map(channel2, 975, 2025, 1100, 1900);
     L = map(Y, 975, 2025, 1100, 1900);
-    thrusterRight.writeMicroseconds(R);
-    thrusterLeft.writeMicroseconds(L);    //left thruster is proportionated for left turns
+    right.writeMicroseconds(R);
+    left.writeMicroseconds(L);    //left thruster is proportionated for left turns
   }
   else if ((channel4 > 1550) & (channel2 < 1450 || channel2 > 1550)) {    //Control for turning right
     Y = (channel2-(channel2-1500)*(channel4-1500)/525);
     R = map(Y, 975, 2025, 1100, 1900);
     L = map(channel2, 975, 2025, 1100, 1900);
-    thrusterRight.writeMicroseconds(R);
-    thrusterLeft.writeMicroseconds(L);    //right thruster is proportionated for right turns
-  }*/
+    right.writeMicroseconds(R);
+    left.writeMicroseconds(L);    //right thruster is proportionated for right turns
+  }
 }
 
 
@@ -179,15 +189,21 @@ void autonomous_Mode() {
     //Delete Previous Message
      inputString = "";
 }
-void rgbon(){
-  analogWrite(rled,255); // Se enciende color rojo
-  delay(500);            // Se esperan 500 ms
-  analogWrite(rled,0);   // Se apaga color rojo 
-  analogWrite(bled,255); // Se enciende color azul
-  delay(500);            // Se esperan 500 ms
-  analogWrite(bled,0);   // Se apaga color azul
-  analogWrite(gled,255); // Se enciende color verde
-  delay(500);            // Se esperan 500 ms
-  analogWrite(gled,0);   // Se apaga colo verde
-}
 
+void rgbon(){
+  digitalWrite(rled,HIGH); // Se enciende color rojo
+  digitalWrite(bled,HIGH);
+  digitalWrite(gled,HIGH);
+  delay(500);            // Se esperan 500 ms
+  digitalWrite(rled,LOW);   // Se apaga color rojo 
+  digitalWrite(gled,LOW);
+  digitalWrite(bled,LOW); // Se enciende color azul
+  delay(500);            // Se esperan 500 ms
+  digitalWrite(bled,HIGH);   // Se apaga color azul
+  digitalWrite(rled,HIGH); // Se enciende color verde
+  digitalWrite(gled,HIGH);
+  delay(500);            // Se esperan 500 ms
+  digitalWrite(rled, LOW);   // Se apaga colo verde
+  digitalWrite(gled, LOW);
+  digitalWrite(bled, LOW);
+}
