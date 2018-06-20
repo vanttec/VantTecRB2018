@@ -289,3 +289,22 @@ class Imu:
 			'distance': int(distance),
 			'degree': int(bearing) * -1
 		}
+	def get_obstacle_gps_coords(boat_X, boat_y, path_x, path_y):
+
+		coords = self.get_gps_coords(self)
+		latitude1 = coords['latitude']
+		longitud1 = coords['longitud']
+
+		#print(coords);
+		#print(latitude2, longitud2);
+
+		y_distance = path_y - boat_y
+		x_distance = path_x - boat_x
+
+		latitude2  = latitude1  + (y_distance / EARTH_RADIUOS) * (180 / math.pi)
+		longitude2 = longitude1 + (x_distance / EARTH_RADIUOS) * (180 / math.pi) / math.cos(latitude1 * math.pi/180)
+
+		return {
+			'latitude': latitude2
+			'longitud': longitude2
+		}
