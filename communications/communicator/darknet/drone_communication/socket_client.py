@@ -3,7 +3,7 @@ Test module for connection with sockets
 '''
 import socket
 
-def main():
+def send_data():
     '''Main function to test connection'''
     host = '127.0.0.1'
     port = 5000
@@ -27,6 +27,10 @@ def main():
         print('Received from server: ' + data)
         message = input('-> ')
 
+    # for message in messages:
+    #     my_socket.send(message.encode())
+    #     data = my_socket.recv(1024).decode()
+    #     print('Received from server: ' + data)
+
     my_socket.close()
 
-main()

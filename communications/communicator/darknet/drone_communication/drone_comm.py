@@ -2,8 +2,6 @@
 Module to communicate drone and the station
 '''
 import socket
-from rx import Observable
-from my_observable import PrintObserver
 
 HOST = "127.0.0.1"
 PORT = 5000
@@ -70,6 +68,3 @@ def drone_communicate(observer):
         header = b''
     conn.close()
     observer.on_completed()
-
-source = Observable.create(drone_communicate)
-source.subscribe(PrintObserver())
