@@ -76,8 +76,8 @@ class DroneThread(threading.Thread):
             header = b''
         conn.close()
 
-thread_drone = DroneThread(1, "Drone")
-thread_drone.start()
+# thread_drone = DroneThread(1, "Drone")
+# thread_drone.start()
 
 class DroneCheker(threading.Thread):
     '''Class to test changes in global variables'''
@@ -91,5 +91,5 @@ class DroneCheker(threading.Thread):
             print('Dock num ', DOCK_NUM)
             print('Map data ', MAP_DATA)
 
-thread_check = DroneCheker(2, "Check")
-thread_check.start()
+# thread_check = DroneCheker(2, "Check")
+# thread_check.start()
