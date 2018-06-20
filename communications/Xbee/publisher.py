@@ -38,10 +38,9 @@ def publisher():
         while True:
             xbee_message = device.read_data()
             if xbee_message is not None:
-                jmessage = json.loads(xbee_message.data.decode()) ###### Guarda el json
+                jmessage = json.loads(bytes(xbee_message.data).decode()) ###### Guarda el json
                 print(jmessage) #Imprime el json para prueba
                 print ("\n")
-
                 xbee_network = device.get_network()
                 remote_device = xbee_network.discover_device(REMOTE_NODE_ID)
                 lat = input("\n lat: ")
