@@ -1,4 +1,4 @@
-import time
+ import time
 from digi.xbee.devices import XBeeDevice
 import json
 
