@@ -1,4 +1,4 @@
-from communications.Xbee import xbee
+from communications.Xbee.comunicacion import xbee
 from communications.thread_classes import DroneThread, DroneCheker, StationXbThread
 from mission_data import MissionStationData
 

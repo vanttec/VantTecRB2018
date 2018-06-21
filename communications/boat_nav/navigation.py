@@ -10,13 +10,6 @@
 '''
 	Required python libraries 
 '''
-#Add python3 path
-import os
-import sys
-sys.path.append('/usr/local/lib/python3.4/site-packages/')
-
-
-
 #Basic libraries
 import time
 import math
@@ -85,8 +78,8 @@ class Navigation:
 				print("Tengo un margen menor a 10 grados")
 				velocity = distance * 10
 
-				if  velocity > 250:
-					velocity = 200
+				if  velocity > 40:
+					velocity = 30
 
 				motors.move(velocity, velocity)
 
@@ -94,10 +87,10 @@ class Navigation:
 				#girar
 				if turn_degrees_needed > 0:
 					print("Going to move left")
-					motors.move(70, -70)
+					motors.move(30, -30)
 				else: 
 					print("Going to move right")
-					motors.move(-70, 70)
+					motors.move(-30, 30)
 			#ir derecho
 			#recorrer 2 metros
 			destiny = imu.get_degrees_and_distance_to_gps_coords(lat, lon)
