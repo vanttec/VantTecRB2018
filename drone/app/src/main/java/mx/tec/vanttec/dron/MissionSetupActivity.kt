@@ -69,6 +69,7 @@ class MissionSetupActivity : AppCompatActivity() {
 
                 // Map async
                 val mapFragment = supportFragmentManager.findFragmentById(R.id.mapFragment) as SupportMapFragment
+
                 mapFragment.getMapAsync(missionMap)
 
                 missionMap.waypointObservable.subscribe {
@@ -104,7 +105,7 @@ class MissionSetupActivity : AppCompatActivity() {
                     }.publish().autoConnect()
 
 
-                    val decoder = LiveFeedDecoder(this, liveFeed.holder, videoFeedObservable)
+                    val decoder = LiveFeedDecoder(this, videoFeedObservable)
                 }
             }
         }

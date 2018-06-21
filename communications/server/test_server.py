@@ -3,9 +3,13 @@ import time # allow wait time in python
 import requests # allow http requests in python
 from datetime import datetime
 
-OBSTACLE_AVOIDANCE = "http://127.0.0.1:5000/obstacleAvoidance/courseA/VNTEC"
-AUTOMATED_DOCKING = "http://127.0.0.1:5000/automatedDocking/courseA/VNTEC"
-HEARTBEAT = "http://localhost:5000/heartbeat/courseA/VNTEC"
+IP_SERVER = "http://192.168.66.2:8080/"
+
+OBSTACLE_AVOIDANCE = IP_SERVER + "obstacleAvoidance/courseB/VTEC"
+AUTOMATED_DOCKING = IP_SERVER + "automatedDocking/courseB/VTEC"
+HEARTBEAT = IP_SERVER + "heartbeat/courseB/VTEC"
+START_RUN = IP_SERVER + "run/start/courseB/VTEC"
+END_RUN = IP_SERVER + "run/end/courseB/VTEC"
 
 
 def obstacleAvoidance():
@@ -55,4 +59,9 @@ def test():
     print("---------- Heading to automated docking ----------")
     automatedDocking()
 
-test()
+def test_competition_server():
+    print('start')
+    r = requests.post(url=START_RUN, data='')
+    print(r.text)
+
+test_competition_server()
