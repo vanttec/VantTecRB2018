@@ -2,7 +2,6 @@
 const int PIN_X8R_2 = A0;
 const int PIN_X8R_5 = A2;
 const int PIN_X8R_4 = A1;
-const int PIN_X8R_6 = A3; 
 
 String inputString;
 
@@ -11,26 +10,21 @@ byte Thruster_right = 5;
 int rled = 12;
 int bled = 10;
 int gled = 9;
-int peri = 6;
 
-Servo periscope;
 Servo left;
 Servo right;
 
 float channel4;
 float channel5;
 float channel2;
-float channel6;
 
 void setup() {
   left.attach(Thruster_left);
   right.attach(Thruster_right);
-  periscope.attach(peri);
 
   pinMode(PIN_X8R_4, INPUT);
   pinMode(PIN_X8R_2, INPUT);
   pinMode(PIN_X8R_5, INPUT);
-  pinMode(PIN_X8R_6, INPUT);
   pinMode(rled, OUTPUT);
   pinMode(bled, OUTPUT);
   pinMode(gled, OUTPUT);
@@ -44,33 +38,13 @@ void setup() {
 void loop() {
     read_values();
     select();
-    set_Cam();    
 }
 
 void read_values(){
     channel4 = pulseIn(PIN_X8R_4, HIGH);
     channel2 = pulseIn(PIN_X8R_2, HIGH);
     channel5 = pulseIn(PIN_X8R_5, HIGH);
-    channel6 = pulseIn(PIN_X8R_6, HIGH);
   }
-
-void set_Cam() {
-#TODO adjust heights
-  if (channel6 < 1300) {
-    //up
-    periscope.write(180);
-  }
-
-  else if (channel6 > 1600){
-    //down
-    periscope.write(0);
-  }
-
-  else {
-    //middle
-    periscope.write(90);
-  }
-}
 
 void select() {
   //Use channel 5 to select between manual or autonomous mode
@@ -94,7 +68,7 @@ void select() {
     left.writeMicroseconds(1500);
     digitalWrite(gled, LOW);
     digitalWrite(bled, LOW);
-    digitalWrite(rled, LOW);
+    digitalWrite(rled, HIGH);
 
     }
 }
