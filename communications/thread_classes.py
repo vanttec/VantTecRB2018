@@ -38,7 +38,7 @@ class DroneCheker(threading.Thread):
 
 
 class BoatXbThread(threading.Thread):
-    '''Class to access xbee data from boat'''
+    '''Class to access xbee data from boat, uses subscriber function'''
     def __init__(self, thread_id, name, boat_xb):
         threading.Thread.__init__(self)
         self.thread_id = thread_id
