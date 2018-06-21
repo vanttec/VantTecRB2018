@@ -17,7 +17,7 @@ def subscriber(xbee, imu):
     print(" |                       Bote                      |")
     print(" +-------------------------------------------------+\n")
     device = XBeeDevice(PORT, BAUD_RATE)
-    gps_navigation = GPSNavigation()
+    # gps_navigation = GPSNavigation()
 
     try:
         device.open()
@@ -39,7 +39,7 @@ def subscriber(xbee, imu):
 
                 # Set target coords
                 xbee.set_target(jmessage['target_lat'],jmessage['target_lon'])
-                gps_navigation.update_nav(xbee.target_lat, xbee.target_lon) # Waypoint
+                 # gps_navigation.update_nav(xbee.target_lat, xbee.target_lon) # Waypoint
                 
                 xbee_network = device.get_network()
                 remote_device = xbee_network.discover_device(REMOTE_NODE_ID) #Aqui debe enviarlo al servidor
