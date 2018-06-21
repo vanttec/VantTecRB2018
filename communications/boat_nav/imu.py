@@ -287,7 +287,7 @@ class Imu:
 			'distance': int(distance),
 			'degree': int(bearing) * -1
 		}
-	def get_obstacle_gps_coords(boat_X, boat_y, path_x, path_y):
+	def get_obstacle_gps_coords(self, boat_X, boat_y, path_x, path_y):
 
 		coords = self.get_gps_coords(self)
 		latitude1 = coords['latitude']

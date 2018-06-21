@@ -19,9 +19,9 @@ from .imu import Imu
 
 
 class GPSNavigation:
-	def __init__(self):
-		self.imu = Imu()
-		self.navigation = Navigation()
+	def __init__(self, imu):
+		self.imu = imu
+		self.navigation = Navigation(imu)
 
 	def update_nav(self, lat, lon):
 		destiny = self.imu.get_degrees_and_distance_to_gps_coords(lat, lon)

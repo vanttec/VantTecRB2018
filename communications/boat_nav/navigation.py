@@ -23,9 +23,10 @@ from .motors import Motors
 from .imu import Imu
 
 class Navigation:
-	def __init__(self):
+	def __init__(self, imu):
 		self.frame = None
 		self.stopNavigation = False
+		self.imu = imu
 
 	def navigate(self, destiny, lat, lon):
 		lastOrientationDegree = 0
@@ -33,28 +34,26 @@ class Navigation:
 		turn_degrees_accum    = 0
 		distance = destiny['distance']
 		orientationDegree = destiny['degree']
-
-		imu = Imu()
 		motors = Motors()
 		#clean angle
-		imu.get_delta_theta()
+		self.imu.get_delta_theta()
 
 		#Condition distance more than 2 meters. 
 		while distance > 2 and not self.stopNavigation:
-			#print("degrees: ", imu.NORTH_YAW)
-			#print("coords: ", imu.get_gps_coords())
+			#print("degrees: ", self.imu.NORTH_YAW)
+			#print("coords: ", self.imu.get_gps_coords())
 			#print("orientation degrees", orientationDegree)
 			if lastOrientationDegree != orientationDegree:
 				turn_degrees_needed = orientationDegree
 				turn_degrees_accum  = 0
 
 				#clean angle
-				imu.get_delta_theta()
+				self.imu.get_delta_theta()
 				lastOrientationDegree = orientationDegree
 
 			#If same direction, keep route
 			#while math.fabs(turn_degrees_needed) > 10:
-			imu_angle = imu.get_delta_theta()['z']%360
+			imu_angle = self.imu.get_delta_theta()['z']%360
 
 			if imu_angle > 180:
 				imu_angle = imu_angle - 360
@@ -93,6 +92,6 @@ class Navigation:
 					motors.move(-30, 30)
 			#ir derecho
 			#recorrer 2 metros
-			destiny = imu.get_degrees_and_distance_to_gps_coords(lat, lon)
+			destiny = self.imu.get_degrees_and_distance_to_gps_coords(lat, lon)
 			#time.sleep(1)
 		motors.move(0,0)

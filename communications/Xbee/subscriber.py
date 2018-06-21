@@ -17,7 +17,7 @@ def subscriber(xbee, imu):
     print(" |                       Bote                      |")
     print(" +-------------------------------------------------+\n")
     device = XBeeDevice(PORT, BAUD_RATE)
- #   gps_navigation = GPSNavigation()
+ #   gps_navigation = GPSNavigation(imu)
 
     try:
         device.open()
