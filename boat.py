@@ -7,5 +7,6 @@ def main_boat():
     thread_boat = BoatXbThread(1, "Boat", main_data.boat_xb)
 
     thread_boat.start()
+    thread_boat.join()
 
 main_boat()
