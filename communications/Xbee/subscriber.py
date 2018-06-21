@@ -6,7 +6,7 @@ def subscriber(xbee, imu):
     '''Esto es para el bote, el bote envia a la estacion cada 500ms'''
     #****************************************************************************************#
     # Replace with the serial port where your local module is connected to.
-    PORT = "/dev/ttyUSB0"
+    PORT = "/dev/ttyUSB1"
     # Replace with the baud rate of your local module.
     BAUD_RATE = 9600
      #****************************************************************************************#
