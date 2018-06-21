@@ -30,7 +30,7 @@ def publisher(xbee):
         print("Dame la latitud y longitud del waypoint donde se iniciara el challenge: ")
         lat = input("\n lat: ")
         lon = input("\n lon: ")
-        xbee.set_latlong(lat,lon)
+        xbee.set_target(lat,lon)
         device.send_data(remote_device, xbee.send())
         while True:
             xbee_message = device.read_data()
@@ -42,7 +42,7 @@ def publisher(xbee):
                 remote_device = xbee_network.discover_device(REMOTE_NODE_ID)
                 lat = input("\n lat: ")
                 lon = input("\n lon: ")
-                xbee.set_latlong(lat,lon)
+                xbee.set_target(lat,lon)
                 device.send_data(remote_device, xbee.send())
 
         print("Success")

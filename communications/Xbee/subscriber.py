@@ -30,7 +30,8 @@ def subscriber(xbee, imu):
                 coords = imu.get_gps_coords()
                 lat = coords['latitude']
                 lon = coords['longitud']
-                xbee.set_target(lat,lon)
+                xbee.set_latlong(lat,lon)
+                xbee.set_target(jmessage['target_lan'],jmessage['target_lon'])
                 REMOTE_NODE_ID = "vtecstation" #El nodo con el que se quiere comunicar.
                 xbee_network = device.get_network()
                 remote_device = xbee_network.discover_device(REMOTE_NODE_ID) #Aqui debe enviarlo al servidor
