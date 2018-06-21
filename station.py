@@ -12,4 +12,9 @@ def main_station():
     thread_check.start()
     thread_station.start()
 
+    thread_drone.join()
+    thread_check.join()
+    thread_station.join()
+
+
 main_station()
