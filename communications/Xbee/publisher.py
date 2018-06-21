@@ -9,7 +9,6 @@ def publisher(xbee):
     PORT = "/dev/ttyUSB0" #La estacion
     # TODO: Replace with the baud rate of your local module.
     BAUD_RATE = 9600
-    DATA_TO_SEND = "Starting conversation..." #Inicia la conversacion con esto
     REMOTE_NODE_ID = "vtecboat" #El remoto es el bote, Esta es la estacion
     #****************************************************************************************#
 

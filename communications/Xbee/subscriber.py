@@ -1,6 +1,7 @@
- import time
+import time
 from digi.xbee.devices import XBeeDevice
 import json
+from ..boat_nav.gpsNavigation import GPSNavigation
 
 def subscriber(xbee, imu):
     '''Esto es para el bote, el bote envia a la estacion cada 500ms'''
@@ -9,12 +10,14 @@ def subscriber(xbee, imu):
     PORT = "/dev/ttyUSB1"
     # Replace with the baud rate of your local module.
     BAUD_RATE = 9600
-     #****************************************************************************************#
+    REMOTE_NODE_ID = "vtecstation" #El nodo con el que se quiere comunicar.
+    #****************************************************************************************#
 
     print(" +-------------------------------------------------+")
     print(" |                       Bote                      |")
     print(" +-------------------------------------------------+\n")
     device = XBeeDevice(PORT, BAUD_RATE)
+    gps_navigation = GPSNavigation()
 
     try:
         device.open()
@@ -27,12 +30,17 @@ def subscriber(xbee, imu):
                 #Imprime el json para prueba
                 jmessage = json.loads(bytes(xbee_message.data).decode()) 
                 print(jmessage)
+
+                # Set current coords
                 coords = imu.get_gps_coords()
                 lat = coords['latitude']
                 lon = coords['longitud']
                 xbee.set_latlong(lat,lon)
+
+                # Set target coords
                 xbee.set_target(jmessage['target_lat'],jmessage['target_lon'])
-                REMOTE_NODE_ID = "vtecstation" #El nodo con el que se quiere comunicar.
+                gps_navigation.update_nav(xbee.target_lat, xbee.target_lon) # Waypoint
+                
                 xbee_network = device.get_network()
                 remote_device = xbee_network.discover_device(REMOTE_NODE_ID) #Aqui debe enviarlo al servidor
                 device.send_data(remote_device, xbee.send())

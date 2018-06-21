@@ -4,9 +4,10 @@ Module to define the thread classes
 #For multithreading
 import threading
 import socket
-from .Xbee import subscriber, publisher
-from .drone_communication import receive
-from .imu import Imu
+from .Xbee.publisher import publisher
+from .Xbee.subscriber import subscriber
+from .drone_communication.drone_server import receive
+from .boat_nav.imu import Imu
 
 class DroneThread(threading.Thread):
     '''Class to access drone data'''

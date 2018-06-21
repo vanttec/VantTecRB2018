@@ -9,11 +9,9 @@
 	@updatedBy      Alejandro Gonzalez
 	@updated_at     2018-06-03 Settings for RoboBoat 2018
 '''
-
 import sys
 import time
 import serial
-
 
 class Motors:
 	def __init__(self):
@@ -37,37 +35,15 @@ class Motors:
 		self.serial_port = '/dev/ttyACM0'
 
 		#serial communication Handler
-		ser = serial.Serial(self.serial_port, self.baudRate )
+		self.ser = serial.Serial(self.serial_port, self.baudRate)
 
-	'''
-	@desc 	Get imu port **
-	@params None
-	@return string
-	
-	def get_port(self):
-		pts = list(ports.comports())
-
-		if not pts:
-			sys.exit('Motors Arduino not found')
-		else:
-			for p in pts:
-				if p[1].find('ACM') == 3:
-					return p[0]
-				elif p[1].find('Serial') == 7:
-					return p[0]
-				elif p[1].find('USB2.0-Serial') == 0 :
-					return p[0]
-				elif p[1].find('USB2.0-Serial') == 0 :
-
-			sys.exit('Motors Arduino not found')
-'''
 	#format value to proper length
-	'''
-	@desc 	format value to proper length
-	@params string
-	@return string
-	'''
-	def check_value_size(val):
+	def check_value_size(self, val):
+		'''
+		@desc 	format value to proper length
+		@params string
+		@return string
+		'''
 		if len(val) == 4:
 			return val 
 		elif len(val) == 3:
@@ -76,15 +52,15 @@ class Motors:
 			return '00' + val 
 		elif len(val) == 1:
 			return '000' + val 
-
-	'''
-	@desc 	move thrusters **
-	@params 
-			int powerR power value for right thruster. It must be inside the PWM lectures.
-			int powerL  power value for left thruster. It must be inside the PWM lectures.
-	@return string
-	'''
-	def move_thrusters(powerR=1500, powerL=1500):
+	
+	def move_thrusters(self, powerR=1500, powerL=1500):
+		'''
+		@desc 	move thrusters **
+		@params 
+				int powerR power value for right thruster. It must be inside the PWM lectures.
+				int powerL  power value for left thruster. It must be inside the PWM lectures.
+		@return string
+		'''
 		#validate the pwm range
 		if powerR < 1100 or powerR > 1900 or powerL < 1100 or powerL > 1900:
 			print("Thruster power must be between 1100 - 1900")
@@ -103,7 +79,8 @@ class Motors:
 			#Debug response
 			print(self.ser.read(self.ser.inWaiting()).decode())
 
-	def move(powerR=0,powerL=0):
+	def move(self, powerR=0, powerL=0):
+		'''Move thrusters'''
 		#validate the pwm range
 		if powerR < -400 or powerR > 400 or powerL < -400 or powerL > 400:
 			print("The power is not on the correct range")
@@ -115,9 +92,9 @@ class Motors:
 			#while(utility.previousLeftMotorValue != powerL or utility.previousRightMotorValue != powerR):
 			#	checkDifference(powerR, powerL)
 
-	#Send gradual changes to motors
-	def checkDifference(currPowerR, currPowerL):
-		threshold = 0.025 * (maxPowerValue - minPowerValue )
+	def checkDifference(self, currPowerR, currPowerL):
+		'''Send gradual changes to motors'''
+		threshold = 0.025 * (self.maxPowerValue - self.minPowerValue)
 
 		#Get the difference between the current power and the last one
 		diffL = abs(currPowerL - self.previousLeftMotorValue)
@@ -150,8 +127,8 @@ class Motors:
 		elif directionL < 0:
 			self.previousLeftMotorValue -= threshold
 
-			realPR = int(self.previousRightMotorValue)+int(thrusterInitPosition)
-			realPL = int(self.previousLeftMotorValue) +int(thrusterInitPosition)
+			realPR = int(self.previousRightMotorValue)+int(self.thrusterInitPosition)
+			realPL = int(self.previousLeftMotorValue) +int(self.thrusterInitPosition)
 			
 			#print(realPR,realPL)
 			self.move_thrusters(realPR,realPL)
@@ -166,8 +143,8 @@ class Motors:
 
 			self.previousLeftMotorValue = currPowerL
 
-			realPR = int(self.previousRightMotorValue)+int(thrusterInitPosition)
-			realPL = int(self.previousLeftMotorValue) +int(thrusterInitPosition)
+			realPR = int(self.previousRightMotorValue)+int(self.thrusterInitPosition)
+			realPL = int(self.previousLeftMotorValue) +int(self.thrusterInitPosition)
 			
 			#print(realPR,realPL)
 			self.move_thrusters(realPR,realPL)
@@ -181,8 +158,8 @@ class Motors:
 			elif directionL < 0:
 				self.previousLeftMotorValue -= threshold
 
-			realPR = int(self.previousRightMotorValue)+int(thrusterInitPosition)
-			realPL = int(self.previousLeftMotorValue) +int(thrusterInitPosition)
+			realPR = int(self.previousRightMotorValue)+int(self.thrusterInitPosition)
+			realPL = int(self.previousLeftMotorValue) +int(self.thrusterInitPosition)
 			
 			#print(realPR,realPL)
 			self.move_thrusters(realPR,realPL)
@@ -191,9 +168,8 @@ class Motors:
 			self.previousLeftMotorValue  = currPowerL
 			self.previousRightMotorValue = currPowerR
 			
-			realPR = int(self.previousRightMotorValue)+int(thrusterInitPosition)
-			realPL = int(self.previousLeftMotorValue) +int(thrusterInitPosition)
+			realPR = int(self.previousRightMotorValue)+int(self.thrusterInitPosition)
+			realPL = int(self.previousLeftMotorValue) +int(self.thrusterInitPosition)
 
 			#print(realPR,realPL)
 			self.move_thrusters(realPR,realPL)
-time.sleep(0.125)

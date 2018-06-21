@@ -23,20 +23,15 @@ import math
 import random
 import datetime
 
-
 '''
 	Required our project libraries 
 ''' 
-from motors import Motors
-from imu import Imu
+from .motors import Motors
+from .imu import Imu
 
 class Navigation:
 	def __init__(self):
-		frame = None
-
-	def update_destiny(self):
-		self.distance = distance
-		self.degree = degree
+		self.frame = None
 		self.stopNavigation = False
 
 	def navigate(self, destiny, lat, lon):
@@ -47,11 +42,12 @@ class Navigation:
 		orientationDegree = destiny['degree']
 
 		imu = Imu()
+		motors = Motors()
 		#clean angle
 		imu.get_delta_theta()
 
 		#Condition distance more than 2 meters. 
-		while distance > 2 and self.stopNavigation != False:
+		while distance > 2 and not self.stopNavigation:
 			#print("degrees: ", imu.NORTH_YAW)
 			#print("coords: ", imu.get_gps_coords())
 			#print("orientation degrees", orientationDegree)
@@ -93,6 +89,7 @@ class Navigation:
 					velocity = 200
 
 				motors.move(velocity, velocity)
+
 			else:
 				#girar
 				if turn_degrees_needed > 0:
@@ -105,7 +102,4 @@ class Navigation:
 			#recorrer 2 metros
 			destiny = imu.get_degrees_and_distance_to_gps_coords(lat, lon)
 			#time.sleep(1)
-
-
 		motors.move(0,0)
-print("End thread Navigation")
