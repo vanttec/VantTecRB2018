@@ -34,12 +34,10 @@ def receive(global_data):
 
         # Dock number
         if header == "DockNum":
-            conn.send("Ack docknum".encode())
             data = data.decode()
             global_data.dock_num = data
         # Map
         elif header == "Map":
-            conn.send("Ack map".encode())
             data = data.decode()
             global_data.map_data = json.loads(data)
         # Dock photo
@@ -57,7 +55,6 @@ def receive(global_data):
                 if offset + size == length:
                     fhand.write(img_data)
                     img_data = b''
-                    conn.send("Ack img".encode())
                 else:
                     img_data += data
         header = b''
