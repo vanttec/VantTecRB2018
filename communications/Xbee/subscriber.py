@@ -6,7 +6,7 @@ def subscriber(xbee, imu):
     '''Esto es para el bote, el bote envia a la estacion cada 500ms'''
     #****************************************************************************************#
     # Replace with the serial port where your local module is connected to.
-    PORT = "/dev/ttyUSB0"
+    PORT = "/dev/ttyUSB1"
     # Replace with the baud rate of your local module.
     BAUD_RATE = 9600
      #****************************************************************************************#
@@ -30,7 +30,8 @@ def subscriber(xbee, imu):
                 coords = imu.get_gps_coords()
                 lat = coords['latitude']
                 lon = coords['longitud']
-                xbee.set_target(lat,lon)
+                xbee.set_latlong(lat,lon)
+                xbee.set_target(jmessage['target_lat'],jmessage['target_lon'])
                 REMOTE_NODE_ID = "vtecstation" #El nodo con el que se quiere comunicar.
                 xbee_network = device.get_network()
                 remote_device = xbee_network.discover_device(REMOTE_NODE_ID) #Aqui debe enviarlo al servidor
