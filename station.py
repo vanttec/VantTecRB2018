@@ -1,7 +1,7 @@
 import threading
 from communications.Xbee.comunicacion import xbee
 from mission_data import MissionStationData
-from .communications.Xbee.publisher import publisher
+from communications.Xbee.publisher import publisher
 
 class StationXbThread(threading.Thread):
     '''Class to access xbee data from station'''
