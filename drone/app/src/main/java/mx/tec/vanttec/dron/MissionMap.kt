@@ -1,11 +1,12 @@
 package mx.tec.vanttec.dron
 
-import android.support.v4.app.FragmentManager
+import android.app.FragmentManager
 import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
+import com.google.maps.android.PolyUtil
 import dji.common.mission.waypoint.Waypoint
 import dji.common.mission.waypoint.WaypointAction
 import dji.common.mission.waypoint.WaypointActionType
@@ -21,9 +22,10 @@ class MissionMap(private val fragmentManager: FragmentManager) : GoogleMap.OnMap
     private var droneMarker: Marker? = null
     private lateinit var waypointListener: WayPointDialog.WayPointConfigListener
     private var waypoints = HashMap<LatLng, Waypoint>()
+    private val geofenceOpts = PolygonOptions()
+    private var geofence : Polygon? = null
 
-    var shouldAddPin = false
-        private set
+    var addPinMode = AddPinMode.DISABLED
 
     val waypointObservable = Observable.create<Waypoint> {
         waypointListener =  object : WayPointDialog.WayPointConfigListener {
@@ -42,6 +44,10 @@ class MissionMap(private val fragmentManager: FragmentManager) : GoogleMap.OnMap
             }
         }
     }.publish()!!
+
+    var exitCallback : () -> Unit = {}
+
+    var lastDronePosition : LatLng? = null
 
     init {
         waypointObservable.connect()
@@ -75,16 +81,22 @@ class MissionMap(private val fragmentManager: FragmentManager) : GoogleMap.OnMap
 
         val tec = LatLng(25.65, -100.290943)
         gMap?.moveCamera(CameraUpdateFactory.newLatLng(tec))
-        gMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
+        gMap?.mapType = GoogleMap.MAP_TYPE_HYBRID
     }
 
     override fun onMapClick(point: LatLng) {
-        if (shouldAddPin) {
+        when (addPinMode) {
             // Open waypoint dialog
-            val waypointDialog = WayPointDialog.instantiate(point)
+            AddPinMode.WAYPOINT -> {
+                val waypointDialog = WayPointDialog.instantiate(point)
 
-            waypointDialog.listener = waypointListener
-            waypointDialog.show(fragmentManager, WAYPOINT_DIALOG_TAG)
+                waypointDialog.listener = waypointListener
+                waypointDialog.show(fragmentManager, WAYPOINT_DIALOG_TAG)
+            }
+
+            AddPinMode.DISABLED -> { /* DO NOTHING */ }
+
+            AddPinMode.GEOFENCE -> addGeofenceVertex(point)
         }
     }
 
@@ -94,6 +106,8 @@ class MissionMap(private val fragmentManager: FragmentManager) : GoogleMap.OnMap
         if (waypoint != null) {
             val waypointDialog = WayPointDialog.instantiate(waypoint)
 
+
+            waypointDialog.missionMap = this
             waypointDialog.listener = object : WayPointDialog.WayPointConfigListener {
                 override fun onWayPointConfigured(point: LatLng, height: Float, time: Int) {
                     waypoint.coordinate = LocationCoordinate2D(point.latitude, point.longitude)
@@ -113,7 +127,7 @@ class MissionMap(private val fragmentManager: FragmentManager) : GoogleMap.OnMap
     }
 
     // Drone state
-    fun updateDroneMarker(position: LatLng, heading: Float) {
+    fun updateDronePosition(position: LatLng, heading: Float) {
         if(droneMarker == null) {
             val options = MarkerOptions()
             val icon = BitmapDescriptorFactory.fromResource(R.drawable.aircraft)
@@ -128,14 +142,35 @@ class MissionMap(private val fragmentManager: FragmentManager) : GoogleMap.OnMap
             droneMarker?.position = position
             droneMarker?.rotation = heading
         }
-    }
 
-    fun toggleAddPin() {
-        shouldAddPin = !shouldAddPin
+        lastDronePosition = position
+
+        val geofencePoints = geofence?.points
+
+        if(geofencePoints != null) {
+            if(geofencePoints.size > 2 && !PolyUtil.containsLocation(position, geofencePoints, false)) {
+                exitCallback()
+            }
+        }
     }
 
     fun moveCamera(cameraUpdate: CameraUpdate) {
         gMap?.moveCamera(cameraUpdate)
+    }
+
+    fun addGeofenceVertex(point: LatLng) {
+        geofenceOpts.add(point)
+
+        if(geofenceOpts.points.size > 3) {
+            geofence?.remove()
+            geofence = gMap?.addPolygon(geofenceOpts)
+        }
+    }
+
+    enum class AddPinMode {
+        DISABLED,
+        WAYPOINT,
+        GEOFENCE
     }
 
     companion object {

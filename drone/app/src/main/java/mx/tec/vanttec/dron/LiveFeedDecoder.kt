@@ -58,8 +58,6 @@ class LiveFeedDecoder(context: Context, private val liveFeedObservable: Observab
         if(decoderName != null) {
             val decoder = MediaCodec.createByCodecName(decoderName)
 
-            decoder.outputFormat.getInteger(MediaFormat.KEY_COLOR_FORMAT)
-
             decoder.setCallback(object : MediaCodec.Callback() {
                 override fun onOutputBufferAvailable(codec: MediaCodec, index: Int, info: MediaCodec.BufferInfo?) {
                     outBuffEmitter?.onNext(Pair(codec, index))

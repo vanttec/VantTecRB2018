@@ -6,12 +6,16 @@ import android.app.DialogFragment
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.widget.Button
 import android.widget.EditText
 import com.google.android.gms.maps.model.LatLng
 import dji.common.mission.waypoint.Waypoint
+import dji.sdk.products.Aircraft
+import dji.sdk.sdkmanager.DJISDKManager
 
 class WayPointDialog : DialogFragment() {
     var listener: WayPointConfigListener? = null
+    var missionMap: MissionMap? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = AlertDialog.Builder(activity)
@@ -23,11 +27,22 @@ class WayPointDialog : DialogFragment() {
         val longitud = view.findViewById<EditText>(R.id.longitud)
         val height = view.findViewById<EditText>(R.id.height)
         val time = view.findViewById<EditText>(R.id.time)
+        val setCurrentButton = view.findViewById<Button>(R.id.setCurrent)
 
         latitude.setText(arguments?.getDouble(LAT_ARG).toString())
         longitud.setText(arguments?.getDouble(LNG_ARG).toString())
         height.setText(arguments?.getFloat(HEIGHT_ARG).toString())
         time.setText(arguments?.getFloat(TIME_ARG).toString())
+
+        setCurrentButton.setOnClickListener {
+            val coordinate = (DJISDKManager.getInstance()?.product as Aircraft?)
+                    ?.flightController
+                    ?.state
+                    ?.aircraftLocation
+
+            latitude.setText(coordinate?.latitude?.toString() ?: "0.0")
+            longitud.setText(coordinate?.longitude?.toString() ?: "0.0")
+        }
 
         builder.setView(view)
 
