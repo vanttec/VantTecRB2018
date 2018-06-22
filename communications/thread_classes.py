@@ -7,7 +7,6 @@ import socket
 from .Xbee.subscriber import subscriber
 from .drone_communication.drone_server import receive
 from .boat_nav.imu import Imu
-from .darknet.caller import main_caller
 
 class DroneThread(threading.Thread):
     '''Class to access drone data'''
@@ -47,13 +46,3 @@ class BoatXbThread(threading.Thread):
 
     def run(self):
         subscriber(self.boat_xb, Imu())
-
-class CameraThread(threading.Thread):
-    '''Class to access camera data'''
-    def __init__(self, thread_id, name):
-        threading.Thread.__init__(self)
-        self.thread_id = thread_id
-        self.name = name
-
-    def run(self):
-        main_caller()

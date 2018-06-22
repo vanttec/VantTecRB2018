@@ -5,7 +5,7 @@ import cv2
 from glob import glob
 import os
 import sys
-from .distances import get_rois_data
+from .distances.path import get_rois_data
 from .darknet import execute
 
 def parse_data(data):
@@ -32,7 +32,7 @@ def main_caller():
         data = execute(data_calib, set_up, num)
         print(data)
 
-        if len(data):
+        if data is not None:
             data = parse_data(data)
             print(data)
             distances = get_rois_data(data) 
