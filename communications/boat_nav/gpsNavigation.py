@@ -15,7 +15,7 @@
 	Required our project libraries 
 ''' 
 from .navigation import Navigation
-from .imu import Imu
+
 
 
 class GPSNavigation:

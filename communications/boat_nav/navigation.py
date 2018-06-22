@@ -20,7 +20,6 @@ import datetime
 	Required our project libraries 
 ''' 
 from .motors import Motors
-from .imu import Imu
 
 class Navigation:
 	def __init__(self, imu):
