@@ -77,7 +77,7 @@ class Motors:
 			self.ser.flush()
 
 			#Debug response
-			print(self.ser.read(self.ser.inWaiting()).decode())
+			
 
 	def move(self, powerR=0, powerL=0):
 		'''Move thrusters'''
