@@ -32,7 +32,7 @@ def main_caller():
     while True:
         print('-------DATOS DARKNET------')
         #execute, send image and datos para undistort la imagen(camera calibration), esto ultimo lo hace la funcion execute
-        data = execute(data_calib, set_up, num,image_list.pop())
+        data = execute(data_calib, set_up, num)
         #data = execute(data_calib, set_up, num)
         print(data)
 
@@ -47,6 +47,26 @@ def main_caller():
         set_up = False
         num += 1
 
+'''#Pruebas
+def main(data_calib,images):
+
+
+    '''AQUI SE ARMA LA CARNita ASAdiuxx'''
+    while True:
+        print('-------DATOS DARKNET------')
+        #execute, send image and datos para undistort la imagen(camera calibration), esto ultimo lo hace la funcion execute
+        data = execute(data_calib,images.pop())
+        print(data)
+        if len(data):
+            data = parse_data(data)
+            print(data)
+            distances = get_rois_data(data) 
+            print(distances)
+        else:
+            print('---------Nothing detected------------')
+            #obtain_data()
+
+'''
 
 def calibration():
     #Termination criteria
@@ -105,8 +125,5 @@ def load_images_from_folder(folder):
         if img is not None:
             images.append(img)
     return images
-
-
-
 
 main_caller()
