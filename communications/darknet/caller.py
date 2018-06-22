@@ -49,9 +49,7 @@ def main_caller():
 
 '''#Pruebas
 def main(data_calib,images):
-
-
-    '''AQUI SE ARMA LA CARNita ASAdiuxx'''
+    #AQUI SE ARMA LA CARNita ASAdiuxx
     while True:
         print('-------DATOS DARKNET------')
         #execute, send image and datos para undistort la imagen(camera calibration), esto ultimo lo hace la funcion execute
