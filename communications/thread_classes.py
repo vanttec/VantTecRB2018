@@ -4,7 +4,6 @@ Module to define the thread classes
 #For multithreading
 import threading
 import socket
-from .Xbee.publisher import publisher
 from .Xbee.subscriber import subscriber
 from .drone_communication.drone_server import receive
 from .boat_nav.imu import Imu
@@ -48,17 +47,6 @@ class BoatXbThread(threading.Thread):
 
     def run(self):
         subscriber(self.boat_xb, Imu())
-
-class StationXbThread(threading.Thread):
-    '''Class to access xbee data from station'''
-    def __init__(self, thread_id, name, station_xb):
-        threading.Thread.__init__(self)
-        self.thread_id = thread_id
-        self.name = name
-        self.station_xb = station_xb
-
-    def run(self):
-        publisher(self.station_xb)
 
 class CameraThread(threading.Thread):
     '''Class to access camera data'''
