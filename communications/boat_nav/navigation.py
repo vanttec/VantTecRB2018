@@ -37,7 +37,7 @@ class Navigation:
 		motors = Motors()
 		#clean angle
 		self.imu.get_delta_theta()
-		print("delta theta: ", self.imu.get_delta_theta)
+		#print("delta theta: ", self.imu.get_delta_theta)
 
 		#Condition distance more than 2 meters. 
 		while distance > 2 and not self.stopNavigation:
@@ -81,10 +81,10 @@ class Navigation:
 			else:
 				#girar
 				if turn_degrees_needed > 0:
-					print("Going to move left")
+					#print("Going to move left")
 					motors.move(15, -15)
 				else: 
-					print("Going to move right")
+					#print("Going to move right")
 					motors.move(-15, 15)
 			#ir derecho
 			#recorrer 2 metros
