@@ -144,27 +144,33 @@ def detect(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45):
     res = sorted(res, key=lambda x: -x[1])
     free_image(im)
     free_detections(dets, num)
-    return res
+    return 
 
-def execute(data_calib):
+net = ''
+meta = ''
+
+def execute(data_calib, set_up, num):
     # For python3 added b before directions7
-    # Path from where main script is running
-    net = load_net(b"communications/darknet/vantec_cfg/yolo-vantec.cfg", b"communications/darknet/vantec_cfg/yolo-vantec.weights", 0)
-    meta = load_meta(b"communications/darknet/vantec_cfg/obj.data")
+    # Path from where main script is 
+    if set_up:
+       global net
+       global meta
+       net = load_net(b"communications/darknet/vantec_cfg/yolo-vantec.cfg", b"communications/darknet/vantec_cfg/yolo-vantec.weights", 0)
+       meta = load_meta(b"communications/darknet/vantec_cfg/obj.data")
 
     #Funcion para tomar fotos y escanear imagen
-    cap = VideoCapture(0)
+    cap = VideoCapture(1)
     ret, raw_frame = cap.read()
     #Undistort image
-    frame = undistorted_image(raw_frame,data_calib)
+    frame = undistorted_image(raw_frame, data_calib)
     drawing_frame = frame.copy()
     height, width, channels = frame.shape
     cap.release()
-    filename = "filename.png"
+    filename = "filename" + str(num) + ".jpg"
     #Save image
-    imwrite(filename,frame) 
+    imwrite(filename, frame) 
     #Call CNN
-    r = detect(net, meta, "filename.png")
+    r = detect(net, meta, filename)
     
     #Iterate detected objects
     for f in r:

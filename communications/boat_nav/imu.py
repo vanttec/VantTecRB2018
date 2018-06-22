@@ -115,7 +115,6 @@ class Imu:
 		
 		coord_x = coord_x / 10
 		coord_y = coord_y / 10
-
 		coords ={ 'latitude': coord_x , 'longitud': coord_y}
 
 		return coords
@@ -291,6 +290,8 @@ class Imu:
 
 		if (bearing > 180):
 			bearing = bearing - 360
+		
+		print("bearing: ", bearing)
 
 		phi1 = math.radians(latitude1)
 		phi2 = math.radians(latitude2)
@@ -299,6 +300,7 @@ class Imu:
 		a = math.sin(dphi/2)*math.sin(dphi/2) + math.cos(phi1)*math.cos(phi2)* math.sin(dlam/2)*math.sin(dlam/2)
 		c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
 		distance = self.earthRadious * c
+		print("distance: ", distance)
 
 		return {
 			'distance': int(distance),

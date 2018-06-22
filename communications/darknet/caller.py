@@ -18,17 +18,18 @@ def parse_data(data):
     return results
 
 
-def main_caller(data_calib):
+def main_caller():
     '''Main function to be threaded to call darknet and and get images'''
     #CALL METHOD FOR CAMERA CALIBRATION, receives a list with parameters for image undistortion.
     data_calib = calibration()
     print(data_calib)
-
+    set_up = True
+    num = 0
     #AQUI SE ARMA LA CARNita ASAdiuxx
     while True:
         print('-------DATOS DARKNET------')
         #execute, send image and datos para undistort la imagen(camera calibration), esto ultimo lo hace la funcion execute
-        data = execute(data_calib)
+        data = execute(data_calib, set_up, num)
         print(data)
 
         if len(data):
@@ -39,6 +40,8 @@ def main_caller(data_calib):
         else:
             print('---------Nothing detected------------')
             #obtain_data()
+        set_up = False
+        num += 1
 
 
 def calibration():
@@ -57,7 +60,7 @@ def calibration():
     objpoints = [] # 3d point in real world space
     imgpoints = [] # 2d points in image plane.
 
-    images = glob('sample_images/*.jpg')
+    images = glob('/home/vantec/Documents/VantTecRB2018/communications/darknet/sample_images/*.jpg')
 
     for fname in images:
         img = cv2.imread(fname)

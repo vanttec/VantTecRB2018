@@ -38,8 +38,8 @@ def subscriber(xbee, imu):
                 xbee.set_latlong(lat,lon)
                 # Set target coords
                 xbee.set_target(float(jmessage['target_lat']),float(jmessage['target_lon']))
-                gps_navigation.update_nav(xbee.target_lat, xbee.target_lon) # Waypoint
-                
+                if jmessage['action'] == '2':
+                    gps_navigation.update_nav(xbee.target_lat, xbee.target_lon) # Waypoint
                 xbee_network = device.get_network()
                 remote_device = xbee_network.discover_device(REMOTE_NODE_ID) #Aqui debe enviarlo al servidor
                 device.send_data(remote_device, xbee.send())
