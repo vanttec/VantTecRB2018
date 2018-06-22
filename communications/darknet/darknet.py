@@ -166,7 +166,7 @@ def execute(data_calib, set_up, num):
     drawing_frame = frame.copy()
     height, width, channels = frame.shape
     cap.release()
-    filename = "filename" + str(num) + ".jpg"
+    filename = "filename" + str(num) + ".png"
     #Save image
     imwrite(filename, frame)
     #Call CNN
