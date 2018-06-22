@@ -6,7 +6,7 @@ from glob import glob
 import os
 import sys
 from .distances import get_rois_data
-from .darknet import execute, execute_test
+from .darknet import execute
 
 def parse_data(data):
     results = []
