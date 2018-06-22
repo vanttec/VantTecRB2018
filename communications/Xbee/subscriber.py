@@ -36,7 +36,9 @@ def subscriber(xbee, imu):
                 lat = coords['latitude']
                 lon = coords['longitud']
                 xbee.set_latlong(lat,lon)
-
+                print("-------")
+                print(type(jmessage['target_lat']))
+                print("-------")
                 # Set target coords
                 xbee.set_target(jmessage['target_lat'],jmessage['target_lon'])
                 gps_navigation.update_nav(xbee.target_lat, xbee.target_lon) # Waypoint
