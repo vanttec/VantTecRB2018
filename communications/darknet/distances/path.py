@@ -38,12 +38,12 @@ import matplotlib.pyplot as plt
 
 	
 """
-ANGLE_PER_PIXEL = 78/math.sqrt(480**2 + 640**2) 
+
 
 #BOUYS (INCHES)
-KNOWN_DISTANCE_B = 74.8    #unknown
-KNOWN_WIDTH_B = 7.87402    #15.354331 inches width of contest's bouys 
-FOCAL_LENGHT_B = 627.29    #(PIX_WIDTH_B * KNOWN_DISTANCE_B) / KNOWN_WIDTH_B
+KNOWN_DISTANCE_B = 63.0    #unknown
+KNOWN_WIDTH_B =    15.354331  #inches width of contest's bouys 
+FOCAL_LENGHT_B =   447.36    #(PIX_WIDTH_B * KNOWN_DISTANCE_B) / KNOWN_WIDTH_B   109pix
 
 #POSTS(INCHES)
 KNOWN_DISTANCE_P = 74.8    #unknown  
@@ -51,7 +51,10 @@ KNOWN_WIDTH_P = 55.0    #unknown
 FOCAL_LENGHT_P = 627.29    #(PIX_WIDTH_P * KNOWN_DISTANCE_P) / KNOWN_WIDTH_P
 
 FOCAL_VIEW =  78.0
-WIDTH_DIM  =  640.0
+WIDTH_DIM  =  800
+HEIGTH_DIM =  600
+
+ANGLE_PER_PIXEL = 78/math.sqrt(WIDTH_DIM**2 + HEIGTH_DIM**2) 
 #check for values'integrity. return 1 if length of params is the expected.
 def receive(values):	
 	if len(values) == 5:
@@ -85,7 +88,7 @@ def get_rois_data(rois):
 			#convert inches to meters
 			meters_b = inches * .0254 
 			#difference of pixels from center
-			difference = 320 - (rois[i][1])
+			difference = int(WIDTH/2) - (rois[i][1])
 		  #compute angles
 			#if difference is 0, angle must be 0
 			if difference == 0:
@@ -128,7 +131,7 @@ def get_rois_data(rois):
 			meters_p = inches * .0254 
 		  #compute angles
 		  	#if difference is 0, angle must be 0
-			difference = 320 - (rois[i][1])
+			difference = int(WIDTH/2) - (rois[i][1])
 			#if difference is 0, angle must be 0
 			if difference == 0:
 				angle_p = 0
