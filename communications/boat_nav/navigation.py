@@ -73,8 +73,8 @@ class Navigation:
 			
 			print("grados a voltear: ", turn_degrees_needed)
 
-			if math.fabs(turn_degrees_needed) < 5: 
-				print("Tengo un margen menor a 5 grados")
+			if math.fabs(turn_degrees_needed) < 15: 
+				print("Tengo un margen menor a 15 grados")
 				velocity = 30
 				motors.move(velocity, velocity)
 
@@ -82,10 +82,10 @@ class Navigation:
 				#girar
 				if turn_degrees_needed > 0:
 					print("Going to move left")
-					motors.move(30, -30)
+					motors.move(15, -15)
 				else: 
 					print("Going to move right")
-					motors.move(-30, 30)
+					motors.move(-15, 15)
 			#ir derecho
 			#recorrer 2 metros
 			destiny = self.imu.get_degrees_and_distance_to_gps_coords(lat, lon)
