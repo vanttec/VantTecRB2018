@@ -19,7 +19,8 @@ from vnpy import *
 #Basic libraries
 import math
 import time
-
+import sys
+import os
 #Debug libraries
 from inspect import getmembers
 from pprint import pprint
@@ -43,62 +44,66 @@ class Imu:
 		self.get_port()
 		self.connect()
 
-	'''
-	@desc 	Get imu port **
-	@params None
-	@return string
-	'''
+	
 	def get_port(self):
-		
+		'''
+		@desc 	Get imu port **
+		@params None
+		@return string
+		'''
 		if os.path.exists(PORT):
-			return 
 			print("Port Found")
 			return PORT
 		else:
 			sys.exit('IMU not found // Check if connected')
 
-	'''
-	@desc 	Get Imu model information **
-	@params None
-	@return string
-	'''
+
 	def print_model(self):
+		'''
+		@desc 	Get Imu model information **
+		@params None
+		@return string
+		'''
 		return self.vnSensor.read_model_number()
 
 
-	'''
-	@desc Close Imu sensor
-	@params None
-	@return None
-	'''
+
 	def close_(self):
+		'''
+		@desc Close Imu sensor
+		@params None
+		@return None
+		'''
 		self.vnSensor.disconnect()
 
-	'''
-	@desc Reconnect Imu
-	@params None
-	@return None
-	'''
+	
 	def connect(self):
+		'''
+		@desc Reconnect Imu
+		@params None
+		@return None
+		'''
 		self.vnSensor.connect(PORT,self.baudRate)
-	'''
-	@desc 	Get  number of listening Satellites**
-	@params None
-	@return integer 
-	'''
+
 	def get_num_satellites(self):
+		'''
+		@desc 	Get  number of listening Satellites**
+		@params None
+		@return integer 
+		'''
 		#Return values of gps
 		#'gps_fix', 'lla', 'ned_acc', 'ned_vel', 'num_sats', 'speed_acc', 'this', 'time', 'time_acc', 'week'
 		return self.vnSensor.read_gps_solution_lla().num_sats
 
-	'''
-	@desc 	Get averages of latitude and longitud coords after 10 tests
-	@params None
-	@return dynamic array
+
+	def get_gps_coords(self):
+		'''
+		@desc 	Get averages of latitude and longitud coords after 10 tests
+		@params None
+		@return dynamic array
 				float longitud
 				float latitude
-	'''
-	def get_gps_coords(self):
+		'''
 		coord_x = 0
 		coord_y = 0
 
@@ -115,23 +120,25 @@ class Imu:
 
 		return coords
 
-	'''
-	@desc 	Get  yaw pitch roll degrees
-	@params None
-	@return vec3f object
+
+	def get_yaw_pitch_roll(self):
+		'''
+		@desc 	Get  yaw pitch roll degrees
+		@params None
+		@return vec3f object
 				float x 
 				float y
 				float z 
-	'''
-	def get_yaw_pitch_roll(self):
+		'''
 		return self.vnSensor.read_yaw_pitch_roll()
 
-	'''
-	@desc 	Get  yaw degree
-	@params None
-	@return float degree
-	'''
+
 	def get_yaw_orientation(self):
+		'''
+		@desc 	Get  yaw degree
+		@params None
+		@return float degree
+		'''
 		degree = self.vnSensor.read_yaw_pitch_roll().x%360
 
 		if(degree > 180):
@@ -140,41 +147,45 @@ class Imu:
 
 		return degree
 
-	'''
-	@desc 	Get  magnetic fields measurements
-	@params None
-	@return vec3f object of cgs (centimetre–gram–second) units (Gaussian units)
+
+	def get_magnetic_measurments(self):
+		'''
+		@desc 	Get  magnetic fields measurements
+		@params None
+		@return vec3f object of cgs (centimetre–gram–second) units (Gaussian units)
 				float x 
 				float y
 				float z 
-	'''
-	def get_magnetic_measurments(self):
+		'''
 		return self.vnSensor.read_magnetic_measurements()
 
-	'''
-	@desc 	Get  magnetic fields measurements
-	@params None
-	@return ???
-	'''
+
 	def get_magnetic_and_gravity_reference(self):
+		'''
+		@desc 	Get  magnetic fields measurements
+		@params None
+		@return ???
+		'''
 		return self.vnSensor.read_magnetic_and_gravity_reference_vectors()
 
-	'''
-	@desc 	Get  all imu measurments
-	@params None
-	@return ???
-	'''
+
 	def get_imu_measurements(self):
+		'''
+		@desc 	Get  all imu measurments
+		@params None
+		@return ???
+		'''
 		return self.vnSensor.read_imu_measurements()
 
-	'''
-	@desc 	Get acceleration and velocity vectors
-	@params None
-	@return dynamic array
-				vec3f acceleration
-				vec3f velocity
-	'''
+
 	def get_gps_acceleration_velocity(self):
+		'''
+		@desc 	Get acceleration and velocity vectors
+		@params None
+		@return dynamic array
+					vec3f acceleration
+					vec3f velocity
+		'''
 		lla = self.vnSensor.read_gps_solution_lla()
 
 		return {
@@ -182,14 +193,15 @@ class Imu:
 			'velocity': lla.ned_vel
 		}
 
-	'''
-	@desc Get acceleration and velocity vectors
-	@params None
-	@return dynamic array
+
+	def get_angular_rates(self):
+		'''
+		@desc Get acceleration and velocity vectors
+		@params None
+		@return dynamic array
 				vec3f acceleration
 				vec3f velocity
-	'''
-	def get_angular_rates(self):
+		'''
 		angles = self.vnSensor.read_angular_rate_measurements()
 
 		return {
@@ -198,23 +210,25 @@ class Imu:
 			'z': angles.z%360,
 		}
 
-	'''
-	@desc Get acceleration
-	@params None
-	@return vec3f acceleration
-	'''
+
 	def get_acceleration(self):
+		'''
+		@desc Get acceleration
+		@params None
+		@return vec3f acceleration
+		'''
 		return self.vnSensor.read_acceleration_measurements()
 
-	'''
-	@desc Get delta theta
-	@params None
-	@return dynamic array
-				x
-				y
-				z
-	'''
+
 	def get_delta_theta(self):
+		'''
+		@desc Get delta theta
+		@params None
+		@return dynamic array
+					x
+					y
+					z
+		'''
 		angles = self.vnSensor.read_delta_theta_and_delta_velocity().delta_theta
 
 		return {
@@ -223,20 +237,22 @@ class Imu:
 			'z': angles.z%360,
 		}
 
-	'''
-	@desc Get delta velocity
-	@params None
-	@return vec3f velocity
-	'''
+
 	def get_delta_velocity(self):
+		'''
+		@desc Get delta velocity
+		@params None
+		@return vec3f velocity
+		'''
 		return self.vnSensor.read_delta_theta_and_delta_velocity().delta_velocity
 
-	'''
-	@desc Get needed degrees to point north
-	@params None
-	@return float degree
-	'''
+
 	def get_degrees_to_north_orientation(self):
+		'''
+		@desc Get needed degrees to point north
+		@params None
+		@return float degree
+		'''
 		degree = (self.get_yaw_orientation()%360) - self.northYaw
 
 		if (degree > 180):
@@ -245,14 +261,15 @@ class Imu:
 
 		return degree
 
-	'''
-	@desc get degrees and distance to gps coords
-	@params goal latitude and longitud
-	@return dynamic array
-				float distance  meters
-				float degrees 
-	'''
+
 	def get_degrees_and_distance_to_gps_coords(self, latitude2, longitud2):
+		'''
+		@desc get degrees and distance to gps coords
+		@params goal latitude and longitud
+		@return dynamic array
+					float distance  meters
+					float degrees 
+		'''
 		north = (self.get_yaw_orientation()%360) - self.northYaw
 
 		if (north > 180):
@@ -287,11 +304,15 @@ class Imu:
 			'distance': int(distance),
 			'degree': int(bearing) * -1
 		}
-	def get_obstacle_gps_coords(self, boat_X, boat_y, path_x, path_y):
-
-		coords = self.get_gps_coords(self)
+	def get_obstacle_gps_coords(self, boat_x, boat_y, path_x, path_y):
+		'''
+		@desc cambio de coordenadas x y a GPS 
+		@params boat_x, boat_y, path_x, path_y
+		@returns latitude, longitude
+		'''
+		coords = self.get_gps_coords()
 		latitude1 = coords['latitude']
-		longitud1 = coords['longitud']
+		longitude1 = coords['longitud']
 
 		#print(coords);
 		#print(latitude2, longitud2);
