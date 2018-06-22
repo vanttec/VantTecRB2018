@@ -2,6 +2,7 @@ package mx.tec.vanttec.dron
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
@@ -31,7 +32,7 @@ import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_mission_setup.*
 
 class MissionSetupActivity : AppCompatActivity() {
-    private val missionMap = MissionMap(supportFragmentManager)
+    private val missionMap = MissionMap(fragmentManager)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,7 +89,7 @@ class MissionSetupActivity : AppCompatActivity() {
                         runOnUiThread {
                             val pos = LatLng(state.aircraftLocation.latitude, state.aircraftLocation.longitude)
                             val head = product.flightController.compass.heading
-                            missionMap.updateDroneMarker(pos, head)
+                            missionMap.updateDronePosition(pos, head)
                         }
                     }
 
@@ -98,6 +99,10 @@ class MissionSetupActivity : AppCompatActivity() {
                         configWayPointMission(operator, product, missionBuilder)
                     }
 
+                    missionMap.exitCallback = {
+                        product.flightController.startGoHome { }
+                    }
+
                     val videoFeedObservable = Observable.create<LiveFeedDecoder.LiveFeedData> {
                         VideoFeeder.getInstance().primaryVideoFeed.setCallback { data, length ->
                             it.onNext(LiveFeedDecoder.LiveFeedData(data, length))
@@ -105,7 +110,7 @@ class MissionSetupActivity : AppCompatActivity() {
                     }.publish().autoConnect()
 
 
-                    val decoder = LiveFeedDecoder(this, videoFeedObservable)
+                    // val decoder = LiveFeedDecoder(this, videoFeedObservable)
                 }
             }
         }
@@ -125,16 +130,25 @@ class MissionSetupActivity : AppCompatActivity() {
     // Init view layout variables
     private fun initUI() {
         locate.setOnClickListener { centerCameraOnLocation() }
-        addPin.setOnClickListener { toggleAddPin() }
+        addPin.setOnClickListener { cycleAddPin() }
+        settings.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
     }
 
-    private fun toggleAddPin() {
-        missionMap.toggleAddPin()
+    private fun cycleAddPin() {
+        missionMap.addPinMode = when(missionMap.addPinMode) {
+            MissionMap.AddPinMode.DISABLED -> MissionMap.AddPinMode.GEOFENCE
+            MissionMap.AddPinMode.GEOFENCE -> MissionMap.AddPinMode.WAYPOINT
+            MissionMap.AddPinMode.WAYPOINT -> MissionMap.AddPinMode.DISABLED
+        }
 
-        val color = if(missionMap.shouldAddPin)
-            resources.getColor(R.color.colorPrimary, theme)
-        else
-            resources.getColor(R.color.white, theme)
+        val color = when(missionMap.addPinMode) {
+            MissionMap.AddPinMode.WAYPOINT -> resources.getColor(R.color.colorPrimary, theme)
+            MissionMap.AddPinMode.GEOFENCE -> resources.getColor(R.color.colorAccent, theme)
+            MissionMap.AddPinMode.DISABLED -> resources.getColor(R.color.white, theme)
+        }
 
         addPin.setColorFilter(color)
     }

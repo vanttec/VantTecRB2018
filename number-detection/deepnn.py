@@ -78,11 +78,11 @@ def bias_variable(shape):
   initial = tf.constant(0.1, shape=shape)
   return tf.Variable(initial)
 
-def train(x, y):
-  x = tf.placeholder(tf.float32, [None, 784])
+def train(data_set):
+  x = tf.placeholder(tf.float32, [None, 875])
 
   # Define loss and optimizer
-  y_ = tf.placeholder(tf.float32, [None, 10])
+  y_ = tf.placeholder(tf.float32, [None, 3])
 
   # Build the graph for the deep net
   y_conv, keep_prob = deepnn(x)
@@ -109,7 +109,7 @@ def train(x, y):
   with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     for i in range(20000):
-      batch = mnist.train.next_batch(50)
+      batch = data_set.batch(20)
       
       if i % 100 == 0:
         train_accuracy = accuracy.eval(feed_dict={x: batch[0], y_: batch[1], keep_prob: 1.0})
@@ -119,6 +119,9 @@ def train(x, y):
 
     print('test accuracy %g' % accuracy.eval(feed_dict={x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
 
-def infer(x):
+class TrainData:
+  def __init__(self, folder):
+    self.folder = folder
 
-
+  def batch(n):
+    
