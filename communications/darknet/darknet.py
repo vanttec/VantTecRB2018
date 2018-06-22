@@ -148,7 +148,7 @@ def detect(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45):
 
 net = ''
 meta = ''
-
+#def execute(data_calib, set_up, num,img):
 def execute(data_calib, set_up, num):
     # For python3 added b before directions7
     # Path from where main script is 
@@ -163,6 +163,7 @@ def execute(data_calib, set_up, num):
     ret, raw_frame = cap.read()
     #Undistort image
     frame = undistorted_image(raw_frame, data_calib)
+    #frame = undistorted_image(img, data_calib)
     drawing_frame = frame.copy()
     height, width, channels = frame.shape
     cap.release()
@@ -219,6 +220,8 @@ def execute(data_calib, set_up, num):
                 cv2.putText(drawing_frame,str(round(d[1],2)), (xc,yc+30), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
                 cv2.putText(drawing_frame,str(d[2]), (xc,yc+40), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
                 imwrite("draw" + filename, drawing_frame)
+    #cv2.imshow('detected',drawing_frame)
+    #cv2.waitKey(0)
     return r
 
 def parse_data(data):
