@@ -4,7 +4,9 @@ import random
 from cv2 import *
 import cv2
 from .distances import get_rois_data
-
+import os
+import calendar
+import time
 def sample(probs):
     s = sum(probs)
     probs = [a/s for a in probs]
@@ -207,8 +209,9 @@ def execute(data_calib):
             cv2.putText(drawing_frame,str(round(h,2)), (xc,yc+20), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
             cv2.putText(drawing_frame,str(round(d[1],2)), (xc,yc+30), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
 
-    cv2.imshow("Rois", drawing_frame)
-    cv2.waitKey(20)
+    path = '/home/charlesdickens/Documents/Dataset_numbers/base_images/resized_25x35'
+    filename_parts = basename(fn) + str(calendar.timegm(time.strptime('Jul 9, 2009 @ 20:02:58 UTC', '%b %d, %Y @ %H:%M:%S UTC'))) 
+    cv2.imwrite(os.path.join(path ,filename_parts), resized_image)
     return r
 
 def parse_data(data):

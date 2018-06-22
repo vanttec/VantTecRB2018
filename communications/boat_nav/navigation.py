@@ -39,9 +39,9 @@ class Navigation:
 
 		#Condition distance more than 2 meters. 
 		while distance > 2 and not self.stopNavigation:
-			#print("degrees: ", self.imu.NORTH_YAW)
-			#print("coords: ", self.imu.get_gps_coords())
-			#print("orientation degrees", orientationDegree)
+			print("degrees: ", self.imu.NORTH_YAW)
+			print("coords: ", self.imu.get_gps_coords())
+			print("orientation degrees", orientationDegree)
 			if lastOrientationDegree != orientationDegree:
 				turn_degrees_needed = orientationDegree
 				turn_degrees_accum  = 0
@@ -56,13 +56,13 @@ class Navigation:
 
 			if imu_angle > 180:
 				imu_angle = imu_angle - 360
-			#print("grados imu: ", imu_angle)
+			print("grados imu: ", imu_angle)
 
 			#threshold
 			if math.fabs(imu_angle) > 1:
 				turn_degrees_accum += imu_angle
 
-			#print("grados acc: ", turn_degrees_accum)
+			print("grados acc: ", turn_degrees_accum)
 			turn_degrees_needed = (orientationDegree + turn_degrees_accum)%360
 
 			if turn_degrees_needed > 180 : 
@@ -70,7 +70,7 @@ class Navigation:
 			elif  turn_degrees_needed < -180:
 				turn_degrees_needed = turn_degrees_needed + 360
 			
-			#print("grados a voltear: ", turn_degrees_needed)
+			print("grados a voltear: ", turn_degrees_needed)
 
 			if math.fabs(turn_degrees_needed) < 10: 
 				print("Tengo un margen menor a 10 grados")
