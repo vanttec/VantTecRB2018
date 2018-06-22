@@ -40,7 +40,7 @@ def subscriber(xbee, imu):
                 print(type(jmessage['target_lat']))
                 print("-------")
                 # Set target coords
-                xbee.set_target(jmessage['target_lat'],jmessage['target_lon'])
+                xbee.set_target(float(jmessage['target_lat']),float(jmessage['target_lon']))
                 gps_navigation.update_nav(xbee.target_lat, xbee.target_lon) # Waypoint
                 
                 xbee_network = device.get_network()
