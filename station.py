@@ -1,6 +1,18 @@
+import threading
 from communications.Xbee.comunicacion import xbee
-from communications.thread_classes import DroneThread, DroneCheker, StationXbThread
 from mission_data import MissionStationData
+from communications.Xbee.publisher import publisher
+
+class StationXbThread(threading.Thread):
+    '''Class to access xbee data from station'''
+    def __init__(self, thread_id, name, station_xb):
+        threading.Thread.__init__(self)
+        self.thread_id = thread_id
+        self.name = name
+        self.station_xb = station_xb
+
+    def run(self):
+        publisher(self.station_xb)
 
 def main_station():
     main_data = MissionStationData(xbee())
