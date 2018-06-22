@@ -3,10 +3,11 @@ import math
 import random
 from cv2 import *
 import cv2
-from .distances.path import get_rois_data
+from distances.path import get_rois_data
 import os
 import calendar
 import time
+from glob import glob
 def sample(probs):
     s = sum(probs)
     probs = [a/s for a in probs]
@@ -148,25 +149,28 @@ def detect(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45):
 
 net = ''
 meta = ''
-#def execute(data_calib, set_up, num,img):
-def execute(data_calib, set_up, num):
+def execute(data_calib, set_up, num,img):
+#def execute(data_calib, set_up, num):
     # For python3 added b before directions7
     # Path from where main script is 
     if set_up:
        global net
        global meta
-       net = load_net(b"communications/darknet/vantec_cfg/yolo-vantec.cfg", b"communications/darknet/vantec_cfg/yolo-vantec.weights", 0)
-       meta = load_meta(b"communications/darknet/vantec_cfg/obj.data")
+       #net = load_net(b"communications/darknet/vantec_cfg/yolo-vantec.cfg", b"communications/darknet/vantec_cfg/yolo-vantec.weights", 0)
+       #meta = load_meta(b"communications/darknet/vantec_cfg/obj.data")
+       net = load_net(b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/yolo-vantec.cfg", b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/yolo-vantec.weights", 0)
+       meta = load_meta(b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/obj.data")
+     
 
     #Funcion para tomar fotos y escanear imagen
-    cap = VideoCapture(1)
-    ret, raw_frame = cap.read()
+    #cap = VideoCapture(1)
+    #ret, raw_frame = cap.read()
     #Undistort image
-    frame = undistorted_image(raw_frame, data_calib)
-    #frame = undistorted_image(img, data_calib)
+    #frame = undistorted_image(raw_frame, data_calib)
+    frame = undistorted_image(img, data_calib)
     drawing_frame = frame.copy()
     height, width, channels = frame.shape
-    cap.release()
+    #cap.release()
     filename = "filename" + str(num) + ".png"
     #Save image
     imwrite(filename, frame)
@@ -220,8 +224,8 @@ def execute(data_calib, set_up, num):
                 cv2.putText(drawing_frame,str(round(d[1],2)), (xc,yc+30), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
                 cv2.putText(drawing_frame,str(d[2]), (xc,yc+40), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
                 imwrite("draw" + filename, drawing_frame)
-    #cv2.imshow('detected',drawing_frame)
-    #cv2.waitKey(0)
+    cv2.imshow('detected',drawing_frame)
+    cv2.waitKey(0)
     return r
 
 def parse_data(data):
@@ -246,4 +250,6 @@ def undistorted_image(img,data_calib):
 	newcameramtx = data_calib[3] 
 	new_image = cv2.undistort(img, mtx, dist, None, newcameramtx)
 	return new_image
-	
+
+
+

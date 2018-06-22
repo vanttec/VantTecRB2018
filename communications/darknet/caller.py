@@ -5,9 +5,10 @@ import cv2
 from glob import glob
 import os
 import sys
-from .distances.path import get_rois_data
-from .darknet import execute
+from distances.path import get_rois_data
+from darknet import execute
 from PIL import Image
+
 def parse_data(data):
     results = []
     for val in data:
@@ -31,8 +32,8 @@ def main_caller():
     while True:
         print('-------DATOS DARKNET------')
         #execute, send image and datos para undistort la imagen(camera calibration), esto ultimo lo hace la funcion execute
-        #data = execute(data_calib, set_up, num,image_list.pop())
-        data = execute(data_calib, set_up, num)
+        data = execute(data_calib, set_up, num,image_list.pop())
+        #data = execute(data_calib, set_up, num)
         print(data)
 
         if data is not None:
@@ -104,3 +105,8 @@ def load_images_from_folder(folder):
         if img is not None:
             images.append(img)
     return images
+
+
+
+
+main_caller()
