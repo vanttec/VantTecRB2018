@@ -168,7 +168,7 @@ def execute(data_calib, set_up, num):
     #Save image
     imwrite(filename, frame) 
     #Call CNN
-    r = detect(net, meta, "filename.png")
+    r = detect(net, meta, filename)
     
     #Iterate detected objects
     for f in r:
