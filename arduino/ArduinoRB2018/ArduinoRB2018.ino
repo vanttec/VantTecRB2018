@@ -113,7 +113,6 @@ void manual_Mode() {
   }
 }
 
-
 void autonomous_Mode() {
   //void for autonomous navigation communicated via serial
   // put your main code here, to run repeatedly:
