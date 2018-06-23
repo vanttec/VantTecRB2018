@@ -29,3 +29,12 @@ class GPSNavigation:
 
 	def auto_nav(self, pdistance, pdegree):
 		self.navigation.visnavigate(pdistance,pdegree)
+
+    def auto_gps(self, pdistance, pdegree):
+        waypoint = self.imu.get_pos_from_vision(self, pdistance, pdegree)
+        waypoint_x = waypoint['real_x']
+        waypoint_y = waypoint['real_y']
+        gate_gps = self.imu.get_obstacle_gps_coords(self, 0, 0, real_x, real_y)
+        lat = gate_gps['latitude']
+        lon = gate_gps['longitud']
+        self.update_nav(lat, lon)

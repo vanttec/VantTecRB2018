@@ -155,3 +155,5 @@ class Navigation:
 			#recorrer 2 metros           
 			#time.sleep(1)
 		motors.move(0,0)
+
+	def 
