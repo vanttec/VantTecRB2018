@@ -43,7 +43,7 @@ FOV_V  = 45.7 * 0.0174533
 FOV_H  = 73.7 * 0.0174533
 ANGLE_PER_PIXEL_H = FOV_H/WIDTH
 ANGLE_PER_PIXEL_V = FOV_V/HEIGTH 
-HEIGTH_DRONE = 20.0
+HEIGTH_DRONE = 15.0
 
 #Calculo de metros en las coordenadas
 
