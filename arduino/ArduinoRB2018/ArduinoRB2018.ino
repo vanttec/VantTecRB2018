@@ -86,28 +86,28 @@ void manual_Mode() {
     Serial.println('parado');
   }
   else if ((channel4 > 1450 & channel4 < 1550) & (channel2 < 1450 || channel2 > 1550)) {    //Control in advance
-    int signal = map(channel2, 975, 2025, 1100, 1900);
+    int signal = map(channel2, 975, 2025, 1300, 1700);
     left.writeMicroseconds(signal); // Send signal to ESC.
     right.writeMicroseconds(signal);   //thrusters at zero
     Serial.println('enfrente');
   }
   else if ((channel4 < 1450 || channel4 > 1550) & (channel2 > 1450 & channel2 < 1550)) {    //Control for rotation both left and right
-    int signal = map(channel4, 975, 2025, 1900, 1100);
-    left.writeMicroseconds(signal); // Send signal to ESC.
-    signal = map(channel4, 975, 2025, 1100, 1900);
-    right.writeMicroseconds(signal);   //thrusters at zero
+    int signal = map(channel4, 975, 2025, 1700, 1300);
+    right.writeMicroseconds(signal); // Send signal to ESC.
+    signal = map(channel4, 975, 2025, 1300, 1700);
+    left.writeMicroseconds(signal);   //thrusters at zero
   }
   else if ((channel4 < 1450) & (channel2 < 1450 || channel2 > 1550)) {    //Control for turning left
     Y = (channel2-(channel2-1500)*(1500-channel4)/525);
-    R = map(channel2, 975, 2025, 1100, 1900);
-    L = map(Y, 975, 2025, 1100, 1900);
+    R = map(channel2, 975, 2025, 1300, 1700);
+    L = map(Y, 975, 2025, 1300, 1700);
     right.writeMicroseconds(R);
     left.writeMicroseconds(L);    //left thruster is proportionated for left turns
   }
   else if ((channel4 > 1550) & (channel2 < 1450 || channel2 > 1550)) {    //Control for turning right
     Y = (channel2-(channel2-1500)*(channel4-1500)/525);
-    R = map(Y, 975, 2025, 1100, 1900);
-    L = map(channel2, 975, 2025, 1100, 1900);
+    R = map(Y, 975, 2025, 1300, 1700);
+    L = map(channel2, 975, 2025, 1300, 1700);
     right.writeMicroseconds(R);
     left.writeMicroseconds(L);    //right thruster is proportionated for right turns
   }
@@ -137,10 +137,10 @@ void autonomous_Mode() {
           String valLeft = inputString.substring(8,12);
           //Serial.println(valLeft);
           int signal = valLeft.toInt();
-          right.writeMicroseconds(signal);
+          left.writeMicroseconds(signal);
           Serial.print(signal);
           signal = valRight.toInt();
-          left.writeMicroseconds(signal);
+          right.writeMicroseconds(signal);
           Serial.print(signal);
         }
         //Left thrusters
