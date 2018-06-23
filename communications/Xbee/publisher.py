@@ -55,13 +55,16 @@ def publisher(xbee):
                 remote_device = xbee_network.discover_device(REMOTE_NODE_ID)
                 action = input("action: ")
                 xbee.set_action(action)
-                if action == '1':
+               if action == '1':
                     xbee.set_target('0.000','0.000')
-                else:
-                    print("Dame la latitud y longitud del waypoint destino: ")
+                elif action == '2':
+                    print("Dame la latitud y longitud del waypoint donde se iniciara el challenge: ")
                     lat = input("\n lat: ")
                     lon = input("\n lon: ")
                     xbee.set_target(lat,lon)
+                elif action == '5':
+                    #path planning
+                    print("path plan")
                 device.send_data(remote_device, xbee.send())
 
         print("Success")
