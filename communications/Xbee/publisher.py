@@ -41,12 +41,6 @@ def publisher(xbee):
             lat = input("\n lat: ")
             lon = input("\n lon: ")
             xbee.set_target(lat,lon)
-        elif action == '3':
-            #autonomous nav 1
-            print("nav 1")
-        elif action == '4':
-            #autonomous nav2
-            print("nav 2")
         elif action == '5':
             #path planning
             print("path plan")
