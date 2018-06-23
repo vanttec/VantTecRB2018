@@ -1,4 +1,5 @@
 from motors import Motors
 
 motors = Motors()
-motors.move(25,25)
+while True:
+    motors.move(25,25)
