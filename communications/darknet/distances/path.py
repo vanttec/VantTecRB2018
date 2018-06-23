@@ -173,8 +173,7 @@ def get_rois_data(rois, challenge = 'autonomus_navigation'):
 	#print(output)
 
 	if(challenge == 'autonomus_navigation'):
-		#return autonomus_navigation(output)
-		return output
+		return autonomus_navigation(output)
 	return output
 
 
