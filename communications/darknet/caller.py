@@ -5,8 +5,9 @@ import cv2
 from glob import glob
 import os
 import sys
-from .distances import get_rois_data
-from .darknet import execute, execute_test
+from .distances.path import get_rois_data
+from .darknet import execute
+from PIL import Image
 
 def parse_data(data):
     results = []
@@ -24,15 +25,17 @@ def main_caller():
     data_calib = calibration()
     print(data_calib)
     set_up = True
-    num = 0
+    img_path = '/home/vantec/Documents/VantTecRB2018/communications/darknet/Competencia/*.png'
+    image_list = [cv2.imread(file) for file in glob(img_path)]
     #AQUI SE ARMA LA CARNita ASAdiuxx
     while True:
         print('-------DATOS DARKNET------')
         #execute, send image and datos para undistort la imagen(camera calibration), esto ultimo lo hace la funcion execute
-        data = execute(data_calib, set_up, num)
+        #data = execute(data_calib, set_up, num, image_list.pop())
+        data = execute(data_calib, set_up)
         print(data)
 
-        if len(data):
+        if data is not None:
             data = parse_data(data)
             print(data)
             distances = get_rois_data(data) 
@@ -41,8 +44,25 @@ def main_caller():
             print('---------Nothing detected------------')
             #obtain_data()
         set_up = False
-        num += 1
 
+'''#Pruebas
+def main(data_calib,images):
+    #AQUI SE ARMA LA CARNita ASAdiuxx
+    while True:
+        print('-------DATOS DARKNET------')
+        #execute, send image and datos para undistort la imagen(camera calibration), esto ultimo lo hace la funcion execute
+        data = execute(data_calib,images.pop())
+        print(data)
+        if len(data):
+            data = parse_data(data)
+            print(data)
+            distances = get_rois_data(data) 
+            print(distances)
+        else:
+            print('---------Nothing detected------------')
+            #obtain_data()
+
+'''
 
 def calibration():
     #Termination criteria

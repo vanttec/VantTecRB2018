@@ -1,5 +1,6 @@
 package mx.tec.vanttec.dron
 
+import com.google.android.gms.maps.model.LatLng
 import org.opencv.calib3d.Calib3d
 import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
@@ -9,6 +10,8 @@ import java.util.ArrayList
 import org.opencv.core.MatOfPoint
 import org.opencv.features2d.FlannBasedMatcher
 import org.opencv.imgproc.Moments
+
+typealias VTPoint = Pair<Int, Int>
 
 // colorLow: Scalar(59.0, 69.0, 0.0)
 // colorHigh: Scalar(255.0, 255.0, 255.0)
@@ -20,11 +23,15 @@ private const val minThresh = 0.0
 
 
 // Descriptor matching vars
-private val minMatches = 10
-private val flannParamsPath = "/path/to/yaml" // TODO: GET PATH
+private const val minMatches = 10
+private const val flannParamsPath = "/path/to/yaml" // TODO: GET PATH
 private val matcher = FlannBasedMatcher.create()
 
-fun  mainMap(srcImg: Mat, colorLow: Scalar, colorHigh: Scalar) : List<Pair<Int, Int>> {
+operator fun LatLng.component1() = this.latitude
+operator fun LatLng.component2() = this.longitude
+
+fun  obstacles(srcImg: Mat, colorLow: Scalar, colorHigh: Scalar) :
+        Triple<List<VTPoint>, VTPoint, VTPoint> {
     val size = srcImg.size()
 
     //RESIZE
@@ -81,7 +88,7 @@ fun  mainMap(srcImg: Mat, colorLow: Scalar, colorHigh: Scalar) : List<Pair<Int, 
     val (totalMetersX, totalMetersY) = getDistanceFieldOfView(altitude, hFOV, vFOV)
 
     //Draw contours
-    val output = ArrayList<Pair<Int, Int>>();
+    val output = ArrayList<VTPoint>();
     for (c in mc) {
         //I draw a black little empty circle in the centroid position
         Imgproc.circle(imgRGB, c, 5, Scalar(255.0, 0.0, 0.0), -1)
@@ -92,7 +99,7 @@ fun  mainMap(srcImg: Mat, colorLow: Scalar, colorHigh: Scalar) : List<Pair<Int, 
         output.add(Pair(x, y))
     }
 
-    return output
+    return Triple(output, VTPoint(0,0), VTPoint(0,0))
 }
 
 private fun getDistanceFieldOfView(h: Double, hFOV: Double, vFOV: Double) : Pair<Double,Double> {
@@ -102,7 +109,7 @@ private fun getDistanceFieldOfView(h: Double, hFOV: Double, vFOV: Double) : Pair
     return Pair(xDist, yDist)
 }
 
-fun findTarget(image: Mat, template: DetectorData) : Mat? {
+fun findInImage(image: Mat, template: DetectorData) : Mat? {
     val (tkp, tdes, tsize) = template
     val (qkp, qdes) = DetectorData(image)
 
