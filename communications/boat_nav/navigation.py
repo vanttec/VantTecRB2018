@@ -99,7 +99,6 @@ class Navigation:
         turn_degrees_accum    = 0
         distance = pdistance
         orientationDegree = pdegree
-        motors = Motors()
         #clean angle
         self.imu.get_delta_theta()
         #print("delta theta: ", self.imu.get_delta_theta)
@@ -166,7 +165,7 @@ class Navigation:
             self.navigate(destiny,lat,lon)
             
         self.motors.move(50,50)
-        time sleep(5)
+        time.sleep(5)
         self.motors.move(0,0)
 
     def visnavigate2(self, pdistance, pdegree):
@@ -175,7 +174,6 @@ class Navigation:
         turn_degrees_accum    = 0
         distance = pdistance
         orientationDegree = pdegree
-        motors = Motors()
         #clean angle
         self.imu.get_delta_theta()
         #print("delta theta: ", self.imu.get_delta_theta)
