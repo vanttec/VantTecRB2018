@@ -37,6 +37,7 @@ def main_caller(challenge):
 
     if r is not None:        
         #Iterate detected objects
+        print('---------detected------------')
         for f in r:
 
             #Unpack data
@@ -52,10 +53,10 @@ def main_caller(challenge):
             y =  int(yc-  hh)
 
             #Drawn rois
-            print('---------detected------------')
-            cv2.rectangle(drawing_frame, (x, y), (x + w, y + h), (0, 0, 255))
-            cv2.imshow('detected', drawing_frame)
-            cv2.waitKey(20)
+            
+            #cv2.rectangle(drawing_frame, (x, y), (x + w, y + h), (0, 0, 255))
+            #cv2.imshow('detected', drawing_frame)
+            #cv2.waitKey(20)
 
         if len(r):
             data = parse_data(r)
