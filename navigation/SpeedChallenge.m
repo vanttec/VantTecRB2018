@@ -1,4 +1,4 @@
-%function path, path2 = FindThePath(width, height, buoypos, boatLocation, circleBuoy)
+%function path, path2 = speed_path(width, height, buoypos, boatLocation, circleBuoy)
 
 filePath = fullfile(fileparts(which('PathPlanningExample')),'data','exampleMaps.mat');
 load(filePath)
