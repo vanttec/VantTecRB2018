@@ -104,8 +104,8 @@ class Navigation:
 		self.imu.get_delta_theta()
 		#print("delta theta: ", self.imu.get_delta_theta)
 
-		#Condition distance more than 2 meters. 
-		while distance > 2 and not self.stopNavigation:
+		#Condition distance more than 4 meters. 
+		while distance > 5 and not self.stopNavigation:
 			print("coords: ", self.imu.get_gps_coords())
 			
 			if lastOrientationDegree != orientationDegree:
@@ -154,4 +154,15 @@ class Navigation:
 			#ir derecho
 			#recorrer 2 metros           
 			#time.sleep(1)
+        
+		while distance < 5 and distance > 2:
+			waypoint = self.imu.get_pos_from_vision(self, pdistance, pdegree)
+			waypoint_x = waypoint['real_x']
+        	waypoint_y = waypoint['real_y']
+        	gate_gps = self.imu.get_obstacle_gps_coords(self, 0, 0, real_x, real_y)
+        	lat = gate_gps['latitude']
+        	lon = gate_gps['longitud']
+        	destiny = self.imu.get_degrees_and_distance_to_gps_coords(lat, lon)
+			self.navigation.navigate(destiny,lat,lon)
+
 		motors.move(0,0)

@@ -34,11 +34,11 @@ class AutoDock:
 		self.Dock1 = 0		#Horizontal pixel the Dock1 is on the camera
 		self.Dock2 = 0		#Horizontal pixel the Dock2 is on the camera
 		self.Dock3 = 0		#Horizontal pixel the Dock3 is on the camera
-		self.Center = 240		#Horizontal pixel which is the center of the image (480 pixels)
+		self.Center = 400	#Horizontal pixel which is the center of the image (800 pixels)
 		#Error margin of a 50 pixels
 		#We need experiments to change it
-		self.CenterMin = Center + 25
-		self.CenterMax = Center - 25
+		self.CenterMin = Center + 50
+		self.CenterMax = Center - 50
 
 	def get_docks_horizontal_coordinate():
 		#Get the horizontal center of each dock
@@ -62,15 +62,22 @@ class AutoDock:
 			Dock = Dock3
 
 
-	def run(self):
-		if Dock < CenterMin and Dock > CenterMax :
-			if Dock < CenterMin :
-				motors.move(50,0)
+	def automated_docking(self):
+		if dock < centerimageMin and dock > centerimageMax and distance > 3:
+			if dock < centerimageMin :
+				motors.move(15,0)
 
-			elif Dock > CenterMax :
-				motors.move(0,50)
+			elif dock > centerimageMax :
+				motors.move(0,15)
+
+		elif dock < centerimageMin and dock > centerimageMax and distance < 2: 
+				motors.move(-30,-30)
+			#si está muy cerca y aun no acomoda la direccion, tiene que regresarse
+
+		elif dock > centerimageMin and dock < centerimageMax and distance > 1:
+				motors.move(30,30)
+				#va derecho, se reduce la distancia
 
 		else
-			motors.move(50,50)
-
-auto_dock = AutoDock()
+			motors.move(0,0)
+				#la distancia es menor a 1 metro, se frena y el impulso lo atraca

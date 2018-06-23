@@ -306,6 +306,7 @@ class Imu:
 			'distance': int(distance),
 			'degree': int(bearing) * -1
 		}
+
 	def get_obstacle_gps_coords(self, boat_x, boat_y, path_x, path_y):
 		'''
 		@desc cambio de coordenadas x y a GPS 
@@ -322,10 +323,31 @@ class Imu:
 		y_distance = path_y - boat_y
 		x_distance = path_x - boat_x
 
+		phi1 = math.radians(latitude1)
+		phi2 = math.radians(latitude2)
+
 		latitude2  = latitude1  + (y_distance / EARTH_RADIUOS) * (180 / math.pi)
-		longitude2 = longitude1 + (x_distance / EARTH_RADIUOS) * (180 / math.pi) / math.cos(latitude1 * math.pi/180)
+		longitude2 = longitude1 + (x_distance / EARTH_RADIUOS) * (180 / math.pi) / math.cos(phi1 * math.pi/180)
 
 		return {
 			'latitude': latitude2,
 			'longitud': longitude2
+		}
+
+	def get_pos_from_vision(self, point_distance, point_degree):
+
+		north = (self.imu.get_yaw_orientation()%360) - self.northYaw
+
+		if (north > 180):
+			north = north - 360
+
+		real_degree = north + point_degree
+		real_radians = math.radians(real_degree)
+
+		real_x = math.sin(abs(real_radians))*point_distance
+		real_y = math.cos(abs(real_radians))*point_distance
+
+		return {
+			'real_x': real_x,
+			'real_y': real_y
 		}
