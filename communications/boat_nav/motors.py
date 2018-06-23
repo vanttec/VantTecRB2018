@@ -36,6 +36,7 @@ class Motors:
 
 		#serial communication Handler
 		self.ser = serial.Serial(self.serial_port, self.baudRate)
+		print(self.ser.name)
 
 	#format value to proper length
 	def check_value_size(self, val):
@@ -69,7 +70,7 @@ class Motors:
 			pR = str(powerR)
 			pR = self.check_value_size(pR)
 			pL = str(powerL)
-			pL = self.check_value_size(pL)
+			pL = self.check_value_size(pL)	
 			val = '%' + 'B,' + pR + ',' + pL + '%'
 
 			#Send motors value to arduino

@@ -2,4 +2,4 @@ from motors import Motors
 
 motors = Motors()
 while True:
-    motors.move(25,25)
+    motors.move_thrusters(1600,1600)
