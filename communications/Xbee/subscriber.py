@@ -57,6 +57,28 @@ def subscriber(xbee, imu, status):
 
                     gps_navigation.auto_nav(res[0], res[1], status) # Waypoint Carlos
 
+                elif jmessage['action'] == '4':
+                    # Until there is a resutl
+                    res = None
+                    while res is None:
+                        res = main_caller(darknet_set_up, 'autonomus_navigation')
+
+                    if res == 'not found pair of posts':
+                        self.navigation.search(False)
+
+                    darknet_set_up = False
+                    gps_navigation.auto_nav2(res[0], res[1], status) # Waypoint Carlos
+                    
+                    res = None
+                    while res is None:
+                        res = main_caller(darknet_set_up, 'autonomus_navigation')
+
+                    if res == 'not found pair of posts':
+                        self.navigation.search(False)
+
+                    gps_navigation.auto_nav2(res[0], res[1], status) # Waypoint Carlos
+
+
                 xbee_network = device.get_network()
                 remote_device = xbee_network.discover_device(REMOTE_NODE_ID) #Aqui debe enviarlo al servidor
                 device.send_data(remote_device, xbee.send())
