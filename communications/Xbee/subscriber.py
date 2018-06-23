@@ -60,6 +60,7 @@ def subscriber(xbee, imu, status):
 
                 elif jmessage['action'] == '4':
                     # Until there is a resutl
+                    xbee.set_action('4')
                     res = 'not found pair of posts'
                     while res == 'not found pair of posts' or res is None:
                         res = main_caller('autonomus_navigation')
