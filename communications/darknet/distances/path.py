@@ -450,13 +450,11 @@ def autonomus_navigation(data):
 		new_ys = [point[0] for point in sorted_points]
 		new_xs = [point[1] for point in sorted_points]
 		new_angs = [point[2] for point in sorted_points]
-
-
+		print('SORTED LISTS OBJECTS Y, X , ANGLES...')
 		print(new_ys)
 		print(new_xs)
 		print(new_angs)
 		if len(new_ys) >=2:
-
 			middle = min(new_xs[0],new_xs[1]) + abs(new_xs[0] - new_xs[1])/2
 			angle_tomiddle = min(new_angs[0],new_angs[1]) + abs(new_angs[0] - new_angs[1])/2
 			return  (middle,angle_tomiddle)
