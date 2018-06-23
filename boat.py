@@ -17,7 +17,7 @@ class CameraThread(threading.Thread):
 
 def main_boat():
     main_data = MissionBoatData(xbee())
-    #thread_boat = BoatXbThread(1, "Boat", main_data.boat_xb) #subscriber
+    thread_boat = BoatXbThread(1, "Boat", main_data.boat_xb) #subscriber
     thread_camera = CameraThread(2, "Camera")
 
     #thread_boat.start()
