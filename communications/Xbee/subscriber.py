@@ -68,14 +68,14 @@ def subscriber(xbee, imu, status):
                         gps_navigation.navigation.search()
 
                     darknet_set_up = False
-                    gps_navigation.auto_nav2(res[0], res[1], status) # Waypoint Carlos
+                    gps_navigation.auto_nav2(res[0], res[1]) # Waypoint Carlos
                     
                     res = 'not found pair of posts'
                     while res == 'not found pair of posts':
                         res = main_caller(darknet_set_up, 'autonomus_navigation')
                         gps_navigation.navigation.search()
 
-                    gps_navigation.auto_nav2(res[0], res[1], status) # Waypoint Carlos
+                    gps_navigation.auto_nav2(res[0], res[1]) # Waypoint Carlos
 
 
                 xbee_network = device.get_network()

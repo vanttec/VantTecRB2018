@@ -167,7 +167,7 @@ class Navigation:
 
         self.motors.move(0,0)
 
-    def visnavigate2(self, pdistance, pdegree, status):
+    def visnavigate2(self, pdistance, pdegree):
         lastOrientationDegree = 0
         turn_degrees_needed   = 0
         turn_degrees_accum    = 0
@@ -179,7 +179,7 @@ class Navigation:
         #print("delta theta: ", self.imu.get_delta_theta)
 
         #Condition distance more than 5 meters. 
-        while distance > 3 and not self.stopNavigation and not status.exit_nav:
+        while distance > 3 and not self.stopNavigation:
             print("coords: ", self.imu.get_gps_coords())
             
             if lastOrientationDegree != orientationDegree:
@@ -229,7 +229,7 @@ class Navigation:
             #recorrer 2 metros           
             #time.sleep(1)
         
-        while distance < 3 and not status.exit_nav:
+        while distance < 3:
             waypoint = self.imu.get_pos_from_vision(pdistance, pdegree)
             waypoint_x = waypoint['real_x']
             waypoint_y = waypoint['real_y']
