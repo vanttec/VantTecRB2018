@@ -99,7 +99,6 @@ class Navigation:
         turn_degrees_accum    = 0
         distance = pdistance
         orientationDegree = pdegree
-        motors = Motors()
         #clean angle
         self.imu.get_delta_theta()
         #print("delta theta: ", self.imu.get_delta_theta)
@@ -155,7 +154,7 @@ class Navigation:
             #recorrer 2 metros           
             #time.sleep(1)
         
-        while distance < 5 and not status.exit_nav:
+        while distance < 5:
             waypoint = self.imu.get_pos_from_vision(pdistance, pdegree)
             waypoint_x = waypoint['real_x']
             waypoint_y = waypoint['real_y']
@@ -164,7 +163,9 @@ class Navigation:
             lon = gate_gps['longitud']
             destiny = self.imu.get_degrees_and_distance_to_gps_coords(lat, lon)
             self.navigate(destiny,lat,lon)
-
+            
+        self.motors.move(50,50)
+        time.sleep(5)
         self.motors.move(0,0)
 
     def visnavigate2(self, pdistance, pdegree):
@@ -173,7 +174,6 @@ class Navigation:
         turn_degrees_accum    = 0
         distance = pdistance
         orientationDegree = pdegree
-        motors = Motors()
         #clean angle
         self.imu.get_delta_theta()
         #print("delta theta: ", self.imu.get_delta_theta)
@@ -228,17 +228,9 @@ class Navigation:
             #ir derecho
             #recorrer 2 metros           
             #time.sleep(1)       
-        '''
-        while distance < 3:
-            waypoint = self.imu.get_pos_from_vision(pdistance, pdegree)
-            waypoint_x = waypoint['real_x']
-            waypoint_y = waypoint['real_y']
-            gate_gps = self.imu.get_obstacle_gps_coords(0, 0, waypoint_x, waypoint_y)
-            lat = gate_gps['latitude']
-            lon = gate_gps['longitud']
-            destiny = self.imu.get_degrees_and_distance_to_gps_coords(lat, lon)
-            self.navigate(destiny,lat,lon)
-        '''
+
+        self.motors.move(50,50)
+        time.sleep(5)
         self.motors.move(0,0)
 
     def search(self):
