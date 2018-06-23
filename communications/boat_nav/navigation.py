@@ -242,4 +242,5 @@ class Navigation:
         self.motors.move(0,0)
 
     def search(self):
+        print('Searching')
         self.motors.move(15,-15)
