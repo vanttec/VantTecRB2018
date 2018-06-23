@@ -2,8 +2,9 @@ import time
 from digi.xbee.devices import XBeeDevice
 import json
 from ..boat_nav.gpsNavigation import GPSNavigation
+from ..darknet.caller import main_caller
 
-def subscriber(xbee, imu):
+def subscriber(xbee, imu, status):
     '''Esto es para el bote, el bote envia a la estacion cada 500ms'''
     #****************************************************************************************#
     # Replace with the serial port where your local module is connected to.
@@ -18,6 +19,7 @@ def subscriber(xbee, imu):
     print(" +-------------------------------------------------+\n")
     device = XBeeDevice(PORT, BAUD_RATE)
     gps_navigation = GPSNavigation(imu)
+    darknet_set_up = True
 
     try:
         device.open()
@@ -41,10 +43,19 @@ def subscriber(xbee, imu):
                 if jmessage['action'] == '2':
                     gps_navigation.update_nav(xbee.target_lat, xbee.target_lon) # Waypoint
                 elif jmessage['action'] == '3':
-                    #TODO funcion de Carlos para obtener waypoint 
-                    gps_navigation.auto_nav(pdistance, pdegree) # Waypoint Carlos
-                    #TODO funcion de Carlos para obtener waypoint
-                    gps_navigation.auto_nav(pdistance, pdegree) #Waypoint Carlos
+                    # Until there is a resutl
+                    res = None
+                    while res is None:
+                        res = main_caller(darknet_set_up, 'autonomus_navigation')
+
+                    darknet_set_up = False
+                    gps_navigation.auto_nav(res[0], res[1], status) # Waypoint Carlos
+                    
+                    res = None
+                    while res is None:
+                        res = main_caller(darknet_set_up, 'autonomus_navigation')
+
+                    gps_navigation.auto_nav(res[0], res[1], status) # Waypoint Carlos
 
                 xbee_network = device.get_network()
                 remote_device = xbee_network.discover_device(REMOTE_NODE_ID) #Aqui debe enviarlo al servidor

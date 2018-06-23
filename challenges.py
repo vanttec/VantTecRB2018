@@ -31,6 +31,10 @@ def follow_the_leader():
     '''Function to execute follow the leader'''
     pass
 
+def autonomus_nav():
+    '''Function to execute autonomus nav'''
+    pass
+
 def gps_nav_to_sc():
     '''Navigate to speed challenge coords'''
     pass
