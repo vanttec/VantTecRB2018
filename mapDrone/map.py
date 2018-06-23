@@ -103,7 +103,7 @@ def map(imgname):
 	moments  = [cv2.moments(cnt) for cnt in contours0]
 	m = cv2.moments(c) 
 	centroid_post = int(round(m['m10']/m['m00'])),int(round(m['m01']/m['m00']))
-	print centroid_post
+	print(centroid_post)
 	x_post = centroid_post[0]
 	y_post = centroid_post[1]
 	# Nota Bene: I rounded the centroids to integer.
@@ -116,36 +116,67 @@ def map(imgname):
 	total_meters_xy = getDistanceFieldOfView(HEIGTH_DRONE,FOV_H,FOV_V)
 	total_meters_x = total_meters_xy[0]
 	total_meters_y = total_meters_xy[1]
-
+	print('LA LONGITUD EN X DEL DRONE ES: ' + str(total_meters_x))
+	print('LA LONGITUD EN Y DEL DRONE ES: ' + str(total_meters_y))
 	output = []
 
-	#Draw contours
-
+	
 	for c in centroids:
+
 		# I draw a black little empty circle in the centroid position
 		cv2.circle(img_bgr,c,5,(255,0,0),-1)
+
+
 		y_modified = 480 - c[1]
 		x = int((c[0] * total_meters_x * 8.55)/WIDTH)
-		y = int((y_modified * total_meters_y * 7.6)/HEIGTH)
+		y = int((y_modified * total_meters_y * 7.6)/HEIGTH) 
+	
 		cv2.putText(img_bgr, "(" + str(x) + "," + str(y) + ")", (c[0],c[1]), cv2.FONT_HERSHEY_SIMPLEX,.3, (0, 0,0))
 		output.append([x,y])
-	
 
+	'''
+	#centroids_sorted_by y
+	centroids_sorted_y = sorted(centroids , key=lambda k: k[1])
+	min_y = centroids_sorted_y[-1]
+	print('MIN CENTROID Y' + str(centroids_sorted_y[-1]))
+	y_modified_offset = 480 - min_y[1]
+	y_offset = int((y_modified_offset * total_meters_y * 7.6)/HEIGTH)	
+	#Draw contours
+	
+	for c in centroids:
+
+		# I draw a black little empty circle in the centroid position
+		cv2.circle(img_bgr,c,5,(255,0,0),-1)
+	
+		if c is not min_y:
+			y_modified = 480 - c[1]
+			x = int((c[0] * total_meters_x * 8.55)/WIDTH)
+			y = int((y_modified * total_meters_y * 7.6)/HEIGTH) - y_offset
+		else:
+			x = int((c[0] * total_meters_x * 8.55)/WIDTH)
+			y = 0
+		cv2.putText(img_bgr, "(" + str(x) + "," + str(y) + ")", (c[0],c[1]), cv2.FONT_HERSHEY_SIMPLEX,.3, (0, 0,0))
+		output.append([x,y])
+	'''
+	
 	closestYbouy = []
 	closestYbouy_pix =  []
 	next_iteration_ctrs = []
+	
+	#sorted by x
 	centroids_sorted = sorted(centroids , key=lambda k: k[0])
 	
-	print x_post
-	print y_post
-	print centroids_sorted
+
+	print(x_post)
+	print(y_post)
+	print(centroids_sorted)
 	for index,coord in enumerate(centroids_sorted):
 		if coord == (x_post,y_post):
 			print('Found it: ' + str(coord))
 			next_iteration_ctrs = centroids_sorted[index:]
 			break
 
-	print next_iteration_ctrs
+	print(next_iteration_ctrs)
 	for index,coord in enumerate(next_iteration_ctrs):
 		if(next_iteration_ctrs[index+1][1] < next_iteration_ctrs[index][1]):
 			closestYbouy = next_iteration_ctrs[index+1]
@@ -176,6 +207,6 @@ def map(imgname):
 
 
 
-result = map('DJI_0419.JPG')
+result = map('DJI_0418.JPG')
 
 
