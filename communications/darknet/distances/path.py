@@ -41,9 +41,9 @@ import matplotlib.pyplot as plt
 
 
 #BOUYS (INCHES)
-KNOWN_DISTANCE_B = 63.0    #unknown
-KNOWN_WIDTH_B =    15.354331  #inches width of contest's bouys 
-FOCAL_LENGHT_B =   447.36    #(PIX_WIDTH_B * KNOWN_DISTANCE_B) / KNOWN_WIDTH_B   109pix
+KNOWN_DISTANCE_B = 78.74   #unknown
+KNOWN_WIDTH_B =    9.0 #inches width of contest's bouys  pix = 64
+FOCAL_LENGHT_B =   559.9    #(PIX_WIDTH_B * KNOWN_DISTANCE_B) / KNOWN_WIDTH_B   109pix
 
 #POSTS(INCHES)
 KNOWN_DISTANCE_P = 74.8    #unknown  
@@ -51,8 +51,8 @@ KNOWN_WIDTH_P = 55.0    #unknown
 FOCAL_LENGHT_P = 627.29    #(PIX_WIDTH_P * KNOWN_DISTANCE_P) / KNOWN_WIDTH_P
 
 FOCAL_VIEW =  78.0
-WIDTH_DIM  =  800
-HEIGTH_DIM =  600
+WIDTH_DIM  =  640
+HEIGTH_DIM =  480
 
 ANGLE_PER_PIXEL = 78/math.sqrt(WIDTH_DIM**2 + HEIGTH_DIM**2) 
 #check for values'integrity. return 1 if length of params is the expected.
@@ -65,7 +65,7 @@ def receive(values):
 # param: rois -- list of lists with description values for each roi [id, xc,yc,w,h]
 # return -- distances, angles, dominant color for each roi.
 
-def get_rois_data(rois):
+def get_rois_data(rois,num):
 
 	#if is empty, return
 	if not rois:
@@ -88,7 +88,7 @@ def get_rois_data(rois):
 			#convert inches to meters
 			meters_b = inches * .0254 
 			#difference of pixels from center
-			difference = int(WIDTH/2) - (rois[i][1])
+			difference = int(WIDTH_DIM/2) - (rois[i][1])
 		  #compute angles
 			#if difference is 0, angle must be 0
 			if difference == 0:
@@ -131,7 +131,7 @@ def get_rois_data(rois):
 			meters_p = inches * .0254 
 		  #compute angles
 		  	#if difference is 0, angle must be 0
-			difference = int(WIDTH/2) - (rois[i][1])
+			difference = int(WIDTH_DIM/2) - (rois[i][1])
 			#if difference is 0, angle must be 0
 			if difference == 0:
 				angle_p = 0
@@ -163,7 +163,7 @@ def get_rois_data(rois):
 			#setting the result
 			output[i][0] = coords
 			output[i][1] = angle_p
-			colorofpost = getColor(rois[i][1],rois[i][3],rois[i][2],rois[i][4])  
+			colorofpost = getColor(rois[i][1],rois[i][3],rois[i][2],rois[i][4],num)  
 			output[i][2] = colorofpost 
 	
 	print("____Datos____")
@@ -398,7 +398,7 @@ def ROI(fn):
 	return left,upper,right,lower
 
 
-def getColor(xc,yc,w,h):
+def getColor(xc,yc,w,h,num):
 
 	width = w	
 	heigth = h
@@ -409,7 +409,8 @@ def getColor(xc,yc,w,h):
 	upper = int(yc - shift_h)
 	lower = int(yc + shift_h)
 	
-	original = cv2.imread('filename.png',1)
+	filename = "filename" + str(num) + ".png"
+	original = cv2.imread(filename,1)
 	crop_img = original[upper:lower, left:right]
 	image = cv2.cvtColor(crop_img, cv2.COLOR_BGR2RGB)
 	image = image.reshape((image.shape[0] * image.shape[1], 3))
