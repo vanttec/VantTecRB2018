@@ -63,7 +63,7 @@ def subscriber(xbee, imu, status):
                 elif jmessage['action'] == '4':
                     # Until there is a resutl
                     res = 'not found pair of posts'
-                    while res == 'not found pair of posts':
+                    while res == 'not found pair of posts' or res is None:
                         res = main_caller(darknet_set_up, 'autonomus_navigation')
                         gps_navigation.navigation.search()
 
@@ -71,7 +71,7 @@ def subscriber(xbee, imu, status):
                     gps_navigation.auto_nav2(res[0], res[1]) # Waypoint Carlos
                     
                     res = 'not found pair of posts'
-                    while res == 'not found pair of posts':
+                    while res == 'not found pair of posts' or res is None:
                         res = main_caller(darknet_set_up, 'autonomus_navigation')
                         gps_navigation.navigation.search()
 
