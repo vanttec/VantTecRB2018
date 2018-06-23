@@ -86,7 +86,7 @@ void manual_Mode() {
     Serial.println('parado');
   }
   else if ((channel4 > 1450 & channel4 < 1550) & (channel2 < 1450 || channel2 > 1550)) {    //Control in advance
-    int signal = map(channel2, 975, 2025, 1300, 1700);
+    int signal = map(channel2, 975, 2025, 1100, 1900);
     left.writeMicroseconds(signal); // Send signal to ESC.
     right.writeMicroseconds(signal);   //thrusters at zero
     Serial.println('enfrente');
