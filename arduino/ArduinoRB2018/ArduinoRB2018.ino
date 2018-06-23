@@ -130,17 +130,17 @@ void autonomous_Mode() {
   //0123456789012
   //%B,1500,1500%
     if(inputString[0] == '%' && inputString.length() > 0 && inputString.length() < 14 && inputString[inputString.length() - 1] == '%' && inputString != ""){
-      Serial.println(inputString);
+      //Serial.println(inputString);
       if(inputString[1] == 'B') {
           String valRight = inputString.substring(3,7);
           String valLeft = inputString.substring(8,12);
-          //Serial.println(valLeft);
+          Serial.println(valLeft);
           int signal = valLeft.toInt();
           left.writeMicroseconds(signal);
-          Serial.print(signal);
+          //Serial.print(signal);
           signal = valRight.toInt();
           right.writeMicroseconds(signal);
-          Serial.print(signal);
+          //Serial.print(signal);
         }
         //Left thrusters
         else if(inputString[1] == 'L') {
@@ -148,7 +148,7 @@ void autonomous_Mode() {
           //Serial.println(valLeft);
           int signal = valLeft.toInt();
           left.writeMicroseconds(signal); 
-          Serial.print(signal);
+          //Serial.print(signal);
         }
         //Right thrusters
         else if(inputString[1] == 'R') {
@@ -156,7 +156,7 @@ void autonomous_Mode() {
           //Serial.println(valRight);
           int signal = valRight.toInt();
           right.writeMicroseconds(signal);
-          Serial.print(signal);
+          //Serial.print(signal);
         }
     }  
     //Delete Previous Message
