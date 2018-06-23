@@ -1,4 +1,4 @@
-from .motors import Motors
+from motors import Motors
 
 motors = Motors()
 motors.move(25,25)
