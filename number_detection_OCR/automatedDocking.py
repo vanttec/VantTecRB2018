@@ -25,7 +25,7 @@ from num_detection import xy_c
 '''
 	Required our project libraries
 '''
-import motors as motors.Motors
+from .motors import Motors
 
 class AutoDock:
 	def __init__(self):
@@ -39,45 +39,77 @@ class AutoDock:
 		#We need experiments to change it
 		self.CenterMin = Center + 50
 		self.CenterMax = Center - 50
+		self.Distance = 0
+		self.Hydrophone = False
 
-	def get_docks_horizontal_coordinate():
-		#Get the horizontal center of each dock
-		#We need the 'xc' of each number, so the number changes with time
+	def autoDock(self, xy_c, drone_display)
 
-		Dock1 = xy_c[0]
-		Dock2 = xy_c[1]
-		Dock3 = xy_c[2]
-
-	def get_dock_number():
-		#we need to get the result coming from the phone, for now we can test giving it the number
-		Display = 1
-
-		if Display = 1:
-			Dock = Dock1
-
-		elif Display = 2:
-			Dock = Dock2
-
-		elif Display = 3:
-			Dock = Dock3
+		#Get Docks position x in pixels and distance in meters
+		self.Dock1 = xy_c[0]
+		self.Dock2 = xy_c[1]
+		self.Dock3 = xy_c[2]
+		self.Distance1 = 
+		self.Distance2 =
+		self.Distance3 =
 
 
-	def automated_docking(self):
-		if dock < centerimageMin and dock > centerimageMax and distance > 3:
-			if dock < centerimageMin :
-				motors.move(15,0)
+		self.Hydrophone = True
 
-			elif dock > centerimageMax :
-				motors.move(0,15)
+		while self.Hydrophone = True
+			if self.Dock2 < self.CenterMin and self.Dock2 > self.CenterMax and self.Distance2 > 3:
+				if self.Dock2 < self.CenterMin :
+					motors.move(15,0)
 
-		elif dock < centerimageMin and dock > centerimageMax and distance < 2: 
-				motors.move(-30,-30)
-			#si está muy cerca y aun no acomoda la direccion, tiene que regresarse
+				elif self.Dock2 > self.CenterMax :
+					motors.move(0,15)
 
-		elif dock > centerimageMin and dock < centerimageMax and distance > 1:
+			elif self.Dock2 < self.CenterMin and self.Dock2 > self.CenterMax and self.Distance2 < 2: 
+					motors.move(-30,-30)
+					#si está muy cerca y aun no acomoda la direccion, tiene que regresarse
+
+			elif self.Dock2 > self.CenterMin and self.Dock2 < self.CenterMax and self.Distance2 > 1:
 				motors.move(30,30)
 				#va derecho, se reduce la distancia
 
-		else
-			motors.move(0,0)
+			else
+				motors.move(0,0)
+				time.sleep(5)
+				self.Hydrophone = False
+
+		while self.Distance2 < 5 and not self.Hydrophone
+			motors.move(-30, -30)
+
+		if self.Distance >= 5 and not self.Hydrophone
+			#we need to get the result coming from the phone, for now we can test giving it the number
+			self.Display = drone_display
+
+			if self.Display = 1:
+				self.Dock = self.Dock1
+				self.Distance = self.Distance1
+
+			elif self.Display = 2:
+				self.Dock = self.Dock2
+				self.Distance = self.Distance2
+
+			elif self.Display = 3:
+				self.Dock = self.Dock3
+				self.Distance = self.Distance3
+
+			if self.Dock < self.CenterMin and self.Dock > self.CenterMax and self.Distance > 3:
+				if self.Dock < self.CenterMin :
+					motors.move(15,0)
+
+				elif self.Dock > self.CenterMax :
+					motors.move(0,15)
+
+			elif self.Dock < self.CenterMin and self.Dock > self.CenterMax and self.Distance < 2: 
+					motors.move(-30,-30)
+					#si está muy cerca y aun no acomoda la direccion, tiene que regresarse
+
+			elif self.Dock > self.CenterMin and self.Dock < self.CenterMax and self.Distance > 1:
+					motors.move(30,30)
+					#va derecho, se reduce la distancia
+
+			else
+				motors.move(0,0)
 				#la distancia es menor a 1 metro, se frena y el impulso lo atraca
