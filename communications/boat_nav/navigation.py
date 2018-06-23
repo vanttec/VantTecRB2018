@@ -241,7 +241,5 @@ class Navigation:
 
         motors.move(0,0)
 
-	def search(self, camera_image)
-		if camera_image == False:
-			motors.move(15,-15)
-			
+	def search(self)
+		motors.move(15,-15)

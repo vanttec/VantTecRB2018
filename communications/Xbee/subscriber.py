@@ -44,37 +44,35 @@ def subscriber(xbee, imu, status):
                     gps_navigation.update_nav(xbee.target_lat, xbee.target_lon) # Waypoint
                 elif jmessage['action'] == '3':
                     # Until there is a resutl
-                    res = None
-                    while res is None:
+                    res = 'not found pair of posts'
+                    while res == 'not found pair of posts':
                         res = main_caller(darknet_set_up, 'autonomus_navigation')
+                        gps_navigation.navigation.search()
 
                     darknet_set_up = False
                     gps_navigation.auto_nav(res[0], res[1], status) # Waypoint Carlos
                     
-                    res = None
-                    while res is None:
+                    res = 'not found pair of posts'
+                    while res == 'not found pair of posts':
                         res = main_caller(darknet_set_up, 'autonomus_navigation')
+                        gps_navigation.navigation.search()
 
                     gps_navigation.auto_nav(res[0], res[1], status) # Waypoint Carlos
 
                 elif jmessage['action'] == '4':
                     # Until there is a resutl
-                    res = None
-                    while res is None:
+                    res = 'not found pair of posts'
+                    while res == 'not found pair of posts':
                         res = main_caller(darknet_set_up, 'autonomus_navigation')
-
-                    if res == 'not found pair of posts':
-                        self.navigation.search(False)
+                        gps_navigation.navigation.search()
 
                     darknet_set_up = False
                     gps_navigation.auto_nav2(res[0], res[1], status) # Waypoint Carlos
                     
-                    res = None
-                    while res is None:
+                    res = 'not found pair of posts'
+                    while res == 'not found pair of posts':
                         res = main_caller(darknet_set_up, 'autonomus_navigation')
-
-                    if res == 'not found pair of posts':
-                        self.navigation.search(False)
+                        gps_navigation.navigation.search()
 
                     gps_navigation.auto_nav2(res[0], res[1], status) # Waypoint Carlos
 
