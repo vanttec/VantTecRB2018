@@ -18,8 +18,8 @@ prm2 = robotics.PRM
 prm2.Map = mapInflated;
 prm2.NumNodes = 150;
 prm2.ConnectionDistance = 15;
-%boatLocation = [2 3]; %xy of the boat %Receive
-%circleCan = [2 4]; %xy to circle the can %Receive
+boatLocation = [2 3]; %xy of the boat %Receive
+circleCan = [2 4]; %xy to circle the can %Receive
 exitLocation = boatLocation + [0 20]; %xy to exit the field %Receive
 
 path = findpath(prm, boatLocation, circleCan);
@@ -29,4 +29,4 @@ path2 = findpath(prm2, circleCan, exitLocation);
 path
 path2
 
-end
+%end
