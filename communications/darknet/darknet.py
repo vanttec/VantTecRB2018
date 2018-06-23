@@ -151,7 +151,7 @@ net = ''
 meta = ''
 
 #def execute(data_calib, set_up, num,img):
-def execute(data_calib, set_up, num):
+def execute(data_calib, set_up):
     # For python3 added b before directions7
     # Path from where main script is 
     if set_up:
@@ -168,7 +168,7 @@ def execute(data_calib, set_up, num):
     drawing_frame = frame.copy()
     height, width, channels = frame.shape
     cap.release()
-    filename = "filename" + str(num) + ".png"
+    filename = "filename.png"
     #Save image
     imwrite(filename, frame)
     #Call CNN
@@ -199,7 +199,7 @@ def execute(data_calib, set_up, num):
         if len(r):
             data = parse_data(r)
             print(data)
-            distances = get_rois_data(data,num) 
+            distances = get_rois_data(data) 
 
             #Put text on image
             for i,d in enumerate(distances) :

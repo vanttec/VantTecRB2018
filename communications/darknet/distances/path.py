@@ -65,7 +65,7 @@ def receive(values):
 # param: rois -- list of lists with description values for each roi [id, xc,yc,w,h]
 # return -- distances, angles, dominant color for each roi.
 
-def get_rois_data(rois,num):
+def get_rois_data(rois):
 
 	#if is empty, return
 	if not rois:
@@ -163,7 +163,7 @@ def get_rois_data(rois,num):
 			#setting the result
 			output[i][0] = coords
 			output[i][1] = angle_p
-			colorofpost = getColor(rois[i][1],rois[i][3],rois[i][2],rois[i][4],num)  
+			colorofpost = getColor(rois[i][1],rois[i][3],rois[i][2],rois[i][4])  
 			output[i][2] = colorofpost 
 	
 	print("____Datos____")
@@ -398,7 +398,7 @@ def ROI(fn):
 	return left,upper,right,lower
 
 
-def getColor(xc,yc,w,h,num):
+def getColor(xc,yc,w,h):
 
 	width = w	
 	heigth = h
@@ -409,7 +409,7 @@ def getColor(xc,yc,w,h,num):
 	upper = int(yc - shift_h)
 	lower = int(yc + shift_h)
 	
-	filename = "filename" + str(num) + ".png"
+	filename = "filename.png"
 	original = cv2.imread(filename,1)
 	crop_img = original[upper:lower, left:right]
 	image = cv2.cvtColor(crop_img, cv2.COLOR_BGR2RGB)
@@ -422,7 +422,3 @@ def getColor(xc,yc,w,h,num):
 		return 'r'
 	else:
 		return 'g'
-
-
-	
-
