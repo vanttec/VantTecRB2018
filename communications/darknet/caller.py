@@ -19,7 +19,7 @@ def parse_data(data):
     return results
 
 
-def main_caller(set_up, challenge):
+def main_caller(challenge):
     '''Main function to be threaded to call darknet and and get images'''
     #CALL METHOD FOR CAMERA CALIBRATION, receives a list with parameters for image undistortion.
     data_calib = calibration()
@@ -30,7 +30,7 @@ def main_caller(set_up, challenge):
 
     #execute, send image and datos para undistort la imagen(camera calibration), esto ultimo lo hace la funcion execute
     #data = execute(data_calib, set_up, num, image_list.pop())
-    r = execute(data_calib, set_up)
+    r = execute(data_calib)
     #print(data)
     img = cv2.imread('filename.png')
     drawing_frame = img.copy()

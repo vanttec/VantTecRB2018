@@ -147,18 +147,14 @@ def detect(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45):
     free_detections(dets, num)
     return res
 
-net = ''
-meta = ''
+net = load_net(b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/yolo-vantec.cfg", b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/yolo-vantec.weights", 0)
+meta = load_meta(b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/obj.data")
 
 #def execute(data_calib, set_up, num,img):
-def execute(data_calib, set_up):
+def execute(data_calib):
     # For python3 added b before directions7
     # Path from where main script is 
-    if set_up:
-        global net
-        global meta
-        net = load_net(b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/yolo-vantec.cfg", b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/yolo-vantec.weights", 0)
-        meta = load_meta(b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/obj.data")
+
     #Funcion para tomar fotos y escanear imagen
     cap = VideoCapture(1)
     ret, raw_frame = cap.read()

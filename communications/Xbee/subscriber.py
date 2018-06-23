@@ -19,7 +19,6 @@ def subscriber(xbee, imu, status):
     print(" +-------------------------------------------------+\n")
     device = XBeeDevice(PORT, BAUD_RATE)
     gps_navigation = GPSNavigation(imu)
-    darknet_set_up = True
 
     try:
         device.open()
@@ -50,7 +49,6 @@ def subscriber(xbee, imu, status):
                         res = main_caller(darknet_set_up, 'autonomus_navigation')
                         gps_navigation.navigation.search()
 
-                    darknet_set_up = False
                     gps_navigation.auto_nav(res[0], res[1], status) # Waypoint Carlos
                     
                     res = 'not found pair of posts'
@@ -67,7 +65,6 @@ def subscriber(xbee, imu, status):
                         res = main_caller(darknet_set_up, 'autonomus_navigation')
                         gps_navigation.navigation.search()
 
-                    darknet_set_up = False
                     gps_navigation.auto_nav2(res[0], res[1]) # Waypoint Carlos
                     
                     res = 'not found pair of posts'
