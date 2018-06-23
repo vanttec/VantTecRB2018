@@ -53,14 +53,7 @@ class Motors:
 		elif len(val) == 1:
 			return '000' + val 
 	
-	def move_thrusters(self, powerR=1500, powerL=1500):
-		'''
-		@desc 	move thrusters **
-		@params 
-				int powerR power value for right thruster. It must be inside the PWM lectures.
-				int powerL  power value for left thruster. It must be inside the PWM lectures.
-		@return string
-		'''
+	def move_thrusters(powerR=1500, powerL=1500):
 		#validate the pwm range
 		if powerR < 1100 or powerR > 1900 or powerL < 1100 or powerL > 1900:
 			print("Thruster power must be between 1100 - 1900")
@@ -77,10 +70,9 @@ class Motors:
 			self.ser.flush()
 
 			#Debug response
-			
+			print(self.ser.read(self.ser.inWaiting()).decode())
 
-	def move(self, powerR=0, powerL=0):
-		'''Move thrusters'''
+	def move(powerR=0,powerL=0):
 		#validate the pwm range
 		if powerR < -400 or powerR > 400 or powerL < -400 or powerL > 400:
 			print("The power is not on the correct range")
