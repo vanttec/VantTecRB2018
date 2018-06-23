@@ -3,7 +3,7 @@ import math
 import random
 from cv2 import *
 import cv2
-from distances.path import get_rois_data
+from .distances.path import get_rois_data
 import os
 import calendar
 import time
@@ -145,26 +145,30 @@ def detect(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45):
     res = sorted(res, key=lambda x: -x[1])
     free_image(im)
     free_detections(dets, num)
-    return 
+    return res
 
-net = load_net(b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/yolo-vantec.cfg", b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/yolo-vantec.weights", 0)
-meta = load_meta(b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/obj.data")
+net = ''
+meta = ''
 
-def execute(data_calib, num):
-#def execute(data_calib, set_up, num):
+#def execute(data_calib, set_up, num,img):
+def execute(data_calib, set_up):
     # For python3 added b before directions7
     # Path from where main script is 
-
+    if set_up:
+        global net
+        global meta
+        net = load_net(b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/yolo-vantec.cfg", b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/yolo-vantec.weights", 0)
+        meta = load_meta(b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/obj.data")
     #Funcion para tomar fotos y escanear imagen
     cap = VideoCapture(1)
     ret, raw_frame = cap.read()
     #Undistort image
     frame = undistorted_image(raw_frame, data_calib)
-    #frame = undistorted_image(data_calib)
+    #frame = undistorted_image(img,data_calib)
     drawing_frame = frame.copy()
     height, width, channels = frame.shape
     cap.release()
-    filename = "filename" + str(num) + ".png"
+    filename = "filename.png"
     #Save image
     imwrite(filename, frame)
     #Call CNN
@@ -188,7 +192,7 @@ def execute(data_calib, num):
             y =  int(yc-  hh)
 
             #Drawn rois
-            cv2.rectangle(drawing_frame, (x,y), (x+w,y+h), (0,0,255))
+            cv2.rectangle(drawing_frame, (x, y), (x + w, y + h), (0, 0, 255))
             
     
         #Parse data 
@@ -211,106 +215,15 @@ def execute(data_calib, num):
                 yc = int(v[1])              
 
                 # #Put text distances and angles
-                cv2.putText(drawing_frame,str(round(x,2)), (xc,yc), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
-                cv2.putText(drawing_frame,str(round(y,2)), (xc,yc+10), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
-                cv2.putText(drawing_frame,str(round(h,2)), (xc,yc+20), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
-                cv2.putText(drawing_frame,str(round(d[1],2)), (xc,yc+30), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
-                cv2.putText(drawing_frame,str(d[2]), (xc,yc+40), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
+                cv2.putText(drawing_frame,str(round(x,2)), (xc,yc), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0, 0))
+                cv2.putText(drawing_frame,str(round(y,2)), (xc,yc+10), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0, 0))
+                cv2.putText(drawing_frame,str(round(h,2)), (xc,yc+20), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0, 0))
+                cv2.putText(drawing_frame,str(round(d[1],2)), (xc,yc+30), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0, 0))
+                cv2.putText(drawing_frame,str(d[2]), (xc,yc+40), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0, 0))
                 imwrite("draw" + filename, drawing_frame)
-    cv2.imshow('detected',drawing_frame)
-    cv2.waitKey(0)
+    cv2.imshow('detected', drawing_frame)
+    cv2.waitKey(20)
     return r
-
-# Pruebas
-'''
-def execute(data_calib,img):
-
-    
-    #undistort image
-    frame = undistorted_image(img,data_calib)
-    #for debugging
-    drawing_frame = frame
-    drawing_frame_squares = frame.copy()
-    height, width, channels = frame.shape
-    #cap.release()
-    filename = "filename.jpg"
-    #save image
-    imwrite(filename,frame) 
-
-    #net = load_net("cfg/densenet201.cfg", "/home/pjreddie/trained/densenet201.weights", 0)
-    #im = load_image("data/wolf.jpg", 0, 0)
-    #meta = load_meta("cfg/imagenet1k.data")
-    #r = classify(net, meta, im)
-    #print r[:10]
-
-    #[id,xc,yc,w,h]
-    r = detect(net, meta, "filename.jpg")
-    
-
-    #The following is just for drawing rois as squares, and see is there is an improvement in the distances' accuracy.
-    for f in r:
-        #get id
-        id = f[0]
-        #get coordinates
-        v  = f[2] 
-        xc = int(v[0])
-        yc = int(v[1])
-        w =  int(v[2])
-        h =  int(v[3])
-        #make rectangles into squares
-        if w < h:
-            minimum = w
-        else: 
-            minimum = h
-        
-        wh = int(v[2] / 2) 
-        hh = int(v[3] / 2)
-        x =  int(xc - wh)
-        y =  int(yc-  hh)
-        
-        #if bouy
-        if(id == 'b'):
-            #draw the ROIS as squares
-            cv2.rectangle(drawing_frame_squares, (x,y), (x+minimum,y+minimum), (0,0,255))
-            #draw the ROIS unchanged
-            cv2.rectangle(drawing_frame, (x,y), (x+w,y+h), (0,0,255))
-        #if post
-        else:
-            #draw unchanged roi in both windows
-            cv2.rectangle(drawing_frame_squares, (x,y), (x+w,y+h), (0,0,255))
-            cv2.rectangle(drawing_frame, (x,y), (x+w,y+h), (0,0,255))
-    
-    #Parse data and
-    if len(r):
-            data = parse_data(r)
-            print(data)
-            distances = get_rois_data(data) 
-
-            #put text on image
-            for i,d in enumerate(distances) :
-                #tuple
-                dist = d[0]  
-                x = dist[0]
-                y = dist[1]
-                h = dist[2]
-                
-                f = r[i]
-                v  = f[2] 
-                xc = int(v[0])
-                yc = int(v[1])              
-
-                #distances
-                cv2.putText(drawing_frame,str(round(x,2)), (xc,yc), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
-                cv2.putText(drawing_frame,str(round(y,2)), (xc,yc+10), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
-                cv2.putText(drawing_frame,str(round(h,2)), (xc,yc+20), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
-                #angles
-                cv2.putText(drawing_frame,str(round(d[1],2)), (xc,yc+30), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
-
-    cv2.imshow("ROIS", drawing_frame)
-    cv2.waitKey(0)
-    return r
-'''
-
 
 def parse_data(data):
     results = []
