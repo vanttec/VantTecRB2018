@@ -33,12 +33,12 @@ class ThreadKiller(threading.Thread):
 def main_boat():
     main_data = MissionBoatData(xbee())
     thread_boat = BoatXbThread(1, "Boat", main_data.boat_xb, main_data) #subscriber
-    thread_killer = ThreadKiller(2, "Killer", main_data)
+    #thread_killer = ThreadKiller(2, "Killer", main_data)
 
     thread_boat.start()
-    thread_killer.start()
+    #thread_killer.start()
     thread_boat.join()
-    thread_killer.join()
+    #thread_killer.join()
 
 
 main_boat()

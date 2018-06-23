@@ -457,7 +457,6 @@ def autonomus_navigation(data):
 		print(new_angs)
 		if len(new_ys) >=2:
 
-			
 			middle = min(new_xs[0],new_xs[1]) + abs(new_xs[0] - new_xs[1])/2
 			angle_tomiddle = min(new_angs[0],new_angs[1]) + abs(new_angs[0] - new_angs[1])/2
 			return  (middle,angle_tomiddle)
