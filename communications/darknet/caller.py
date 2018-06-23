@@ -33,13 +33,13 @@ def main_caller():
         #execute, send image and datos para undistort la imagen(camera calibration), esto ultimo lo hace la funcion execute
         #data = execute(data_calib, set_up, num, image_list.pop())
         data = execute(data_calib, set_up)
-        print(data)
+        #print(data)
 
         if data is not None:
             data = parse_data(data)
-            print(data)
+            #print(data)
             distances = get_rois_data(data) 
-            print(distances)
+            #print(distances)
         else:
             print('---------Nothing detected------------')
             #obtain_data()
