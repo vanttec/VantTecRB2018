@@ -5,8 +5,8 @@ import cv2
 from glob import glob
 import os
 import sys
-from distances.path import get_rois_data
-from darknet import execute
+from .distances.path import get_rois_data
+from .darknet import execute
 from PIL import Image
 
 def parse_data(data):
@@ -123,5 +123,3 @@ def load_images_from_folder(folder):
         if img is not None:
             images.append(img)
     return images
-
-main_caller()

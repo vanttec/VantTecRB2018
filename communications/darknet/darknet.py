@@ -3,7 +3,7 @@ import math
 import random
 from cv2 import *
 import cv2
-from distances.path import get_rois_data
+from .distances.path import get_rois_data
 import os
 import calendar
 import time
@@ -147,15 +147,18 @@ def detect(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45):
     free_detections(dets, num)
     return res
 
-net = load_net(b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/yolo-vantec.cfg", b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/yolo-vantec.weights", 0)
-meta = load_meta(b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/obj.data")
-
+net = ''
+meta = ''
 
 #def execute(data_calib, set_up, num,img):
 def execute(data_calib, set_up, num):
     # For python3 added b before directions7
     # Path from where main script is 
-
+    if set_up:
+        global net
+        global meta
+        net = load_net(b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/yolo-vantec.cfg", b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/yolo-vantec.weights", 0)
+        meta = load_meta(b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/obj.data")
     #Funcion para tomar fotos y escanear imagen
     cap = VideoCapture(1)
     ret, raw_frame = cap.read()
@@ -189,7 +192,7 @@ def execute(data_calib, set_up, num):
             y =  int(yc-  hh)
 
             #Drawn rois
-            cv2.rectangle(drawing_frame, (x,y), (x+w,y+h), (0,0,255))
+            cv2.rectangle(drawing_frame, (x, y), (x + w, y + h), (0, 0, 255))
             
     
         #Parse data 
@@ -212,14 +215,14 @@ def execute(data_calib, set_up, num):
                 yc = int(v[1])              
 
                 # #Put text distances and angles
-                cv2.putText(drawing_frame,str(round(x,2)), (xc,yc), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
-                cv2.putText(drawing_frame,str(round(y,2)), (xc,yc+10), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
-                cv2.putText(drawing_frame,str(round(h,2)), (xc,yc+20), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
-                cv2.putText(drawing_frame,str(round(d[1],2)), (xc,yc+30), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
-                cv2.putText(drawing_frame,str(d[2]), (xc,yc+40), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0,0))
+                cv2.putText(drawing_frame,str(round(x,2)), (xc,yc), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0, 0))
+                cv2.putText(drawing_frame,str(round(y,2)), (xc,yc+10), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0, 0))
+                cv2.putText(drawing_frame,str(round(h,2)), (xc,yc+20), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0, 0))
+                cv2.putText(drawing_frame,str(round(d[1],2)), (xc,yc+30), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0, 0))
+                cv2.putText(drawing_frame,str(d[2]), (xc,yc+40), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0, 0))
                 imwrite("draw" + filename, drawing_frame)
-    cv2.imshow('detected',drawing_frame)
-    cv2.waitKey(0)
+    cv2.imshow('detected', drawing_frame)
+    cv2.waitKey(20)
     return r
 
 def parse_data(data):
