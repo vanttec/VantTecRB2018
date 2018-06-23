@@ -22,7 +22,6 @@ def main_boat():
 
     #thread_boat.start()
     thread_camera.start()
-
     #thread_boat.join()
     thread_camera.join()
 

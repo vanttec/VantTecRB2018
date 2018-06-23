@@ -29,17 +29,59 @@ def main_caller():
     image_list = [cv2.imread(file) for file in glob(img_path)]
     #AQUI SE ARMA LA CARNita ASAdiuxx
     while True:
-        print('-------DATOS DARKNET------')
         #execute, send image and datos para undistort la imagen(camera calibration), esto ultimo lo hace la funcion execute
         #data = execute(data_calib, set_up, num, image_list.pop())
-        data = execute(data_calib, set_up)
+        r = execute(data_calib, set_up)
         #print(data)
+        img = cv2.imread('filename.png')
+        drawing_frame = img.copy()
 
-        if data is not None:
-            data = parse_data(data)
-            #print(data)
-            distances = get_rois_data(data) 
-            #print(distances)
+
+        if r is not None:        
+            #Iterate detected objects
+            for f in r:
+
+                #Unpack data
+                id = f[0]
+                v  = f[2] 
+                xc = int(v[0])
+                yc = int(v[1])
+                w =  int(v[2])
+                h =  int(v[3])
+                wh = int(v[2] / 2) 
+                hh = int(v[3] / 2)
+                x =  int(xc - wh)
+                y =  int(yc-  hh)
+
+                #Drawn rois
+                cv2.rectangle(drawing_frame, (x, y), (x + w, y + h), (0, 0, 255))
+            
+            if len(r):
+                data = parse_data(r)
+                distances = get_rois_data(data, challenge='otro') 
+                #Put text on image
+                for i,d in enumerate(distances) :
+                    #Unpack data
+                    dist = d[0]  
+                    x = dist[0]
+                    y = dist[1]
+                    h = dist[2]
+                    
+                    f = r[i]
+                    v  = f[2] 
+                    xc = int(v[0])
+                    yc = int(v[1])              
+
+                    # #Put text distances and angles
+                    cv2.putText(drawing_frame,str(round(x,2)), (xc,yc), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0, 0))
+                    cv2.putText(drawing_frame,str(round(y,2)), (xc,yc+10), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0, 0))
+                    cv2.putText(drawing_frame,str(round(h,2)), (xc,yc+20), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0, 0))
+                    cv2.putText(drawing_frame,str(round(d[1],2)), (xc,yc+30), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0, 0))
+                    cv2.putText(drawing_frame,str(d[2]), (xc,yc+40), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0, 0))
+                    cv2.imwrite("drawfilename.png", drawing_frame)
+            #cv2.imshow('detected', drawing_frame)
+            #cv2.waitKey(20)
+
         else:
             print('---------Nothing detected------------')
             #obtain_data()
