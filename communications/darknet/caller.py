@@ -53,11 +53,10 @@ def main_caller(challenge):
 
             #Drawn rois
             cv2.rectangle(drawing_frame, (x, y), (x + w, y + h), (0, 0, 255))
-        
         if len(r):
             data = parse_data(r)
             distances = get_rois_data(data, challenge)
-
+            print(distances)
             if challenge == 'autonomus_navigation':
                 return distances
             else:
