@@ -198,7 +198,7 @@ def execute(data_calib, set_up):
         #Parse data 
         if len(r):
             data = parse_data(r)
-            print(data)
+            #print(data)
             distances = get_rois_data(data) 
 
             #Put text on image

@@ -41,9 +41,9 @@ import matplotlib.pyplot as plt
 
 
 #BOUYS (INCHES)
-KNOWN_DISTANCE_B = 78.74   #unknown
-KNOWN_WIDTH_B =    9.0 #inches width of contest's bouys  pix = 64
-FOCAL_LENGHT_B =   559.9    #(PIX_WIDTH_B * KNOWN_DISTANCE_B) / KNOWN_WIDTH_B   109pix
+KNOWN_DISTANCE_B = 64.0   #165 cm 
+KNOWN_WIDTH_B =    7.0#inches width of contest's bouys  pix = 102
+FOCAL_LENGHT_B =   768.0    #(PIX_WIDTH_B * KNOWN_DISTANCE_B) / KNOWN_WIDTH_B   109pix
 
 #POSTS(INCHES)
 KNOWN_DISTANCE_P = 74.8    #unknown  
@@ -51,8 +51,8 @@ KNOWN_WIDTH_P = 55.0    #unknown
 FOCAL_LENGHT_P = 627.29    #(PIX_WIDTH_P * KNOWN_DISTANCE_P) / KNOWN_WIDTH_P
 
 FOCAL_VIEW =  78.0
-WIDTH_DIM  =  640
-HEIGTH_DIM =  480
+WIDTH_DIM  =  800
+HEIGTH_DIM =  600
 
 ANGLE_PER_PIXEL = 78/math.sqrt(WIDTH_DIM**2 + HEIGTH_DIM**2) 
 #check for values'integrity. return 1 if length of params is the expected.
@@ -65,7 +65,7 @@ def receive(values):
 # param: rois -- list of lists with description values for each roi [id, xc,yc,w,h]
 # return -- distances, angles, dominant color for each roi.
 
-def get_rois_data(rois):
+def get_rois_data(rois, challenge = 'autonomus_navigation'):
 
 	#if is empty, return
 	if not rois:
@@ -78,11 +78,13 @@ def get_rois_data(rois):
 	#iterate through all of the rois row by row.
 	#args [id, xc,yc,w,h]
 	for i in range(len(rois)):
-
+		
 	   #buoys
-		if(rois[i][0]) == 1:
-		  #distances(meters)
+
+		if(rois[i][0]) == 0:
+		  #distances(meters)	  	
 			width_b = int(rois[i][2]) 
+			print(width_b)
 			#get inches to the object 
 			inches = distance2camera(KNOWN_WIDTH_B, FOCAL_LENGHT_B, width_b)
 			#convert inches to meters
@@ -112,11 +114,11 @@ def get_rois_data(rois):
 					x = -x
 			elif angle_b > 0:
 				x = abs(x)
-			#form tuple
-			coords = (x,y,h)
+			#form tuple alex quizo absolutos
+			coords = (abs(x),abs(y),abs(h))
 			#change back to degreees
 			angle_b = angle_b / 0.0174533
-
+			angle_b = -angle_b 
 			#setting the result
 			output[i][0] = coords
 			output[i][1] = angle_b
@@ -155,20 +157,24 @@ def get_rois_data(rois):
 			elif angle_p > 0:
 				x = abs(x)
 			#form tuple
-			coords = (x,y,h)
+			coords = (abs(x),abs(y),abs(h))
 
 			#change back to degreees
 			angle_p = angle_p / 0.0174533
-
+			angle_p = -angle_p
+	
 			#setting the result
 			output[i][0] = coords
 			output[i][1] = angle_p
 			colorofpost = getColor(rois[i][1],rois[i][3],rois[i][2],rois[i][4])  
 			output[i][2] = colorofpost 
 	
-	print("____Datos____")
-	print(output)
+	#print("____Datos____")
+	#print(output)
 
+	if(challenge == 'autonomus_navigation'):
+		print(autonomus_navigation(output))
+	
 	return output
 
 
@@ -422,3 +428,9 @@ def getColor(xc,yc,w,h):
 		return 'r'
 	else:
 		return 'g'
+
+
+def autonomus_navigation(data):
+	if data is not None:
+		return 'Autonomus navigation challenge'
+		
