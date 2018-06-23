@@ -2,7 +2,7 @@
 	@name       	gpsNavigation.py
     @desc 			Principal file for the vantec boat.
 	@author  	   	Alejandro Gonzalez
-	@created_at     2018-03-07
+	@created_at     2018-06-22
 '''
 
 '''
@@ -26,3 +26,6 @@ class GPSNavigation:
 	def update_nav(self, lat, lon):
 		destiny = self.imu.get_degrees_and_distance_to_gps_coords(lat, lon)
 		self.navigation.navigate(destiny,lat,lon)
+
+	def auto_nav(self, pdistance, pdegree):
+		self.navigation.visnavigate(pdistance,pdegree)

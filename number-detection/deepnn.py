@@ -1,21 +1,27 @@
 import tensorflow as tf
+import numpy as np
+import os
+import fnmatch
+import cv2
+import sys
+import tempfile
+import math as m
 
 def make_graph(x):
-  """deepnn builds the graph for a deep net for classifying digits.
+  """make_graph builds the graph for a deep net for classifying digits.
   Args:
-    x: an input tensor with the dimensions (N_examples, 784), where 784 is the
-    number of pixels in a standard MNIST image.
+    x: an input tensor with the dimensions (N_examples, 875), where 875 is 25 X 35.
   Returns:
-    A tuple (y, keep_prob). y is a tensor of shape (N_examples, 10), with values
-    equal to the logits of classifying the digit into one of 10 classes (the
-    digits 0-9). keep_prob is a scalar placeholder for the probability of
+    A tuple (y, keep_prob). y is a tensor of shape (N_examples, 3), with values
+    equal to the logits of classifying the digit into one of 3 classes (the
+    digits 1-3). keep_prob is a scalar placeholder for the probability of
     dropout.
   """
   # Reshape to use within a convolutional neural net.
   # Last dimension is for "features" - there is only one here, since images are
-  # grayscale -- it would be 3 for an RGB image, 4 for RGBA, etc.
+  # grayscale
   with tf.name_scope('reshape'):
-    x_image = tf.reshape(x, [-1, 28, 28, 1])
+    x_image = tf.reshape(x, [-1, 25, 35, 1])
 
   # First convolutional layer - maps one grayscale image to 32 feature maps.
   with tf.name_scope('conv1'):
@@ -37,13 +43,13 @@ def make_graph(x):
   with tf.name_scope('pool2'):
     h_pool2 = max_pool_2x2(h_conv2)
 
-  # Fully connected layer 1 -- after 2 round of downsampling, our 28x28 image
-  # is down to 7x7x64 feature maps -- maps this to 1024 features.
+  # Fully connected layer 1 -- after 2 round of downsampling, our 25x35 image
+  # is down to 6x7x64 feature maps -- maps this to 1024 features.
   with tf.name_scope('fc1'):
-    W_fc1 = weight_variable([7 * 7 * 64, 1024])
+    W_fc1 = weight_variable([7 * 9 * 64, 1024])
     b_fc1 = bias_variable([1024])
 
-    h_pool2_flat = tf.reshape(h_pool2, [-1, 7*7*64])
+    h_pool2_flat = tf.reshape(h_pool2, [-1, 7 * 9 * 64])
     h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
   # Dropout - controls the complexity of the model, prevents co-adaptation of
@@ -52,10 +58,10 @@ def make_graph(x):
     keep_prob = tf.placeholder(tf.float32)
     h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
-  # Map the 1024 features to 10 classes, one for each digit
+  # Map the 1024 features to 3 classes, one for each dock number (1,2,3)
   with tf.name_scope('fc2'):
-    W_fc2 = weight_variable([1024, 10])
-    b_fc2 = bias_variable([10])
+    W_fc2 = weight_variable([1024, 3])
+    b_fc2 = bias_variable([3])
 
     y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
   return y_conv, keep_prob
@@ -85,7 +91,7 @@ def train(data_set):
   y_ = tf.placeholder(tf.float32, [None, 3])
 
   # Build the graph for the deep net
-  y_conv, keep_prob = deepnn(x)
+  y_conv, keep_prob = make_graph(x)
 
   with tf.name_scope('loss'):
     cross_entropy = tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=y_conv)
@@ -100,15 +106,15 @@ def train(data_set):
     correct_prediction = tf.cast(correct_prediction, tf.float32)
   accuracy = tf.reduce_mean(correct_prediction)
 
-  graph_location = tempfile.mkdtemp()
+  _, tmp_location = tempfile.mkstemp()
   
-  print('Saving graph to: %s' % graph_location)
-  train_writer = tf.summary.FileWriter(graph_location)
+  print('Saving graph to: %s' % tmp_location)
+  train_writer = tf.summary.FileWriter(tmp_location)
   train_writer.add_graph(tf.get_default_graph())
 
   with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
-    for i in range(20000):
+    for i in range(2000):
       batch = data_set.batch(20)
       
       if i % 100 == 0:
@@ -117,11 +123,61 @@ def train(data_set):
       
       train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
 
-    print('test accuracy %g' % accuracy.eval(feed_dict={x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
+    print('test accuracy %g' % accuracy.eval(feed_dict={x: data_set.test(), y_: data_set.test(), keep_prob: 1.0}))
+
+def main(argv):
+  data_set = TrainData('.')
+  train(data_set)
+
 
 class TrainData:
-  def __init__(self, folder):
-    self.folder = folder
+  def __init__(self, dir):
+    self.files = []
+    self.offset = 0
+  
+    for file in os.listdir(dir):
+      if fnmatch.fnmatch(file, '*.png'):
+        self.files.append(file)
 
-  def batch(n):
+    # Save floor(10%) + 1 of dataset for testing
+    self.test_n = 1 + m.floor(len(self.files) * 0.1)
+    self.train_n = len(self.files) - self.test_n
+
+  def batch(self, n):
+    x = []
+    y = []
     
+    for i in range(self.offset, self.offset + n):
+      i = i % self.train_n
+
+      x.append(cv2.imread(self.files[i], 0)[:25,:35].flatten())
+
+      if self.files[i][-5] == '1':
+        y.append([1,0,0])
+      elif self.files[i][-5] == '2':
+        y.append([0,1,0])
+      else:
+        y.append([0,0,1])
+    
+    self.offset += n
+
+    return [x,y]
+
+  def test(self):
+    x = []
+    y = []
+
+    for i in range(self.train_n, self.test_n):
+      x.append(cv2.imread(self.files[i], 0)[:25,:35].flatten())
+      
+      if self.files[i][-5] == '1':
+        y.append([1,0,0])
+      elif self.files[i][-5] == '2':
+        y.append([0,1,0])
+      else:
+        y.append([0,0,1])
+
+    return np.array([x,y])
+
+if __name__ == '__main__':
+  main(sys.argv)
