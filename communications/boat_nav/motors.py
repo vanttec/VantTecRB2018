@@ -32,7 +32,7 @@ class Motors:
 		self.thrustersFront = 'f'
 		self.servoInitPosition = 90
 		self.baudRate = 115200
-		self.serial_port = '/dev/ttyACM0'
+		self.serial_port = '/dev/ttyACM2'
 
 		#serial communication Handler
 		self.ser = serial.Serial(self.serial_port, self.baudRate)
@@ -54,34 +54,28 @@ class Motors:
 		elif len(val) == 1:
 			return '000' + val 
 	
-	def move_thrusters(self, powerR=1500, powerL=1500):
-		'''
-		@desc 	move thrusters **
-		@params 
-				int powerR power value for right thruster. It must be inside the PWM lectures.
-				int powerL  power value for left thruster. It must be inside the PWM lectures.
-		@return string
-		'''
+	def move_thrusters(self,powerR=1500, powerL=1500):
 		#validate the pwm range
 		if powerR < 1100 or powerR > 1900 or powerL < 1100 or powerL > 1900:
 			print("Thruster power must be between 1100 - 1900")
 		else:
 			#Format motors value
 			pR = str(powerR)
-			pR = self.check_value_size(pR)
+			#pR = self.check_value_size(pR)
 			pL = str(powerL)
-			pL = self.check_value_size(pL)	
+			#pL = self.check_value_size(pL)	
 			val = '%' + 'B,' + pR + ',' + pL + '%'
 
 			#Send motors value to arduino
 			self.ser.write(val.encode())
-			self.ser.flush()
+			
+			#self.ser.flush()
 
 			#Debug response
-			
+			#print(self.ser.read(self.ser.inWaiting()).decode())
+			print('val: ', val)
 
-	def move(self, powerR=0, powerL=0):
-		'''Move thrusters'''
+	def move(self, powerR=0,powerL=0):
 		#validate the pwm range
 		if powerR < -400 or powerR > 400 or powerL < -400 or powerL > 400:
 			print("The power is not on the correct range")
@@ -90,6 +84,7 @@ class Motors:
 			realPowerValueL = round(powerL + 1500)
 			
 			self.move_thrusters(realPowerValueR,realPowerValueL)
+			print('moving')
 			#while(utility.previousLeftMotorValue != powerL or utility.previousRightMotorValue != powerR):
 			#	checkDifference(powerR, powerL)
 

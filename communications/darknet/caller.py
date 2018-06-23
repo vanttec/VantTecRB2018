@@ -56,13 +56,17 @@ def main_caller(challenge):
             
             #cv2.rectangle(drawing_frame, (x, y), (x + w, y + h), (0, 0, 255))
             #cv2.imshow('detected', drawing_frame)
-            #cv2.waitKey(20)
+            #cv2.waitKey(10)
+            
 
         if len(r):
             data = parse_data(r)
             distances = get_rois_data(data, challenge)
+            print('DATA OF ROIS...')
             print(distances)
             if challenge == 'autonomus_navigation':
+                print('DATA FOR AUTONOMOUS NAV...')
+                print(distances)
                 return distances
             else:
                 return None
