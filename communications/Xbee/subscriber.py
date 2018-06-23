@@ -39,8 +39,9 @@ def subscriber(xbee, imu, status):
                 lon = coords['longitud']
                 xbee.set_latlong(lat,lon)
                 # Set target coords
-                xbee.set_target(float(jmessage['target_lat']),float(jmessage['target_lon']))
+                
                 if jmessage['action'] == '2':
+                    xbee.set_target(float(jmessage['target_lat']),float(jmessage['target_lon']))
                     gps_navigation.update_nav(xbee.target_lat, xbee.target_lon) # Waypoint
                 elif jmessage['action'] == '3':
                     # Until there is a resutl
