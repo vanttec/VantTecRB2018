@@ -32,7 +32,7 @@ class Motors:
 		self.thrustersFront = 'f'
 		self.servoInitPosition = 90
 		self.baudRate = 115200
-		self.serial_port = '/dev/ttyACM2'
+		self.serial_port = '/dev/ttyACM0'
 
 		#serial communication Handler
 		self.ser = serial.Serial(self.serial_port, self.baudRate)
