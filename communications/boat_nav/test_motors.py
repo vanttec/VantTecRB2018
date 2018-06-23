@@ -3,12 +3,18 @@ import serial
 import time
 def kill_me():
     ser = serial.Serial('/dev/ttyACM0', 115200)
-    val = '%B,1600,1600%'
-    val2 = '%B,1500,1500%'
-    val = val.encode()
-    val2 = val2.encode()
+    val = '%B,1600,1600%'.encode()
+    #val2 = '%B,1500,1500%'
+    #print('value: ', val)
+    #val2 = val2.encode()
+    time.sleep(10)
     ser.write(val)
-    time.sleep(15)
-    ser.write(val2)
+    #ser.write(val2)
     ser.close()
-kill_me()
+
+def test_m():
+    motors = Motors()
+    motors.move_thrusters(1600,1600)
+
+#kill_me()
+test_m()

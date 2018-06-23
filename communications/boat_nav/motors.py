@@ -36,7 +36,7 @@ class Motors:
 
 		#serial communication Handler
 		self.ser = serial.Serial(self.serial_port, self.baudRate)
-		print(self.ser.name)
+		time.sleep(10)
 
 	#format value to proper length
 	def check_value_size(self, val):
@@ -67,13 +67,14 @@ class Motors:
 			val = '%' + 'B,' + pR + ',' + pL + '%'
 
 			#Send motors value to arduino
-			self.ser.write(val.encode())
+			value = val.encode()
+			self.ser.write(value)
 			
 			#self.ser.flush()
 
 			#Debug response
 			#print(self.ser.read(self.ser.inWaiting()).decode())
-			print('val: ', val)
+			print('value: ', value)
 
 	def move(self, powerR=0,powerL=0):
 		#validate the pwm range
