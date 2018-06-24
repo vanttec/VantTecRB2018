@@ -26,8 +26,8 @@ class GPSNavigation:
 		destiny = self.imu.get_degrees_and_distance_to_gps_coords(lat, lon)
 		self.navigation.navigate(destiny,lat,lon)
 
-	def auto_nav(self, pdistance, pdegree, status):
-		self.navigation.visnavigate(pdistance, pdegree, status)
+	def auto_nav(self, pdistance, pdegree):
+		self.navigation.visnavigate(pdistance, pdegree)
 
 	def auto_nav2(self, pdistance, pdegree):
 		self.navigation.visnavigate2(pdistance, pdegree)

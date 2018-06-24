@@ -2,6 +2,8 @@ from communications.Xbee.comunicacion import xbee
 from communications.thread_classes import BoatXbThread
 from mission_data import MissionBoatData
 import threading
+from communications.Xbee.subscriber import subscriber
+from communications.boat_nav.imu import Imu
 # from communications.darknet.caller import main_caller
 
 
@@ -40,5 +42,4 @@ def main_boat():
     thread_boat.join()
     #thread_killer.join()
 
-
-main_boat()
+subscriber(xbee(), Imu())

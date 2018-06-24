@@ -4,7 +4,7 @@ import json
 from ..boat_nav.gpsNavigation import GPSNavigation
 from ..darknet.caller import main_caller
 
-def subscriber(xbee, imu, status):
+def subscriber(xbee, imu):
     '''Esto es para el bote, el bote envia a la estacion cada 500ms'''
     #****************************************************************************************#
     # Replace with the serial port where your local module is connected to.
@@ -49,14 +49,14 @@ def subscriber(xbee, imu, status):
                         res = main_caller('autonomus_navigation')
                         gps_navigation.navigation.search()
 
-                    gps_navigation.auto_nav(res[0], res[1], status) # Waypoint Carlos
-                    
+                    gps_navigation.auto_nav(res[0], res[1]) # Waypoint Carlos
+
                     res = 'not found pair of posts'
                     while res == 'not found pair of posts':
                         res = main_caller('autonomus_navigation')
                         gps_navigation.navigation.search()
 
-                    gps_navigation.auto_nav(res[0], res[1], status) # Waypoint Carlos
+                    gps_navigation.auto_nav(res[0], res[1]) # Waypoint Carlos
 
                 elif jmessage['action'] == '4':
                     # Until there is a resutl

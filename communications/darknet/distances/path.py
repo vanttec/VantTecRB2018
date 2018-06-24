@@ -122,7 +122,7 @@ def get_rois_data(rois, challenge = 'autonomus_navigation'):
 			#setting the result
 			output[i][0] = coords
 			output[i][1] = angle_b
-			output[i][2] = getColor(rois[i][1],rois[i][3],rois[i][2],rois[i][4])  
+			output[i][2] = 'dontcare'#getColor(rois[i][1],rois[i][3],rois[i][2],rois[i][4])  
 		#posts
 		else:
 		  #distances(meters)
