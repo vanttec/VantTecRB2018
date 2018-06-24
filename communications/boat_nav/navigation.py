@@ -240,7 +240,10 @@ class Navigation:
         self.motors.move(30,-30)
 
     def visgpsnavigate(self, pdistance, pdegree):
-         while distance > 2:
+         
+        distance = pdistance
+         
+        while distance > 2:
             waypoint = self.imu.get_pos_from_vision(pdistance, pdegree)
             waypoint_x = waypoint['real_x']
             waypoint_y = waypoint['real_y']
@@ -249,7 +252,7 @@ class Navigation:
             lon = gate_gps['longitud']
             destiny = self.imu.get_degrees_and_distance_to_gps_coords(lat, lon)
             self.navigate(destiny,lat,lon)
-            
+             
         self.motors.move(50,50)
         time.sleep(5)
         self.motors.move(0,0)
