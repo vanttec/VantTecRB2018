@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
-#import deepnn as net
+import deepnn as net
+import sys
 #import pytesseract as pt
 
 def crop_aspect_center(img, aspect):
@@ -74,7 +75,10 @@ def search_display(img, template):
     tkp, tdes = orb.detectAndCompute(template, None)
     qkp, qdes = orb.detectAndCompute(img, None)
 
-    # kp_img = cv2.drawKeypoints(template, tkp, None)
+    kp_img = cv2.drawKeypoints(template, tkp, None)
+
+    cv2.imshow('kp_img', kp_img)
+    cv2.waitKey(0)
 
     matches = matcher.knnMatch(qdes,tdes,2)
 
@@ -121,18 +125,15 @@ def search_display(img, template):
 
     return None
 
-def number_recognition(img):
-    net.make_graph(img)
-
-def main():
-    img = cv2.imread('box_in_scene.png')
-    template = cv2.imread('box.png')
+def main(argv):
+    img = cv2.imread(argv[1])
+    template = cv2.imread(argv[2])
     
     display = search_display(img, template)
     
     if display is not None:
         number = search_number(template)
-        #print(number_recognition(number))
+        print(net.predict(number, 'last_one'))
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
