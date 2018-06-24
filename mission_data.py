@@ -33,3 +33,4 @@ class MissionBoatData:
         },
         self.received_dock_img = False
         self.boat_xb = boat_xb
+        self.exit_nav = False

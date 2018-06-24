@@ -27,17 +27,23 @@ def publisher(xbee):
             exit(1)
         print(" +--------------------------------------+")
         print(" |    Give 1 to receive GPS coords      |")
-        print(" |    Give 2 to send target coords     |")
+        print(" |    Give 2 to send target coords      |")
+        print(" |    Give 3 to autonomous nav 1        |")
+        print(" |    Give 4 to autonomous nav 2        |")
+        print(" |    Give 5 to path planning           |")
         print(" +--------------------------------------+\n")
         action = input("action: ")
         xbee.set_action(action)
         if action == '1':
             xbee.set_target('0.000','0.000')
-        else:
+        elif action == '2':
             print("Dame la latitud y longitud del waypoint donde se iniciara el challenge: ")
             lat = input("\n lat: ")
             lon = input("\n lon: ")
             xbee.set_target(lat,lon)
+        elif action == '5':
+            #path planning
+            print("path plan")
         device.send_data(remote_device, xbee.send())
         while True:
             xbee_message = device.read_data()
@@ -51,11 +57,14 @@ def publisher(xbee):
                 xbee.set_action(action)
                 if action == '1':
                     xbee.set_target('0.000','0.000')
-                else:
-                    print("Dame la latitud y longitud del waypoint destino: ")
+                elif action == '2':
+                    print("Dame la latitud y longitud del waypoint donde se iniciara el challenge: ")
                     lat = input("\n lat: ")
                     lon = input("\n lon: ")
                     xbee.set_target(lat,lon)
+                elif action == '5':
+                    #path planning
+                    print("path plan")
                 device.send_data(remote_device, xbee.send())
 
         print("Success")

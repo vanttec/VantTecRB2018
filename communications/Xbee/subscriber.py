@@ -2,6 +2,7 @@ import time
 from digi.xbee.devices import XBeeDevice
 import json
 from ..boat_nav.gpsNavigation import GPSNavigation
+from ..darknet.caller import main_caller
 
 def subscriber(xbee, imu):
     '''Esto es para el bote, el bote envia a la estacion cada 500ms'''
@@ -37,14 +38,43 @@ def subscriber(xbee, imu):
                 lon = coords['longitud']
                 xbee.set_latlong(lat,lon)
                 # Set target coords
-                xbee.set_target(float(jmessage['target_lat']),float(jmessage['target_lon']))
+                
                 if jmessage['action'] == '2':
+                    xbee.set_target(float(jmessage['target_lat']),float(jmessage['target_lon']))
                     gps_navigation.update_nav(xbee.target_lat, xbee.target_lon) # Waypoint
                 elif jmessage['action'] == '3':
-                    #TODO funcion de Carlos para obtener waypoint 
-                    gps_navigation.auto_nav(pdistance, pdegree) # Waypoint Carlos
-                    #TODO funcion de Carlos para obtener waypoint
-                    gps_navigation.auto_nav(pdistance, pdegree) #Waypoint Carlos
+                    # Until there is a resutl
+                    res = 'not found pair of posts'
+                    while res == 'not found pair of posts':
+                        res = main_caller('autonomus_navigation')
+                        gps_navigation.navigation.search()
+
+                    gps_navigation.auto_nav(res[0], res[1]) # Waypoint Carlos
+
+                    res = 'not found pair of posts'
+                    while res == 'not found pair of posts':
+                        res = main_caller('autonomus_navigation')
+                        gps_navigation.navigation.search()
+
+                    gps_navigation.auto_nav(res[0], res[1]) # Waypoint Carlos
+
+                elif jmessage['action'] == '4':
+                    # Until there is a resutl
+                    xbee.set_action('4')
+                    res = 'not found pair of posts'
+                    while res == 'not found pair of posts' or res is None:
+                        res = main_caller('autonomus_navigation')
+                        gps_navigation.navigation.search()
+
+                    gps_navigation.auto_nav2(res[0], res[1]) # Waypoint Carlos
+                    
+                    res = 'not found pair of posts'
+                    while res == 'not found pair of posts' or res is None:
+                        res = main_caller('autonomus_navigation')
+                        gps_navigation.navigation.search()
+
+                    gps_navigation.auto_nav2(res[0], res[1]) # Waypoint Carlos
+
 
                 xbee_network = device.get_network()
                 remote_device = xbee_network.discover_device(REMOTE_NODE_ID) #Aqui debe enviarlo al servidor

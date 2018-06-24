@@ -17,7 +17,6 @@
 from .navigation import Navigation
 
 
-
 class GPSNavigation:
 	def __init__(self, imu):
 		self.imu = imu
@@ -28,4 +27,7 @@ class GPSNavigation:
 		self.navigation.navigate(destiny,lat,lon)
 
 	def auto_nav(self, pdistance, pdegree):
-		self.navigation.visnavigate(pdistance,pdegree)
+		self.navigation.visnavigate(pdistance, pdegree)
+
+	def auto_nav2(self, pdistance, pdegree):
+		self.navigation.visnavigate2(pdistance, pdegree)

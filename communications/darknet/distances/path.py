@@ -34,7 +34,7 @@ import matplotlib.pyplot as plt
 					  	http://vrguy.blogspot.com/2013/04/converting-diagonal-field-of-view-and.html
 
     WIDTH_DIM      --   Dimensions of video frame
-						480 x 640 
+						800 x 600
 
 	
 """
@@ -65,24 +65,25 @@ def receive(values):
 # param: rois -- list of lists with description values for each roi [id, xc,yc,w,h]
 # return -- distances, angles, dominant color for each roi.
 
-def get_rois_data(rois):
+def get_rois_data(rois, challenge = 'autonomus_navigation'):
 
 	#if is empty, return
 	if not rois:
 		return False
 	rowLength = len(rois)
 	#create output list of lists
-	colLength = 3 
+	colLength = 3
 	output = [[[0] for i in range(colLength)] for i in range(rowLength)]
 
 	#iterate through all of the rois row by row.
-	#args [id, xc,yc,w,h]
+	#args [id, xc,w,yc,h]
 	for i in range(len(rois)):
 
 	   #buoys  xc w yc h
 		if(rois[i][0]) == 1:
 		  #distances(meters)
 			width_b = int(rois[i][2]) 
+			#print(width_b)
 			#get inches to the object 
 			inches = distance2camera(KNOWN_WIDTH_B, FOCAL_LENGHT_B, width_b)
 			#convert inches to meters
@@ -112,15 +113,15 @@ def get_rois_data(rois):
 					x = -x
 			elif angle_b > 0:
 				x = abs(x)
-			#form tuple
+			#form tuple alex quizo absolutos
 			coords = (x,y,h)
 			#change back to degreees
 			angle_b = angle_b / 0.0174533
-
+			angle_b = -angle_b 
 			#setting the result
 			output[i][0] = coords
 			output[i][1] = angle_b
-			output[i][2] = 'dont care'
+			output[i][2] = 'dontcare'#getColor(rois[i][1],rois[i][3],rois[i][2],rois[i][4])  
 		#posts
 		else:
 		  #distances(meters)
@@ -159,16 +160,19 @@ def get_rois_data(rois):
 
 			#change back to degreees
 			angle_p = angle_p / 0.0174533
-
+			angle_p = -angle_p
+	
 			#setting the result
 			output[i][0] = coords
 			output[i][1] = angle_p
 			colorofpost = getColor(rois[i][1],rois[i][3],rois[i][2],rois[i][4])  
 			output[i][2] = colorofpost 
 	
-	print("____Datos____")
-	print(output)
+	#print("____Datos____")
+	#print(output)
 
+	if(challenge == 'autonomus_navigation'):
+		return autonomus_navigation(output)
 	return output
 
 
@@ -411,14 +415,48 @@ def getColor(xc,yc,w,h):
 	
 	filename = "filename.png"
 	original = cv2.imread(filename,1)
-	crop_img = original[upper:lower, left:right]
-	image = cv2.cvtColor(crop_img, cv2.COLOR_BGR2RGB)
-	image = image.reshape((image.shape[0] * image.shape[1], 3))
-	clt = KMeans(n_clusters = 1)
-	clt.fit(image)
-	result = clt.cluster_centers_
-	result = result[0]
-	if(result[0] > result[1]):
-		return 'r'
-	else:
-		return 'g'
+
+	if original is not None:
+		crop_img = original[upper:lower, left:right]
+		image = cv2.cvtColor(crop_img, cv2.COLOR_BGR2RGB)
+		if image is not None:
+			image = image.reshape((image.shape[0] * image.shape[1], 3))
+			clt = KMeans(n_clusters = 1)
+			clt.fit(image)
+			result = clt.cluster_centers_
+			result = result[0]
+			if(result[0] > result[1]):
+				return 'r'
+			else:
+				return 'g'
+	return 'no color'
+
+def autonomus_navigation(data):
+	posts_distances_y = []
+	posts_distances_x = []
+	posts_angles = []
+	if data is not None:
+		for rois in data:
+			if rois[2] == 'r' or rois[2]  == 'g':
+				dists = rois[0]
+				posts_distances_y.append(dists[1])
+				posts_distances_x.append(dists[0])
+				posts_angles.append(rois[1])
+
+		points = zip(posts_distances_y,posts_distances_x,posts_angles)
+		sorted_points = sorted(points)
+
+		new_ys = [point[0] for point in sorted_points]
+		new_xs = [point[1] for point in sorted_points]
+		new_angs = [point[2] for point in sorted_points]
+		print('SORTED LISTS OBJECTS Y, X , ANGLES...')
+		print(new_ys)
+		print(new_xs)
+		print(new_angs)
+		if len(new_ys) >=2:
+			middle = min(new_xs[0],new_xs[1]) + abs(new_xs[0] - new_xs[1])/2
+			angle_tomiddle = min(new_angs[0],new_angs[1]) + abs(new_angs[0] - new_angs[1])/2
+			return  (middle,angle_tomiddle)
+	return 'not found pair of posts'
+
+		

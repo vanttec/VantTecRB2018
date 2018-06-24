@@ -147,18 +147,14 @@ def detect(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45):
     free_detections(dets, num)
     return res
 
-net = ''
-meta = ''
+net = load_net(b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/yolo-vantec.cfg", b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/yolo-vantec.weights", 0)
+meta = load_meta(b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/obj.data")
 
 #def execute(data_calib, set_up, num,img):
-def execute(data_calib, set_up):
+def execute(data_calib):
     # For python3 added b before directions7
     # Path from where main script is 
-    if set_up:
-        global net
-        global meta
-        net = load_net(b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/yolo-vantec.cfg", b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/yolo-vantec.weights", 0)
-        meta = load_meta(b"/home/vantec/Documents/VantTecRB2018/communications/darknet/vantec_cfg/obj.data")
+
     #Funcion para tomar fotos y escanear imagen
     cap = VideoCapture(1)
     ret, raw_frame = cap.read()
@@ -174,55 +170,6 @@ def execute(data_calib, set_up):
     #Call CNN
     r = detect(net, meta, filename)
     
-    #Iterate detected objects
-
-    if r is not None:
-        for f in r:
-
-            #Unpack data
-            id = f[0]
-            v  = f[2] 
-            xc = int(v[0])
-            yc = int(v[1])
-            w =  int(v[2])
-            h =  int(v[3])
-            wh = int(v[2] / 2) 
-            hh = int(v[3] / 2)
-            x =  int(xc - wh)
-            y =  int(yc-  hh)
-
-            #Drawn rois
-            cv2.rectangle(drawing_frame, (x, y), (x + w, y + h), (0, 0, 255))
-            
-    
-        #Parse data 
-        if len(r):
-            data = parse_data(r)
-            print(data)
-            distances = get_rois_data(data) 
-
-            #Put text on image
-            for i,d in enumerate(distances) :
-                #Unpack data
-                dist = d[0]  
-                x = dist[0]
-                y = dist[1]
-                h = dist[2]
-                
-                f = r[i]
-                v  = f[2] 
-                xc = int(v[0])
-                yc = int(v[1])              
-
-                # #Put text distances and angles
-                cv2.putText(drawing_frame,str(round(x,2)), (xc,yc), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0, 0))
-                cv2.putText(drawing_frame,str(round(y,2)), (xc,yc+10), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0, 0))
-                cv2.putText(drawing_frame,str(round(h,2)), (xc,yc+20), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0, 0))
-                cv2.putText(drawing_frame,str(round(d[1],2)), (xc,yc+30), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0, 0))
-                cv2.putText(drawing_frame,str(d[2]), (xc,yc+40), cv2.FONT_HERSHEY_SIMPLEX, .3, (0, 0, 0))
-                imwrite("draw" + filename, drawing_frame)
-    cv2.imshow('detected', drawing_frame)
-    cv2.waitKey(20)
     return r
 
 def parse_data(data):
