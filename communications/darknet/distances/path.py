@@ -41,9 +41,9 @@ import matplotlib.pyplot as plt
 
 
 #BOUYS (INCHES)
-KNOWN_DISTANCE_B = 78.74   #unknown
-KNOWN_WIDTH_B =    9.0 #inches width of contest's bouys  pix = 64
-FOCAL_LENGHT_B =   559.9    #(PIX_WIDTH_B * KNOWN_DISTANCE_B) / KNOWN_WIDTH_B   109pix
+KNOWN_DISTANCE_B = 64.0   #unknown    173 cm  68.11024 inch
+KNOWN_WIDTH_B =    8.5 #inches width of contest's bouys  pix =102
+FOCAL_LENGHT_B =   768.0    #(PIX_WIDTH_B * KNOWN_DISTANCE_B) / KNOWN_WIDTH_B   109pix          return  KNOWN_WIDTH_B, FOCAL_LENGHT_B, width_b)   (C_WIDTH*C_FL)/PIX_WIDTH
 
 #POSTS(INCHES)
 KNOWN_DISTANCE_P = 74.8    #unknown  
@@ -51,8 +51,8 @@ KNOWN_WIDTH_P = 55.0    #unknown
 FOCAL_LENGHT_P = 627.29    #(PIX_WIDTH_P * KNOWN_DISTANCE_P) / KNOWN_WIDTH_P
 
 FOCAL_VIEW =  78.0
-WIDTH_DIM  =  640
-HEIGTH_DIM =  480
+WIDTH_DIM  =  800.0
+HEIGTH_DIM =  600.0
 
 ANGLE_PER_PIXEL = 78/math.sqrt(WIDTH_DIM**2 + HEIGTH_DIM**2) 
 #check for values'integrity. return 1 if length of params is the expected.
@@ -79,7 +79,7 @@ def get_rois_data(rois):
 	#args [id, xc,yc,w,h]
 	for i in range(len(rois)):
 
-	   #buoys
+	   #buoys  xc w yc h
 		if(rois[i][0]) == 1:
 		  #distances(meters)
 			width_b = int(rois[i][2]) 

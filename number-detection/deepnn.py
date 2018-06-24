@@ -126,7 +126,8 @@ def train(data_set):
     print('test accuracy %g' % accuracy.eval(feed_dict={x: data_set.test(), y_: data_set.test(), keep_prob: 1.0}))
 
 def main(argv):
-  data_set = TrainData('.')
+  print(argv[0])
+  data_set = TrainData(argv[0])
   train(data_set)
 
 
