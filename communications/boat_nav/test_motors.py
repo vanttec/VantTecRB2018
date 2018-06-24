@@ -15,6 +15,8 @@ def kill_me():
 def test_m():
     motors = Motors()
     motors.move_thrusters(1600,1600)
+    time.sleep(5)
+    motors.move_thrusters(1500, 1500)
 
 #kill_me()
 test_m()

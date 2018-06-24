@@ -31,6 +31,7 @@ class Navigation:
         self.motors = Motors()
 
     def navigate(self, destiny, lat, lon):
+        print('--------entra-------')
         lastOrientationDegree = 0
         turn_degrees_needed   = 0
         turn_degrees_accum    = 0
@@ -91,10 +92,10 @@ class Navigation:
             #ir derecho
             #recorrer 2 metros
             destiny = self.imu.get_degrees_and_distance_to_gps_coords(lat, lon)
-            #time.sleep(1)
+            time.sleep(0.5)
         self.motors.move(0,0)
 
-    def visnavigate(self, pdistance, pdegree, status):
+    def visnavigate(self, pdistance, pdegree):
         lastOrientationDegree = 0
         turn_degrees_needed   = 0
         turn_degrees_accum    = 0
@@ -105,7 +106,7 @@ class Navigation:
         #print("delta theta: ", self.imu.get_delta_theta)
 
         #Condition distance more than 4 meters. 
-        while distance > 5 and not self.stopNavigation and not status.exit_nav:
+        while distance > 5 and not self.stopNavigation:
             print("coords: ", self.imu.get_gps_coords())
             
             if lastOrientationDegree != orientationDegree:

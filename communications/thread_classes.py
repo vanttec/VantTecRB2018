@@ -46,4 +46,4 @@ class BoatXbThread(threading.Thread):
         self.data = data
 
     def run(self):
-        subscriber(self.boat_xb, Imu(), self.data)
+        subscriber(self.boat_xb, Imu())

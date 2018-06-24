@@ -143,10 +143,8 @@ def predict(img, model='saved_model'):
   return res[0] + 1
 
 def main(argv):
-  
   if argv[1] == 'train':
     print('Training set dir: {}'.format(argv[2]))
-
     data_set = TrainData(argv[2])
     
     if(len(argv) > 3):
