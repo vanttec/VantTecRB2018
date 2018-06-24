@@ -76,23 +76,23 @@ class Navigation:
             
             print("grados a voltear: ", turn_degrees_needed)
 
-            if math.fabs(turn_degrees_needed) < 15: 
-                print("Tengo un margen menor a 15 grados")
-                velocity = 30
+            if math.fabs(turn_degrees_needed) < 10: 
+                print("Tengo un margen menor a 10 grados")
+                velocity = 50
                 self.motors.move(velocity, velocity)
 
             else:
                 #girar
                 if turn_degrees_needed > 0:
-                    #print("Going to move left")
-                    self.motors.move(15, -15)
-                else: 
-                    #print("Going to move right")
-                    self.motors.move(-15, 15)
+                    print("Going to move left")
+                    self.motors.move(25, -25)
+                else:
+                    print("Going to move right")
+                    self.motors.move(-25, 25)
             #ir derecho
             #recorrer 2 metros
             destiny = self.imu.get_degrees_and_distance_to_gps_coords(lat, lon)
-            time.sleep(0.5)
+            #time.sleep()
         self.motors.move(0,0)
 
     def visnavigate(self, pdistance, pdegree):
@@ -148,10 +148,10 @@ class Navigation:
                 #girar
                 if turn_degrees_needed > 0:
                     #print("Going to move left")
-                    self.motors.move(15, -15)
+                    self.motors.move(30, -30)
                 else: 
                     #print("Going to move right")
-                    self.motors.move(-15, 15)
+                    self.motors.move(-30, 30)
             #ir derecho
             #recorrer 2 metros           
             #time.sleep(1)
@@ -223,10 +223,10 @@ class Navigation:
                 #girar
                 if turn_degrees_needed > 0:
                     #print("Going to move left")
-                    self.motors.move(15, -15)
+                    self.motors.move(30, -30)
                 else: 
                     #print("Going to move right")
-                    self.motors.move(-15, 15)
+                    self.motors.move(-30, 30)
             #ir derecho
             #recorrer 2 metros           
             #time.sleep(1)       
@@ -238,3 +238,18 @@ class Navigation:
     def search(self):
         print('Searching')
         self.motors.move(30,-30)
+
+    def visgpsnavigate(self, pdistance, pdegree):
+         while distance > 2:
+            waypoint = self.imu.get_pos_from_vision(pdistance, pdegree)
+            waypoint_x = waypoint['real_x']
+            waypoint_y = waypoint['real_y']
+            gate_gps = self.imu.get_obstacle_gps_coords(0, 0, waypoint_x, waypoint_y)
+            lat = gate_gps['latitude']
+            lon = gate_gps['longitud']
+            destiny = self.imu.get_degrees_and_distance_to_gps_coords(lat, lon)
+            self.navigate(destiny,lat,lon)
+            
+        self.motors.move(50,50)
+        time.sleep(5)
+        self.motors.move(0,0)

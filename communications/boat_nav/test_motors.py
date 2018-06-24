@@ -14,7 +14,7 @@ def kill_me():
 
 def test_m():
     motors = Motors()
-    motors.move_thrusters(1600,1600)
+    motors.move_thrusters(1530,1470)
     time.sleep(5)
     motors.move_thrusters(1500, 1500)
 

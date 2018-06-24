@@ -31,3 +31,6 @@ class GPSNavigation:
 
 	def auto_nav2(self, pdistance, pdegree):
 		self.navigation.visnavigate2(pdistance, pdegree)
+
+	def auto_nav3(self, pdistance, pdegree):
+		self.navigation.visgpsnavigate(pdistance, pdegree)
