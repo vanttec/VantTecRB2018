@@ -11,24 +11,25 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.SurfaceHolder
 import android.view.WindowManager
 import android.widget.Toast
-
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
-
 import dji.common.camera.SettingsDefinitions
 import dji.common.error.DJIError
 import dji.common.mission.waypoint.*
+import dji.sdk.camera.MediaFile
+import dji.sdk.camera.MediaManager
 import dji.sdk.camera.VideoFeeder
+import dji.sdk.codec.DJICodecManager
 import dji.sdk.mission.waypoint.WaypointMissionOperator
 import dji.sdk.mission.waypoint.WaypointMissionOperatorListener
 import dji.sdk.products.Aircraft
 import dji.sdk.sdkmanager.DJISDKManager
-
 import io.reactivex.Observable
-
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_mission_setup.*
 
 class MissionSetupActivity : AppCompatActivity() {
@@ -74,6 +75,7 @@ class MissionSetupActivity : AppCompatActivity() {
                 mapFragment.getMapAsync(missionMap)
 
                 missionMap.waypointObservable.subscribe {
+                    it.addAction(WaypointAction(WaypointActionType.START_TAKE_PHOTO,0))
                     missionBuilder.addWaypoint(it)
                 }
 
@@ -108,6 +110,16 @@ class MissionSetupActivity : AppCompatActivity() {
                             it.onNext(LiveFeedDecoder.LiveFeedData(data, length))
                         }
                     }.publish().autoConnect()
+
+                    val decoder = DJICodecManager(this@MissionSetupActivity,
+                            liveFeed.holder,
+                            liveFeed.width,
+                            liveFeed.height)
+
+                    videoFeedObservable.subscribe { (data, len) ->
+                        decoder.sendDataToDecoder(data, len)
+                    }
+
 
 
                     // val decoder = LiveFeedDecoder(this, videoFeedObservable)
@@ -209,7 +221,7 @@ class MissionSetupActivity : AppCompatActivity() {
                                       product: Aircraft,
                                       missionBuilder: WaypointMission.Builder) {
         val mSpeed = 3.0f
-        missionBuilder.finishedAction(WaypointMissionFinishedAction.GO_HOME)
+        missionBuilder.finishedAction(WaypointMissionFinishedAction.NO_ACTION)
                 .headingMode(WaypointMissionHeadingMode.AUTO)
                 .autoFlightSpeed(mSpeed)
                 .maxFlightSpeed(mSpeed)
@@ -219,19 +231,37 @@ class MissionSetupActivity : AppCompatActivity() {
             val error = waypointMissionOperator.loadMission(missionBuilder.build())
             if (error == null) {
                 setResultToToast("loadWaypoint succeeded")
-                uploadWayPointMission(waypointMissionOperator, product)
+                uploadWayPointMission(waypointMissionOperator, product, missionBuilder.waypointCount)
             } else {
                 setResultToToast("loadWaypoint failed " + error.description)
             }
         }
     }
 
-    private fun uploadWayPointMission(waypointMissionOperator: WaypointMissionOperator, product: Aircraft) {
+    private fun uploadWayPointMission(waypointMissionOperator: WaypointMissionOperator,
+                                      product: Aircraft,
+                                      count: Int) {
+
         waypointMissionOperator.uploadMission { error ->
             if (error == null) {
                 waypointMissionOperator.addListener(object : WaypointMissionOperatorListener {
                     override fun onExecutionFinish(p0: DJIError?) {
-                        //Blank
+                        switchCameraMode(product, SettingsDefinitions.CameraMode.MEDIA_DOWNLOAD)
+                        product.camera.mediaManager?.refreshFileListOfStorageLocation(SettingsDefinitions.StorageLocation.SDCARD) {
+                            if(it != null) {
+                                Log.e(TAG, it.description)
+                            } else {
+                                val files = product.camera.mediaManager?.internalStorageFileListSnapshot ?: emptyList()
+
+                                val latest = files.sortedBy{ it.timeCreated }
+                                        .takeLast(count)
+
+                                for ((i, file) in latest.withIndex()) {
+                                    file.
+                                }
+                            }
+                        }
+
                     }
 
                     override fun onExecutionStart() {
@@ -260,6 +290,13 @@ class MissionSetupActivity : AppCompatActivity() {
 
     private fun startWaypointMission(waypointMissionOperator: WaypointMissionOperator, product: Aircraft) {
         switchCameraMode(product, SettingsDefinitions.CameraMode.SHOOT_PHOTO)
+        val camera = product.cameras.first()
+
+        val logErr : (DJIError?) -> Unit = { if(it != null) Log.e(TAG, it.toString()) }
+
+        camera.setPhotoAspectRatio(SettingsDefinitions.PhotoAspectRatio.RATIO_16_9, logErr)
+        camera.setFocusMode(SettingsDefinitions.FocusMode.AUTO, logErr)
+        camera.setExposureMode(SettingsDefinitions.ExposureMode.PROGRAM, logErr)
 
         waypointMissionOperator.startMission { error ->
             val status = if (error == null) "Success" else error.description

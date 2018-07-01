@@ -126,13 +126,14 @@ def search_display(img, template):
     return None
 
 def main(argv):
-    img = cv2.imread(argv[1])
-    template = cv2.imread(argv[2])
+    # img = cv2.imread(argv[1])
+    display = cv2.imread(argv[1])
+    # template = cv2.imread(argv[2])
     
-    display = search_display(img, template)
+    # display = search_display(img, template)
     
     if display is not None:
-        number = search_number(template)
+        number = search_number(display)
         print(net.predict(number, 'last_one'))
 
 if __name__ == '__main__':

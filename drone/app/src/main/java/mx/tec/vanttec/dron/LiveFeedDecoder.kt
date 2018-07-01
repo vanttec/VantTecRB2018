@@ -2,7 +2,6 @@ package mx.tec.vanttec.dron
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Paint
 import android.media.MediaCodec
 import android.media.MediaCodecList
 import android.media.MediaFormat
@@ -13,12 +12,8 @@ import android.renderscript.ScriptIntrinsicYuvToRGB
 import android.renderscript.Type
 import android.util.Log
 import android.view.Surface
-import android.view.SurfaceHolder
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
-import org.opencv.android.Utils
-import org.opencv.core.Mat
-import org.opencv.utils.Converters
 
 class LiveFeedDecoder(context: Context, private val liveFeedObservable: Observable<LiveFeedData>) :
         Runnable {

@@ -1,6 +1,8 @@
 package mx.tec.vanttec.dron
 
 import android.app.FragmentManager
+import android.graphics.Color
+import com.google.android.gms.location.Geofence
 import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -22,8 +24,9 @@ class MissionMap(private val fragmentManager: FragmentManager) : GoogleMap.OnMap
     private var droneMarker: Marker? = null
     private lateinit var waypointListener: WayPointDialog.WayPointConfigListener
     private var waypoints = HashMap<LatLng, Waypoint>()
-    private val geofenceOpts = PolygonOptions()
+    private var geofenceOpts = PolygonOptions()
     private var geofence : Polygon? = null
+    private var enableGeofence = false
 
     var addPinMode = AddPinMode.DISABLED
 
@@ -67,6 +70,10 @@ class MissionMap(private val fragmentManager: FragmentManager) : GoogleMap.OnMap
     fun clearWaypointMarkers() {
         for(marker in mMarkers)
             marker.remove()
+
+        geofenceOpts = PolygonOptions()
+        geofence?.remove()
+        enableGeofence = false
 
         mMarkers.clear()
     }
@@ -148,8 +155,17 @@ class MissionMap(private val fragmentManager: FragmentManager) : GoogleMap.OnMap
         val geofencePoints = geofence?.points
 
         if(geofencePoints != null) {
-            if(geofencePoints.size > 2 && !PolyUtil.containsLocation(position, geofencePoints, false)) {
-                exitCallback()
+            if(enableGeofence) {
+                if(geofencePoints.size > 2 && !PolyUtil.containsLocation(position, geofencePoints, false)) {
+                    enableGeofence = false
+                    geofence?.strokeColor = Color.RED
+                    exitCallback()
+                }
+            } else {
+                if(geofencePoints.size > 2 && PolyUtil.containsLocation(position, geofencePoints, false)) {
+                    enableGeofence = true
+                    geofence?.strokeColor = Color.GREEN
+                }
             }
         }
     }
@@ -164,6 +180,7 @@ class MissionMap(private val fragmentManager: FragmentManager) : GoogleMap.OnMap
         if(geofenceOpts.points.size > 3) {
             geofence?.remove()
             geofence = gMap?.addPolygon(geofenceOpts)
+            geofence?.strokeColor = Color.RED
         }
     }
 

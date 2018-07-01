@@ -132,7 +132,7 @@ def train(data_set, save_location='saved_model'):
     print('test accuracy %g' % accuracy.eval(feed_dict={x: test[0], y_: test[1], keep_prob: 1.0}))
 
 def predict(img, model='saved_model'):
-  img = cv2.imread(img, 0)
+  #img = cv2.imread(img, 0)
  
   print(img.shape)
 
@@ -140,7 +140,7 @@ def predict(img, model='saved_model'):
  
   res = predictor({ 'img': [img.flatten()], 'dropout': 1 })
 
-  return res[0] + 1
+  return res['prediction'][0] + 1
 
 def main(argv):
   if argv[1] == 'train':
